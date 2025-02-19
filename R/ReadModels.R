@@ -8,14 +8,20 @@
 rm(list = ls())
 
 library(here)
-allModels <- list.files(here("data"))
-allModels <- allModels[grep(".rda", allModels)]
+allModels <-  list.files(here("data"))[grep("Model", list.files(here("data"))) ]
 
 for (f in allModels) {
   path <- paste0("data/", f)
 load(here(path))
 }
 
-cat(Model_AgeS$AgesMultiCS2_EXPZO$cauchy)
+## Age Estimation
+cat(Model_AgeS$AgesMultiCS2_EXPZO$gaussian)
 
 cat(Model_Palaeodose$PalaeodosesMultiBF_EXPLIN$cauchy)
+
+## BayLum Prior with Jeffreys priors ?
+cat(ModelPrior$OSL)
+
+
+
