@@ -35,7 +35,12 @@ Compute_AgeS_D <- function(
     adapt = 1000,
     t = 5,
     n.chains = 3,
-    prior = "Jeffreys"
+    prior = "Jeffreys",
+    jags_method = "rjags",
+    autorun = F,
+    quit = F,
+    roundingOfValue = 3,
+    ...
 ) {
 
   ## StratigraphicConstraints
@@ -70,5 +75,7 @@ Compute_AgeS_D <- function(
   if (is.null(model)) {
     model <- Model_Prior[[prior]]
   }
+
+
 
 }
