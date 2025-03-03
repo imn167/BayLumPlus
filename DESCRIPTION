@@ -48,6 +48,7 @@ Imports:
     hexbin (>= 1.28.3),
     KernSmooth (>= 2.23),
     Luminescence (>= 0.9.24),
+    magrittr,
     methods,
     rjags (>= 4-15),
     runjags (>= 2.2.2),

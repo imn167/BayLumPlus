@@ -1,7 +1,6 @@
-## writing the model in Jags
-library(here)
+
 ### Model with Jeffreys prior
-AgePrior <- list()
+ModelAgePrior <- list()
 
 Jeffreys <- " model {
   ###### Likelyhood ####
@@ -37,5 +36,5 @@ Jeffreys <- " model {
 ## saving the model to data in rda form
 
 
-AgePrior$Jeffreys <- Jeffreys ## see how to save the Model in the data of the package ?
-
+ModelAgePrior$Jeffreys <- Jeffreys ## see how to save the Model in the data of the package ?
+usethis::use_data(ModelAgePrior, overwrite = T)

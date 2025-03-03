@@ -46,7 +46,7 @@ inst/doc
 docs
 
 ## Rproject
-BayLum.Rproj
+*.Rproj
 
 .DS_Store
 

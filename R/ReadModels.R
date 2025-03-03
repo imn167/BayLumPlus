@@ -4,15 +4,11 @@
 # Date : february 18 2025
 ####################################################@#
 
-##cleaning
-rm(list = ls())
-
-library(here)
-library(tidyverse)
-
+#' @export
 extract_Jags_model <- function() {
     #getting names and purpose of the Models
-  AllData <- as.data.frame(data(package = "BayLum")$results[, c("Item", "Title")]) %>% filter(substr(Item, 1, 5) == "Model")
+  AllData <- as.data.frame(data(package = "BayLum")$results[, c("Item", "Title")]) %>%
+    dplyr::filter(substr(Item, 1, 5) == "Model")
 
   ## interactive consol
 
