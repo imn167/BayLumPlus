@@ -52,3 +52,4 @@
 
 # -- Package 'BayLum' stuff -- 
 ^BayLum\..*$
+^^DataManipulation$$

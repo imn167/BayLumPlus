@@ -22,14 +22,12 @@ create_MeasuresDataFrame <- function(
 
   return(list(Theta = Theta, Measures = Measures))
 }
-
+sepSC <- NULL
 #'@describeIn destination description
 #'@export
 
 Compute_AgeS_D <- function(
-    DATA, SamplesNames = DATA$SamplesNames,
-    Nb_Samples = DATA$Nb_Samples,
-    THETA = c(),
+    DATAMeasures,
     StratiConstraints = c(),
     model = NULL,
     Iter = 10000,
@@ -40,7 +38,7 @@ Compute_AgeS_D <- function(
     prior = "Jeffreys",
     jags_method = "rjags",
     autorun = F,
-    quit = F,
+    quiet = F,
     roundingOfValue = 3,
     SavePdf = FALSE,
     OutputFileName = c('MCMCplot', "summary"),
@@ -51,13 +49,16 @@ Compute_AgeS_D <- function(
     ...
 ) {
 
+  Measures = DATAMeasures$Measures
+  PriorAge = rep(c(0.01, 100), Measures$Nb_sample)
+
   ## StratigraphicConstraints
   ##no Strati
   if (length(StratiConstraints) == 0) {
     StratiConstraints <- matrix(
-      data = c(rep(1, Nb_sample), rep(0, Nb_sample * Nb_sample)),
-      ncol = Nb_sample,
-      nrow = (Nb_sample + 1),
+      data = c(rep(1, Measures$Nb_sample), rep(0, Measures$Nb_sample * Measures$Nb_sample)),
+      ncol = Measures$Nb_sample,
+      nrow = (Measures$Nb_sample + 1),
       byrow = T
     )
   }
@@ -71,17 +72,18 @@ Compute_AgeS_D <- function(
 
   ### JagsRun
   ## liste of data
-  DataList = list(
-    "I" = Measures$Nb_Sample,
-    "Theta" = Theta,
+  dataList = list(
+    "I" = Measures$Nb_sample,
+    "Theta" = DATAMeasures$Theta,
     "ddot" = Measures$ddot,
     "StratiConstraints" = StratiConstraints,
-    "xbound" = PriorAges
+    "xbound" = PriorAge,
+    "D" = Measures$D
   )
 
   ## select Model
   if (is.null(model)) {
-    model <- AgePrior[[prior]]
+    model <- ModelAgePrior[[prior]]
   }
 
 
@@ -90,20 +92,25 @@ Compute_AgeS_D <- function(
     #write model in tempfile
     temp_file <- tempfile(fileext = ".txt")
     writeLines(model, con = temp_file)
-
+  inits = list(
+    list(u = runif(Measures$Nb_sample)), #chain 1
+    list(u = runif(Measures$Nb_sample)), # chain 2
+    list(u = runif(Measures$Nb_sample)) #chain 3
+  )
     #run JAGS
     results_runjags <-
       runjags::run.JAGS(
         model = temp_file,
         data = dataList,
         n.chains = n.chains,
-        monitor = c("A", "Sigma"),
+        monitor = c("A"),
         adapt = adapt,
         burnin = burnin,
         sample = Iter,
         silent.jags = quiet,
         method = jags_method,
-        thin = t
+        thin = t,
+        inits = inits
       )
 
   }
@@ -147,9 +154,9 @@ Compute_AgeS_D <- function(
   # storing the arguments used for the BayLum-run this way,
   # because it allows us an easy way to code the storage of arguments when extending a JAGS-model.
   results_runjags$args <- list(
-    "PriorAge" = Model_Prior,
+    "PriorAge" = PriorAge,
     "StratiConstraints" = StratiConstraints,
-    "CovarianceMatrix" = Theta,
+    "CovarianceMatrix" = DATAMeasures$Theta,
     "model" = model
   )
 
@@ -168,7 +175,7 @@ Compute_AgeS_D <- function(
   sample <- as.data.frame(runjags::combine.mcmc(echantillon))
 
   ##try makes sure that the function runs
-  try(plot_MCMC(echantillon, sample_names = SampleNames))
+  try(plot_MCMC(echantillon, sample_names = Measures$SampleNames))
 
   if (SavePdf) {
     dev.off()
@@ -179,13 +186,13 @@ Compute_AgeS_D <- function(
   cat(paste(
     "\n\n>> Results of the Gelman and Rubin criterion of convergence <<\n"
   ))
-  for (i in 1:Nb_sample) {
+  for (i in 1:Measures$Nb_sample) {
     cat("----------------------------------------------\n")
-    cat(paste(" Sample name: ", SampleNames[i], "\n"))
+    cat(paste(" Sample name: ", Measures$SampleNames[i], "\n"))
     cat("---------------------\n")
     cat(paste("\t\t", "Point estimate", "Uppers confidence interval\n"))
     cat(paste(
-      paste("A_", SampleNames[i], sep = ""),
+      paste("A_", Measures$SampleNames[i], sep = ""),
       "\t",
       round(CV$psrf[i, 1], roundingOfValue),
       "\t\t",
@@ -207,12 +214,12 @@ Compute_AgeS_D <- function(
 
   #---print results ####
   ##Matrix of results
-  rnames <- paste0("A_", SamplesNames)
+  rnames <- paste0("A_", Measures$SampleNames)
 
   R <- matrix(
     data = NA,
     ncol = 8,
-    nrow = Nb_Samples,
+    nrow = Measures$Nb_sample,
     dimnames = list(rnames,
                   c(
                       "lower bound at 95%",
@@ -233,15 +240,18 @@ Compute_AgeS_D <- function(
     "\n\n>> Bayes estimates of Age, Palaeodose and its dispersion for each sample and credible interval <<\n"
   )
 
-  credible95 <- apply(sample, 2, CredibleInterval, level = .95)[, 2:3]
-  credible68 <- apply(sampe, 2, CredibleInterval, level = .68)[, 2:3]
+  credible95 <-  apply(sample, 2, CredibleInterval, level = .95)[ 2:3, ]
+  credible68 <- apply(sample, 2, CredibleInterval, level = .68)[2:3, ]
   estimate <- apply(sample, 2, mean)
+
   R[, c(1,5)] <- round(credible95, roundingOfValue)
   R[, c(2,4)] <- round(credible68, roundingOfValue)
   R[, 3] <-   round(estimate, roundingOfValue)
 
-  cat("\n----------------------------------------------\n")
   R[, c(7, 8)] <- round(CV$psrf, roundingOfValue)
+
+  print(dplyr::tibble(R) )
+  cat("\n----------------------------------------------\n")
 
 
   #---print csv table ####
@@ -272,12 +282,12 @@ Compute_AgeS_D <- function(
 
   output <- .list_BayLum(
     "Ages" = data.frame(
-      SAMPLE = SampleNames,
-      AGE = AgePlotMoy,
-      HPD68.MIN = credible68[, 2],
-      HPD68.MAX = credible68[, 3],
-      HPD95.MIN = credible95[, 2],
-      HPD95.MAX = credible95[, 3],
+      SAMPLE = Measures$SampleNames,
+      AGE = estimate,
+      HPD68.MIN = credible68[ 1,],
+      HPD68.MAX = credible68[2, ],
+      HPD95.MIN = credible95[1, ],
+      HPD95.MAX = credible95[2, ],
       stringsAsFactors = FALSE
     ),
     "Sampling" = echantillon,
@@ -287,6 +297,10 @@ Compute_AgeS_D <- function(
     "model" = results_runjags$model,
     "runjags_object" = results_runjags
   )
+
+  cat("\n ===================================\n")
+  print(list(SummaryRunJAGS = summary(results_runjags)))
+  cat("\n==============================\n")
 
   #---Plot ages ####
   BayLum::plot_Ages(object = output, legend.pos = "bottomleft")

@@ -1,3 +1,21 @@
+#' @title JAGS Models for OSL Age Estimation in [Compute_AgeS_D()]
+#'
+#' @description
+#' JAGS models used to estimate true OSL ages based on data obtained from the Bayesian OSL analysis performed
+#' by the function [Paleodose_Computation()].
+#'
+#' @details
+#' These models take as input the estimated dose response ($D$) from [Paleodose_Computation()]
+#' along with the structured data matrix computed by [create_MeasuresDataFrame()].
+#' The models are designed to refine age estimation by integrating these measurements into a Bayesian framework.
+#'@md
+#' @references
+#' To cite this package, please use: citation("BayLum")
+#'
+
+
+
+
 
 ### Model with Jeffreys prior
 ModelAgePrior <- list()
@@ -8,10 +26,10 @@ Jeffreys <- " model {
     for (j in 1:I) {
       Sigma[i, j] = A[i]* A[j] * Theta[i,j]
     }
-    mu[i] <— A[i] * ddot[i]
+    mu[i] = A[i] * ddot[i]
   }
-  invSigma <- inverse(Sigma) #DP and symmetric ?
-  D ~ dnorm(mu, invSigma)
+  invSigma = inverse(Sigma) #DP and symmetric ?
+  D ~ dmnorm(mu, invSigma)
 
   ###### Prior #####
   ## borne inf de la strati, soit la + proche de 0
@@ -21,13 +39,13 @@ Jeffreys <- " model {
   CS[1]=xbound[1]
   # alpha1 et beta1 : borne pour l'age 1
   # la loi de Atem2 est proportionnel à celle de jeffrey sur l'intervalle (alpha1, beta1)
-  Atemp[2]<-exp( u[1]*log(xbound[2]/CS[1]) +log(CS[1]) )
+  Atemp[2]=exp( u[1]*log(xbound[2]/CS[1]) +log(CS[1]) )
   # i0>2
   for(i0 in 3:(I+1)){
     u[i0-1]~dunif(0,1)
     #On choisit le marjorant des bornes inf soit entre alpha_(i-1) et A1 ..... A(i-1)
     CS[i0-1]=max( StratiConstraints[(1:(i0-1)),(i0-1)] *c( xbound[(2*(i0-1)-1)],Atemp[2:(i0-1)]) )
-    Atemp[i0]<-exp(u[(i0-1)]*log(xbound[2*(i0-1)]/CS[i0-1])+log(CS[i0-1]))
+    Atemp[i0]=exp(u[(i0-1)]*log(xbound[2*(i0-1)]/CS[i0-1])+log(CS[i0-1]))
   }
   A=Atemp[2:(I+1)] #A1, A2, ...., An
 
@@ -36,5 +54,5 @@ Jeffreys <- " model {
 ## saving the model to data in rda form
 
 
-ModelAgePrior$Jeffreys <- Jeffreys ## see how to save the Model in the data of the package ?
-usethis::use_data(ModelAgePrior, overwrite = T)
+# ModelAgePrior$Jeffreys <- Jeffreys ## see how to save the Model in the data of the package ?
+# usethis::use_data(ModelAgePrior, overwrite = T)
