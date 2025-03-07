@@ -14,9 +14,6 @@
 #'
 
 
-
-
-
 ### Model with Jeffreys prior
 ModelAgePrior <- list()
 

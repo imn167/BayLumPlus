@@ -61,7 +61,7 @@ Imports:
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.2.1)
+    testthat (>= 3.0.0)
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
@@ -71,3 +71,4 @@ NeedsCompilation: no
 RoxygenNote: 7.3.2
 SystemRequirements: JAGS >= 4.3.2 (https://mcmc-jags.sourceforge.io/)
 Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3

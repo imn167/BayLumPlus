@@ -2,7 +2,7 @@
 % Please edit documentation in R/Separation.R
 \name{create_MeasuresDataFrame}
 \alias{create_MeasuresDataFrame}
-\title{Bayesian Models for Age estimation based on OSL measures}
+\title{Create Input for Age Computation}
 \usage{
 create_MeasuresDataFrame(
   PalaeodoseObject,
@@ -11,7 +11,36 @@ create_MeasuresDataFrame(
   contamination_degree
 )
 }
+\arguments{
+\item{symetric_error}{The $\alpha$ parameter in Combes & Philippe (2017)}
+
+\item{contamination_degree}{The common error $\sigma_c$ in Combes & Philippe (2017)}
+
+\item{Data}{A structured dataset following the format required for OSL sample analysis.}
+
+\item{P}{A Palaeodose_computation object}
+}
+\value{
+A list containing:
+\itemize{
+\item \strong{Sigma}: The covariance matrix computed as:
+\deqn{\Theta = A \Sigma A + \text{diag}(sD)}
+\item \strong{Info}: A list with details including:
+\itemize{
+\item Number of samples (\code{Nb_sample})
+\item Sample names (\code{NamesOfSamples})
+\item Dose rate values (\code{ddot})
+\item Dose rate uncertainties (\code{sddot})
+\item Estimated palaeodose values (\code{D})
+\item Estimated palaeodose uncertainties (\code{sD})
+}
+}
+}
 \description{
-This function compute the age (in ka) of at least two samples. \cr
-The function is based on the output of the \link{Palaeodose_Computation} and \link{create_measuresDataFrame}
+This function prepares the necessary data frame entries for the function \link{Computation_AgeS_D}.
+It takes structured input data (as defined in \code{\link[=Generate_DataFile]{Generate_DataFile()}} and \code{\link[=Generate_DataFile_MG]{Generate_DataFile_MG()}})
+and computes relevant parameters for age estimation.
+}
+\seealso{
+\link{Computation_AgeS_D}, \link{Palaeodose_Computation}, \link{Generate_DataFile}, \link{Generate_DataFile_MG}
 }

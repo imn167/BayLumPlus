@@ -1,9 +1,31 @@
-#' @title Bayesian Models for Age estimation based on OSL measures
+#' @title Create Input for Age Computation
 #'
 #' @description
-#'  This function compute the age (in ka) of at least two samples. \cr
-#'  The function is based on the output of the [Palaeodose_Computation] and [create_measuresDataFrame]
-#'@export
+#' This function prepares the necessary data frame entries for the function [Computation_AgeS_D].
+#' It takes structured input data (as defined in [Generate_DataFile()] and [Generate_DataFile_MG()])
+#' and computes relevant parameters for age estimation.
+#'
+#' @param Data A structured dataset following the format required for OSL sample analysis.
+#' @param P A Palaeodose_computation object
+#' @param symetric_error The $\alpha$ parameter in Combes & Philippe (2017)
+#'@param contamination_degree The common error $\sigma_c$ in Combes & Philippe (2017)
+#' @return A list containing:
+#' \itemize{
+#'   \item \strong{Sigma}: The covariance matrix computed as:
+#'   \deqn{\Theta = A \Sigma A + \text{diag}(sD)}
+#'   \item \strong{Info}: A list with details including:
+#'   \itemize{
+#'     \item Number of samples (`Nb_sample`)
+#'     \item Sample names (`NamesOfSamples`)
+#'     \item Dose rate values (`ddot`)
+#'     \item Dose rate uncertainties (`sddot`)
+#'     \item Estimated palaeodose values (`D`)
+#'     \item Estimated palaeodose uncertainties (`sD`)
+#'   }
+#' }
+#'
+#' @seealso [Computation_AgeS_D], [Palaeodose_Computation], [Generate_DataFile], [Generate_DataFile_MG]
+#' @export
 create_MeasuresDataFrame <- function(
     PalaeodoseObject,
     DATA,
@@ -23,8 +45,22 @@ create_MeasuresDataFrame <- function(
   return(list(Theta = Theta, Measures = Measures))
 }
 sepSC <- NULL
-#'@describeIn destination description
-#'@export
+#' @title Bayesian Models for Age Estimation with Priors from ModelAgePrior Dataset
+#'
+#' @description
+#' This function computes the second part of Combes & Philippe (2017), specifically the age estimation
+#' using a Bayesian model. Its behavior is similar to other functions like [AgeS_Computation()],
+#' with the primary difference being the first parameter.
+#'
+#' @param DATAMeasures **(required)** [list]
+#' The output of the function [create_MeasuresDataFrame()], containing the necessary input data for computation.
+#'
+#' @return See the documentation for [AgeS_Computation()] for details on the returned output.
+#'
+#' @seealso [AgeS_Computation()], [create_MeasuresDataFrame()]
+#' @md
+#' @export
+
 
 Compute_AgeS_D <- function(
     DATAMeasures,
