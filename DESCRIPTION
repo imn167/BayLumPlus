@@ -6,7 +6,7 @@ Version: 0.3.3.9000-13
 Date: 2024-07-12
 Authors@R: c(
     person("Claire", "Christophe", role = "aut"),
-    person("Anne", "Philippe", , "anne.philippe@univ-nantes.fr", role = c("aut", "cre"),
+    person("Anne", "Philippe", email = "anne.philippe@univ-nantes.fr", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5331-5087")),
     person("Sebastian", "Kreutzer", role = "aut",
            comment = c(ORCID = "0000-0002-0734-2199")),
@@ -16,9 +16,12 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-4374-5948")),
     person("Nicolas", "Frerebeau", role = "aut",
            comment = c(ORCID = "0000-0001-5759-4944")),
-    person("Université Bordeaux Montaigne", role = c("cph", "fnd")),
-    person("CNRS", role = "fnd"),
-    person("LabEx Sciences archéologiques de Bordeaux", role = "fnd")
+    person("Imene", "Bouafia", role = "aut"), 
+    person("Université Bordeaux Montaigne", role = c("cph", "fnd"), 
+    comment = "Institutional contributor"),
+    person("CNRS", role = "fnd", comment = "Institutional contributor"),
+    person("LabEx Sciences archéologiques de Bordeaux", role = "fnd", 
+    comment = "Institutional contributor")
   )
 Author: Claire Christophe [aut], Anne Philippe [aut, cre]
     (<https://orcid.org/0000-0002-5331-5087>), Sebastian Kreutzer [aut]
@@ -45,17 +48,20 @@ Depends:
     utils
 Imports: 
     cli (>= 3.6.1),
+    dplyr,
+    usethis,
     hexbin (>= 1.28.3),
     KernSmooth (>= 2.23),
     Luminescence (>= 0.9.24),
+    magrittr,
     methods,
     rjags (>= 4-15),
-    runjags (>= 2.2.2),
+    runjags (>= 2.2.2.4),
     yaml (>= 2.3.9)
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.2.1)
+    testthat (>= 3.0.0)
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
@@ -64,3 +70,5 @@ LazyData: true
 NeedsCompilation: no
 RoxygenNote: 7.3.2
 SystemRequirements: JAGS >= 4.3.2 (https://mcmc-jags.sourceforge.io/)
+Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3
