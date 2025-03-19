@@ -53,3 +53,34 @@ Jeffreys <- " model {
 
 # ModelAgePrior$Jeffreys <- Jeffreys ## see how to save the Model in the data of the package ?
 # usethis::use_data(ModelAgePrior, overwrite = T)
+
+
+
+StrictOrder <- " model {
+  ###### Likelyhood ####
+  for (i in 1:I) {
+    for (j in 1:I) {
+      Sigma[i, j] = A[i]* A[j] * Theta[i,j]
+    }
+    mu[i] = A[i] * ddot[i]
+  }
+  invSigma = inverse(Sigma) #DP and symmetric ?
+  D ~ dmnorm(mu, invSigma)
+
+  #bounds
+  alpha = xbound[1]
+  beta = xbound[(2*I)]
+###### Prior #####
+  for (i in 1: (I+1)) {
+  e[i] ~ dexp(1)
+  }
+
+  for (i in 1:I) {
+  u[i] = sum(e[1:i]) / sum(e[1:(I+1)])
+  A[i] = exp(u[i] * (log(beta) - log(alpha)) + log(alpha))
+  }
+
+}"
+
+
+

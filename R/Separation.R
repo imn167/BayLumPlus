@@ -36,7 +36,7 @@ create_MeasuresDataFrame <- function(
   Obs <- apply(MCMCSamples, 2, median)
   #creating the dataframe for AgeEstimation
   Measures <- list(SampleNames = DATA$SampleNames, Nb_sample = DATA$Nb_sample,
-                         ddot = DATA$ddot[, 1], sddot = DATA$ddot[, 2],
+                         ddot = DATA$ddot_env[1, ], sddot = DATA$ddot_env[2, ],
                          D = Obs[1:DATA$Nb_sample],
                          sD = Obs[(DATA$Nb_sample+1): (2*DATA$Nb_sample)])
   Theta = diag(Measures$sddot) + (contamination_degree %*% t(contamination_degree)) * symetric_error +

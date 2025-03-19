@@ -12,4 +12,7 @@ P <- Palaeodose_Computation(DATA4, DATA4$SampleNames, DATA4$Nb_sample)
 
 DATA4$ddot_env
 DtMeasures <- create_MeasuresDataFrame(P, DATA4,alpha[1], sdc[1:3])
-DATA4$ddot_env
+DtMeasures$Measures$D
+Sc = matrix(c(rep(1, 3), rep(0,3), c(1,0,1), c(1,0,0)), nrow = 4, byrow = T)
+
+AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior)
