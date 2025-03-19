@@ -20,3 +20,5 @@ AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys)
 AgeCorrected <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder")
 AgeAsBayLum$Ages
 AgeCorrected$Ages
+
+

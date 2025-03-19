@@ -38,7 +38,8 @@ create_MeasuresDataFrame <- function(
   Measures <- list(SampleNames = DATA$SampleNames, Nb_sample = DATA$Nb_sample,
                          ddot = DATA$ddot_env[1, ], sddot = DATA$ddot_env[2, ],
                          D = Obs[1:DATA$Nb_sample],
-                         sD = Obs[(DATA$Nb_sample+1): (2*DATA$Nb_sample)])
+                         sD = Obs[(DATA$Nb_sample+1): (2*DATA$Nb_sample)],
+                   sddot_shared = contamination_degree, symetric_error = symetric_error)
   Theta = diag(Measures$sddot) + (contamination_degree %*% t(contamination_degree)) * symetric_error +
     diag(Measures$sD)
 
