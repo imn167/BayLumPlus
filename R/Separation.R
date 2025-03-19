@@ -117,22 +117,37 @@ Compute_AgeS_D <- function(
     "D" = Measures$D
   )
 
+  ModelAgePrior <- 0
+  data(ModelAgePrior, envir = environment())
+
   ## select Model
   if (is.null(model)) {
     model <- ModelAgePrior[[prior]]
   }
-
 
   ## first way to run jags model : manual
   if (!(autorun)) {
     #write model in tempfile
     temp_file <- tempfile(fileext = ".txt")
     writeLines(model, con = temp_file)
+    if ( prior == "Jeffreys") {
+
   inits = list(
     list(u = runif(Measures$Nb_sample)), #chain 1
     list(u = runif(Measures$Nb_sample)), # chain 2
     list(u = runif(Measures$Nb_sample)) #chain 3
   )
+    }
+
+  else if ( prior == "StrictOrder") {
+    temp_file <- tempfile(fileext = ".txt")
+    writeLines(model, con = temp_file)
+    inits = list(
+     list( e = rexp(Measures$Nb_sample + 1)), #chain 1
+     list( e = rexp(Measures$Nb_sample+ 1)), #chain 2
+      list(e = rexp(Measures$Nb_sample+ 1)) #chain 3
+    )
+  }
     #run JAGS
     results_runjags <-
       runjags::run.JAGS(
