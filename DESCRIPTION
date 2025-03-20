@@ -57,7 +57,9 @@ Imports:
     methods,
     rjags (>= 4-15),
     runjags (>= 2.2.2.4),
-    yaml (>= 2.3.9)
+    yaml (>= 2.3.9),
+    truncnorm,
+    igraph (>= 2.1.2)
 Suggests: 
     knitr,
     rmarkdown,
