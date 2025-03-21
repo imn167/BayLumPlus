@@ -21,35 +21,36 @@ findbound <- function(index,  Sc) {
 GibbsDensity <- function(DataMeasures, A, Ai, index, a, b) {
     ## Using the function create_MeasuresDataFrame
   Measures <- DataMeasures$Measures
-  D = Measures$D
+  D = as.numeric(Measures$D)
   Di = D[index]
-  sD = Measures$sD
+  sD = as.numeric(Measures$sD)
   sDi = sD[index]
-  ddot = Measures$ddot
+  ddot = as.numeric(Measures$ddot)
   ddoti = ddot[index]
-  sddot = Measures$sddot
+  sddot = as.numeric(Measures$sddot)
   sddoti = sddot[index]
-  sdc = Measures$sddot_shared
+  sdc = as.numeric(Measures$sddot_shared)
   sdci = sdc[index]
-  alpha = Measures$symmetric_error
-  alphai = alpha[index]
+  alpha = as.numeric(Measures$symmetric_error)
+
 
   ## getting the modidied
   A[index] = Ai
 
   detCov <- function(A) {
-    1 + sum((A*ddot * alpha)**2 / ((A*sddot)**2 + sD**2))
+    1 + sum( (A*alpha*sdc)**2 / ((A*sddot)**2 + sD**2) )
   }
 
 
-  invdiagvar =as.numeric( ((Ai*sddoti)**2 + sDi**2)**(-1))
-  centeri = as.numeric((Di-Ai*ddoti)**2)
+  invdiagvar = ( (Ai*sddoti)**2 + sDi**2 )**(-1)
+  centeri = (Di -Ai*ddoti)
 
-  firstExp = exp( (-.5) * centeri *invdiagvar  )
-  secondExp = exp(  as.numeric(-.5* detCov(A)**(-1) * sum( (Ai*(centeri) * invdiagvar * (D-A*ddot)**2 / ((A*sddot)**2 + sD**2) ))))
+  firstExp = exp( (-1/2) * centeri**2 *invdiagvar )
+  sumexp = sum( Ai*centeri * invdiagvar* alpha *( (A* (D-A*ddot) * sdc**2)  / ((A*sddot)**2 + sD**2) ) )
+  secondExp = exp( (1/2) * detCov(A)**(-1) * sumexp )
 
-  #
-  return( detCov(A)**(-.5)* invdiagvar * firstExp * secondExp *(Ai > a) * (Ai < b) / Ai )
+  # detCov(A)*invdiagvar *(-.5)  * firstExp * secondExp * (Ai<= b)* (Ai>=a)
+  return( detCov(A)**(-1/2) * invdiagvar *firstExp * secondExp * (Ai<= b)* (Ai>=a) )
 }
 
 
@@ -140,7 +141,7 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
 
   for (iter in 1:nchain) {
     for (i in 1:n_ages) {
-      bounds_i = c(LowerPeriod, chain[iter, ], UpperPeriod)[IndexBounds[, (i+1)]] # (a(iter), b(iter))
+      bounds_i = c(LowerPeriod, A[iter, ], UpperPeriod)[IndexBounds[, i]] # (a(iter), b(iter))
 
       #proposal depends on the transformation
       if (Transformation == "arctan") {
@@ -155,7 +156,7 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
 
       u = log(runif(1))
 
-      print(top)
+
 
       if (u < log_ratio) {
         chain[iter+1, i] = proposal

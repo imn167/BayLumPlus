@@ -20,9 +20,9 @@ AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys)
 AgeCorrected <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder")
 
 
-GibbsOutput = GibbsSampler(DtMeasures, rep(.01, 3), 10000, 2000,Sc, 1, 100)
+GibbsOutput = GibbsSampler(DtMeasures, c(.03, .07, .001), 100000, 20000,Sc, 1, 100)
 
-
+plot(coda::as.mcmc.list(coda::as.mcmc(GibbsOutput$A)))
 
 ###-------------------------------------------------------------------------------@
 C14_SampleNames = c("OxA-21261","OxA-21262","UCIAMS-98210","UCIAMS-103134","P-782","UCIAMS-103138","OxA-23247","OxA-9774",
