@@ -1,26 +1,39 @@
 ### data used in paper
-SamplesNames <- c("OSL8", "OSL7" ,"OSL6", "OSL4", "OSL1")
-ddot = c( 1.40, 1.30, 1.25, 1.33, 1.13)
-sddot <- rep(.03, 4)
-sdc <- c(0.08, 0.09, 0.09, 0.09, 0.10)
-alpha <- rep(1, 4)
+Measures <- list(SampleNames = c("OSL-001", "OSL-002", "OSL-003", "OSL-004", "OSL-005"),
+ddot = c(2.50, 2.30, 2.10, 1.90, 1.75),  # Environmental dose rate (Gy/ka)
+sddot = c(0.10, 0.12, 0.15, 0.10, 0.08), # Error on dose rate (Gy/ka)
+D = c(75.0, 85.0, 92.0, 105.0, 115.0),  # OSL Dose (Gy)
+sD = c(3.0, 3.5, 4.0, 5.0, 4.5),  # Error on dose (Gy)
+sddot_shared = c(1.5, 1.6, 1.7, 1.9, 2.0),  # Common error term (Gy)
+Nb_sample = 5)
+Theta = diag(as.numeric(Measures$sddot)) +
+  as.numeric(Measures$sddot_shared) %*% t(as.numeric(Measures$sddot_shared)) +
+  diag(as.numeric(Measures$sD))
 
-DATA4 <-  combine_DataFiles(DATA2, DATA3 , DATA1)
-DATA4$SampleNames <-  c( "GDB5", "FER1","GDB3")
+DtMeasures <- list(Theta = Theta, Measures = Measures)
 
-P <- Palaeodose_Computation(DATA4, DATA4$SampleNames, DATA4$Nb_sample)
+Age = c(30.0, 37.0, 43.8, 55.3, 65.7)  # Calculated age (ka)
+# DATA4 <-  combine_DataFiles(DATA2, DATA3 , DATA1)
+# DATA4$SampleNames <-  c( "GDB5", "FER1","GDB3")
+#
+# P <- Palaeodose_Computation(DATA4, DATA4$SampleNames, DATA4$Nb_sample)
+#
+#
+# DtMeasures <- create_MeasuresDataFrame(P, DATA4,alpha[1], sdc[1:3])
+# DtMeasures$Measures$D
+Sc = rbind(rep(1, 5), upper.tri(matrix(rep(1), ncol = 5, nrow = 5))*1)
+
+AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 50000, burnin = 30000,
+                             PriorAge = rep(c(.1, 150),  Measures$Nb_sample))
+
+AgeCorrected <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder", Iter = 50000, burnin = 30000,
+                               PriorAge = rep(c(.1, 150),  Measures$Nb_sample))
+
+init_dist <- replicate(1000, initialize_SC(Sc, 1, 150))
+ldensity <- apply(init_dist, 1, function(l) plot(density(l)))
 
 
-DtMeasures <- create_MeasuresDataFrame(P, DATA4,alpha[1], sdc[1:3])
-DtMeasures$Measures$D
-Sc = matrix(c(rep(1, 3), c(0,1,1), c(0,0,1), rep(0,3)), nrow = 4, byrow = T)
-
-AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys)
-
-AgeCorrected <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder")
-
-
-GibbsOutput = GibbsSampler(DtMeasures, c(.03, .07, .001), 100000, 20000,Sc, 1, 100)
+GibbsOutput = GibbsSampler(DtMeasures, c(.2, .2, .1, .1, .1), 50000, 30000,Sc, 1, 150)
 
 plot(coda::as.mcmc.list(coda::as.mcmc(GibbsOutput$A)))
 

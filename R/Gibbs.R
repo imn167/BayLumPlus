@@ -50,7 +50,7 @@ GibbsDensity <- function(DataMeasures, A, Ai, index, a, b) {
   secondExp = exp( (1/2) * detCov(A)**(-1) * sumexp )
 
   # detCov(A)*invdiagvar *(-.5)  * firstExp * secondExp * (Ai<= b)* (Ai>=a)
-  return( detCov(A)**(-1/2) * invdiagvar *firstExp * secondExp * (Ai<= b)* (Ai>=a) )
+  return( detCov(A)**(-1/2) * invdiagvar *firstExp * secondExp * (Ai<= b)* (Ai>=a)/Ai )
 }
 
 
@@ -74,7 +74,7 @@ arctanT <- function(A, bounds) {
 #=================================================================================@
 #'@export
 initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F) {
-  Sc = Sc[-1, ] #del. first line
+  Sc = Sc[-1, ] #del first line
   n = nrow(Sc)
   rownames(Sc) = colnames(Sc) = paste0("A", 1:n)
 
@@ -121,10 +121,9 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
   A = chain #nchains+1 x n_ages
   #initialize
   init = initialize_SC(Sc, LowerPeriod, UpperPeriod, plotGraph)
-
   A[1, ] = init
-
   acceptance = 0
+
 
   IndexBounds = sapply(1:n_ages, findbound, Sc) + 1 # 2 x n_ages
   IndexBounds[which(IndexBounds == 0, arr.ind = T)] = n_ages + 2
@@ -132,11 +131,11 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
 
   if (Transformation == "logit") { #Test Sigmoid with parameter lambda
   ##logit transformation for init
-  chain[1, ] = sapply(init, logitT, bounds) # n_ages
+  chain[1, ] = log((init-bounds[1,]) / (bounds[2,] - init)) # n_ages
   }
 
   else if (Transformation == "arctan") {
-    chain[1, ] = sapply(init, arctanT, bounds)
+    chain[1, ] = tan( (pi/(bounds[2, ] - bounds[1, ])) * (init - bounds[1,]) - pi/2 )
   }
 
   for (iter in 1:nchain) {
@@ -146,19 +145,26 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
       #proposal depends on the transformation
       if (Transformation == "arctan") {
       # MAJ Ai
-      proposal = chain[iter, i] + truncnorm::rtruncnorm(1, a = -pi/2, b = pi/2, sd = sd[i]) #proposal for the i-th Age in (-pi, pi)/2
-      Aproposal = (bounds_i[2] - bounds_i[1]) * tan(proposal)/pi + (bounds_i[2] + bounds_i[1])/2
+      proposal = chain[iter, i] + rnorm(1, sd = sd[i])
+      Aproposal = atan(proposal) *(bounds_i[2]-bounds_i[1]) / pi +pi/2 + bounds_i[1]
 
-      top = GibbsDensity(DataMeasures, A[iter, ], Aproposal, i, bounds_i[1], bounds_i[2]) * (1+tan(proposal)**2)
-      bottom = GibbsDensity(DataMeasures, A[iter, ], A[iter, i], i, bounds_i[1], bounds_i[2]) * (1+ tan(chain[iter, i])**2)
+      top = GibbsDensity(DataMeasures, A[iter, ], Aproposal, i, bounds_i[1], bounds_i[2]) *
+        (bounds_i[2]-bounds_i[1]) / (pi* (1 + proposal**2))
+      bottom = GibbsDensity(DataMeasures, A[iter, ], A[iter, i], i, bounds_i[1], bounds_i[2]) *
+        ((bounds_i[2]-bounds_i[1]) / (pi *(1+chain[iter, i]**2)) )
 
-      log_ratio = log(top) - log(bottom)
+      }##### END OF ARCTAN TRANSFORMATION
 
-      u = log(runif(1))
+      ratio = top /bottom
+      if (!is.numeric(ratio)   ) {
+        next
+      }
 
+      u = runif(1)
 
-
-      if (u < log_ratio) {
+      # print(paste("Iter", iter, "A", i, "| proposal", Aproposal, "| densitytop", top,
+      #             "| densityBottom",bottom, "|bounds", bounds_i[1], bounds_i[2] ))
+      if (u < ratio) {
         chain[iter+1, i] = proposal
         A[iter+1, i] = Aproposal
         acceptance = acceptance +1
@@ -168,13 +174,12 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
         chain[iter+1, i] = chain[iter, i]
         A[iter+1, i] = A[iter, i]
         }
-      }##### END OF ARCTAN TRANSFORMATION
 
 
     }
   ## message
     if (iter%/% 1000) {
-      message(paste("Iteration iter =", iter, "done"))
+      cat(sprintf("\rIteration: %d", iter))
     }
   }
   seq_lag = seq(burnin, (nchain+1), lag)
@@ -182,6 +187,7 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
   A = A[seq_lag, ]
 
   ##plot
+
 
   return(list(A = A, chain = chain, acceptance = acceptance / (n_ages * nchain)))
 }
