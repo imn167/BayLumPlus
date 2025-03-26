@@ -1,4 +1,4 @@
-### data used in paper
+### Data simulated
 Measures <- list(SampleNames = c("OSL-001", "OSL-002", "OSL-003", "OSL-004", "OSL-005"),
 ddot = c(2.50, 2.30, 2.10, 1.90, 1.75),  # Environmental dose rate (Gy/ka)
 sddot = c(0.10, 0.12, 0.15, 0.10, 0.08), # Error on dose rate (Gy/ka)
@@ -6,13 +6,64 @@ D = c(75.0, 85.0, 92.0, 105.0, 115.0),  # OSL Dose (Gy)
 sD = c(3.0, 3.5, 4.0, 5.0, 4.5),  # Error on dose (Gy)
 sddot_shared = c(1.5, 1.6, 1.7, 1.9, 2.0),  # Common error term (Gy)
 Nb_sample = 5)
+
+
+### List of the Measures
 Theta = diag(as.numeric(Measures$sddot)) +
-  as.numeric(Measures$sddot_shared) %*% t(as.numeric(Measures$sddot_shared)) +
-  diag(as.numeric(Measures$sD))
+  as.numeric(Measures$sddot_shared) %*% t(as.numeric(Measures$sddot_shared))
+covD = diag(as.numeric(Measures$sD))
 
-DtMeasures <- list(Theta = Theta, Measures = Measures)
+DtMeasures <- list(Theta = Theta, Measures = Measures, covD = covD)
 
+## RW step
+Ahat = as.numeric(Measures$D)/as.numeric(Measures$ddot)
+vAhat = Ahat *sqrt((as.numeric(Measures$sD / Measures$D))**2 +
+                     as.numeric(Measures$sddot/Measures$ddot)**2)
+
+#### Try inverse
+invVhat <- vAhat
+invVhat[c(2,3)] = invVhat[c(3,2)]
+
+invMeasures = lapply(Measures[2:6], function(l){
+  l[c(2,3)] = l[c(3,2)]
+
+  return(l)} )
+invMeasures$SampleNames <- Measures$SampleNames
+invMeasures$Nb_sample <- Measures$Nb_sample
+invTheta = diag(as.numeric(invMeasures$sddot)) +
+  as.numeric(invMeasures$sddot_shared) %*% t(as.numeric(invMeasures$sddot_shared))
+invcovD = diag(as.numeric(invMeasures$sD))
+invDtMeasures <- list(Theta = invTheta, Measures = invMeasures, covD = invcovD)
+
+##-------------------------- True Ages -------------------#@
 Age = c(30.0, 37.0, 43.8, 55.3, 65.7)  # Calculated age (ka)
+##-------------------------- Constraints Matrix -------------------#@
+Sc = rbind(rep(1, 5), upper.tri(matrix(rep(1), ncol = 5, nrow = 5))*1)
+
+AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 50000, burnin = 30000,
+                             PriorAge = rep(c(1, 150),  Measures$Nb_sample))
+
+invAgeAsBayLum <- Compute_AgeS_D(invDtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 50000, burnin = 30000,
+                                 PriorAge = rep(c(1, 150),  Measures$Nb_sample))
+
+AgeCorrected <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder", Iter = 70000, burnin = 50000,
+                               PriorAge = rep(c(1, 150),  Measures$Nb_sample))
+
+
+init_dist <- replicate(1000, initialize_SC(Sc, 1, 150))
+ldensity <- apply(init_dist, 1, function(l) plot(density(l)))
+
+
+GibbsOutput = GibbsSampler(DtMeasures,  vAhat, 50000, 30000,Sc, 1, 150, "logit")
+invGibbsOutput = GibbsSampler(invDtMeasures,  invVhat, 50000, 30000,Sc, 1, 150, "logit")
+
+plot(coda::as.mcmc.list(coda::as.mcmc(GibbsOutput$A)))
+
+
+
+
+
+###-------------------------------------------------------------------------------@
 # DATA4 <-  combine_DataFiles(DATA2, DATA3 , DATA1)
 # DATA4$SampleNames <-  c( "GDB5", "FER1","GDB3")
 #
@@ -21,23 +72,6 @@ Age = c(30.0, 37.0, 43.8, 55.3, 65.7)  # Calculated age (ka)
 #
 # DtMeasures <- create_MeasuresDataFrame(P, DATA4,alpha[1], sdc[1:3])
 # DtMeasures$Measures$D
-Sc = rbind(rep(1, 5), upper.tri(matrix(rep(1), ncol = 5, nrow = 5))*1)
-
-AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 50000, burnin = 30000,
-                             PriorAge = rep(c(.1, 150),  Measures$Nb_sample))
-
-AgeCorrected <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder", Iter = 50000, burnin = 30000,
-                               PriorAge = rep(c(.1, 150),  Measures$Nb_sample))
-
-init_dist <- replicate(1000, initialize_SC(Sc, 1, 150))
-ldensity <- apply(init_dist, 1, function(l) plot(density(l)))
-
-
-GibbsOutput = GibbsSampler(DtMeasures, c(.2, .2, .1, .1, .1), 50000, 30000,Sc, 1, 150)
-
-plot(coda::as.mcmc.list(coda::as.mcmc(GibbsOutput$A)))
-
-###-------------------------------------------------------------------------------@
 C14_SampleNames = c("OxA-21261","OxA-21262","UCIAMS-98210","UCIAMS-103134","P-782","UCIAMS-103138","OxA-23247","OxA-9774",
                     "OxA-9946","UCIAMS-98208","UCIAMS-98209",
                     "OxA-9947","OxA-9775","OxA-9948","OxA-23523","UCIAMS-103135","UCIAMS_103136","UCIAMS-103137",

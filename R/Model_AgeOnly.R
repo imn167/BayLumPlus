@@ -25,7 +25,7 @@ Jeffreys <- " model {
     }
     mu[i] = A[i] * ddot[i]
   }
-  invSigma = inverse(Sigma) #DP and symmetric ?
+  invSigma = inverse(Sigma + covD) #DP and symmetric ?
   D ~ dmnorm(mu, invSigma)
 
   ###### Prior #####
@@ -51,8 +51,7 @@ Jeffreys <- " model {
 ## saving the model to data in rda form
 
 
-# ModelAgePrior$Jeffreys <- Jeffreys ## see how to save the Model in the data of the package ?
-# usethis::use_data(ModelAgePrior, overwrite = T)
+ModelAgePrior$Jeffreys <- Jeffreys
 
 
 
@@ -64,12 +63,12 @@ StrictOrder <- " model {
     }
     mu[i] = A[i] * ddot[i]
   }
-  invSigma = inverse(Sigma) #DP and symmetric ?
+  invSigma = inverse(Sigma + covD) #DP and symmetric ?
   D ~ dmnorm(mu, invSigma)
 
   #bounds
   alpha = xbound[1]
-  beta = xbound[(2*I)]
+  beta = xbound[2]
 ###### Prior #####
   for (i in 1: (I+1)) {
   e[i] ~ dexp(1)
@@ -82,5 +81,6 @@ StrictOrder <- " model {
 
 }"
 
+ModelAgePrior$StrictOrder <- StrictOrder
 
-
+usethis::use_data(ModelAgePrior, overwrite = T)

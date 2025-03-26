@@ -14,6 +14,7 @@ Compute_AgeS_D(
   t = 5,
   n.chains = 3,
   prior = "Jeffreys",
+  PriorAge = rep(c(0.01, 100), Measures$Nb_sample),
   jags_method = "rjags",
   autorun = F,
   quiet = F,

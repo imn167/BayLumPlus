@@ -40,10 +40,10 @@ create_MeasuresDataFrame <- function(
                          D = Obs[1:DATA$Nb_sample],
                          sD = Obs[(DATA$Nb_sample+1): (2*DATA$Nb_sample)],
                    sddot_shared = contamination_degree, symetric_error = symetric_error)
-  Theta = diag(Measures$sddot) + (contamination_degree %*% t(contamination_degree)) * symetric_error +
-    diag(Measures$sD)
+  Theta = diag(Measures$sddot) + (contamination_degree %*% t(contamination_degree)) * symetric_error
+  CovD = diag(Measures$sD)
 
-  return(list(Theta = Theta, Measures = Measures))
+  return(list(Theta = Theta, Measures = Measures, covD = covD))
 }
 sepSC <- NULL
 #' @title Bayesian Models for Age Estimation with Priors from ModelAgePrior Dataset
@@ -113,6 +113,7 @@ Compute_AgeS_D <- function(
   dataList = list(
     "I" = Measures$Nb_sample,
     "Theta" = DATAMeasures$Theta,
+    "covD" = DATAMeasures$covD,
     "ddot" = Measures$ddot,
     "StratiConstraints" = StratiConstraints,
     "xbound" = PriorAge,

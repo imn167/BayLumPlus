@@ -5,7 +5,7 @@
 \alias{ModelAgePrior}
 \title{JAGS Models for OSL Age Estimation in \code{\link[=Compute_AgeS_D]{Compute_AgeS_D()}}}
 \format{
-An object of class \code{list} of length 0.
+An object of class \code{list} of length 2.
 }
 \usage{
 ModelAgePrior

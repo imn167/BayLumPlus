@@ -122,7 +122,7 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
   #initialize
   init = initialize_SC(Sc, LowerPeriod, UpperPeriod, plotGraph)
   A[1, ] = init
-  acceptance = 0
+  acceptance = rep(0, n_ages)
 
 
   IndexBounds = sapply(1:n_ages, findbound, Sc) + 1 # 2 x n_ages
@@ -139,13 +139,26 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
   }
 
   for (iter in 1:nchain) {
-    for (i in 1:n_ages) {
+    for (i in sample(1:n_ages)) {
       bounds_i = c(LowerPeriod, A[iter, ], UpperPeriod)[IndexBounds[, i]] # (a(iter), b(iter))
+      #adaptive sd for RW
 
-      #proposal depends on the transformation
-      if (Transformation == "arctan") {
+
       # MAJ Ai
       proposal = chain[iter, i] + rnorm(1, sd = sd[i])
+
+      #proposal depends on the transformation
+      if (Transformation == "logit") {
+        Aproposal = (exp(proposal) * bounds_i[2] + bounds_i[1]) / (1 + exp(proposal))
+
+        top = GibbsDensity(DataMeasures, A[iter, ], Aproposal, i, bounds_i[1], bounds_i[2]) *
+          (bounds_i[2]-bounds_i[1]) * exp(proposal) / ( (1 + exp(proposal))**2)
+
+        bottom = GibbsDensity(DataMeasures, A[iter, ], A[iter, i], i, bounds_i[1], bounds_i[2]) *
+          ((bounds_i[2]-bounds_i[1]) * exp(chain[iter, i]) / (( 1+exp(chain[iter, i]))**2 ) )
+      }
+
+      else if (Transformation == "arctan") {
       Aproposal = atan(proposal) *(bounds_i[2]-bounds_i[1]) / pi +pi/2 + bounds_i[1]
 
       top = GibbsDensity(DataMeasures, A[iter, ], Aproposal, i, bounds_i[1], bounds_i[2]) *
@@ -156,9 +169,6 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
       }##### END OF ARCTAN TRANSFORMATION
 
       ratio = top /bottom
-      if (!is.numeric(ratio)   ) {
-        next
-      }
 
       u = runif(1)
 
@@ -167,7 +177,7 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
       if (u < ratio) {
         chain[iter+1, i] = proposal
         A[iter+1, i] = Aproposal
-        acceptance = acceptance +1
+        acceptance[i] = acceptance[i] + 1
       }
 
       else {
@@ -185,11 +195,22 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
   seq_lag = seq(burnin, (nchain+1), lag)
   chain = chain[seq_lag, ]
   A = A[seq_lag, ]
+  colnames(A) <- DtMeasures$Measures$SampleNames
 
   ##plot
+  #--- Gelman Rubin test ---#
+
+  cat("\n\n ------------------------------------------------------------------------------\n\n")
+  message(".   *****  The following information are only valid if the MCMC chains have converged.   ****    ")
+  cat("\n\n ------------------------------------------------------------------------------\n\n")
+
+  summA <- summary(coda::as.mcmc(A))
+
+  print(summA$statistics)
 
 
-  return(list(A = A, chain = chain, acceptance = acceptance / (n_ages * nchain)))
+
+  return(list(A = A, chain = chain, acceptance = acceptance / nchain))
 }
 
 
