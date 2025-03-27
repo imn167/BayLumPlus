@@ -53,22 +53,35 @@ GibbsDensity <- function(DataMeasures, A, Ai, index, a, b) {
   return( detCov(A)**(-1/2) * invdiagvar *firstExp * secondExp * (Ai<= b)* (Ai>=a)/Ai )
 }
 
-
 #=================================================================================@
 #'@export
-logitT <- function(A, bounds) {
+proposal_sd <- function(DataMeasures) {
+  Measures = DataMeasures$Measures
+  Ahat = as.numeric(Measures$D)/as.numeric(Measures$ddot)
+  sdAhat = Ahat *sqrt((as.numeric(Measures$sD / Measures$D))**2 +
+                       as.numeric(Measures$sddot/Measures$ddot)**2)
+  return(sdAhat)
+
+}
+#=================================================================================@
+#'@export
+logitT <- function(u, bounds) {
   lowerbound = bounds[1]
   upperbound = bounds[2]
-  return(log((A-lowerbound) / (upperbound-A)))
+  return(
+    (exp(u) * upperbound + lowerbound) / (1+ exp(u))
+  )
 }
 
 
 #=================================================================================@
 #' @export
-arctanT <- function(A, bounds) {
+arctanT <- function(u, bounds) {
   lowerbound = bounds[1]
   upperbound = bounds[2]
-  return( atan( pi* (A-lowerbound) / (upperbound - lowerbound) - pi /2 ) )
+  return(
+      (upperbound - lowerbound) * tan(u) /pi + (upperbound + lowerbound) / 2
+    )
 }
 
 #=================================================================================@
@@ -113,43 +126,62 @@ initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F) {
 
 #=================================================================================@
 #'@export
-GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
-                      LowerPeriod, UpperPeriod, Transformation = "arctan", lag = 10, plotGraph = T) {
+GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
+                      LowerPeriod, UpperPeriod, Transformation = "arctan",
+                      lag = 10, plotGraph = T, plotChain = T,
+                      roundingOfValue = 3) {
 
+  #---------------- Pre-seting -----------------#@
   n_ages = DataMeasures$Measures$Nb_sample
-  chain = matrix(NA, nrow = nchain+1, ncol = n_ages)
-  A = chain #nchains+1 x n_ages
-  #initialize
-  init = initialize_SC(Sc, LowerPeriod, UpperPeriod, plotGraph)
-  A[1, ] = init
-  acceptance = rep(0, n_ages)
-
-
+  chains = coda::mcmc.list() #list of chains
+  As = coda::mcmc.list()
+  acceptances = list()
+  ### Bounds Index according to SC
   IndexBounds = sapply(1:n_ages, findbound, Sc) + 1 # 2 x n_ages
   IndexBounds[which(IndexBounds == 0, arr.ind = T)] = n_ages + 2
-  bounds = apply(IndexBounds, 2, function(b) c(LowerPeriod, init, UpperPeriod)[b])
 
-  if (Transformation == "logit") { #Test Sigmoid with parameter lambda
-  ##logit transformation for init
-  chain[1, ] = log((init-bounds[1,]) / (bounds[2,] - init)) # n_ages
-  }
+  ## standard deviation for kernel proposal
 
-  else if (Transformation == "arctan") {
-    chain[1, ] = tan( (pi/(bounds[2, ] - bounds[1, ])) * (init - bounds[1,]) - pi/2 )
-  }
 
-  for (iter in 1:nchain) {
-    for (i in sample(1:n_ages)) {
+  for (c in 1:nchain) {
+    #initialize
+    if (c > 1) {
+      plotGraph = F
+    }
+    init = initialize_SC(Sc, LowerPeriod, UpperPeriod, plotGraph)
+
+    bounds = apply(IndexBounds, 2, function(b) c(LowerPeriod, init, UpperPeriod)[b])
+    #creating array for iteration
+    chain <- A <- matrix(NA, nrow = niter+1, ncol = n_ages)
+    colnames(A) <- DataMeasures$Measures$SampleNames
+
+    A[1, ] = init
+    acceptance = rep(0, n_ages)
+    names(acceptance) <- paste("rate", DataMeasures$Measures$SampleNames, sep = "-")
+
+
+    if (Transformation == "logit") { #Test Sigmoid with parameter lambda
+    ##logit transformation for init
+    chain[1, ] = log((init-bounds[1,]) / (bounds[2,] - init)) # n_ages
+    }
+
+    else if (Transformation == "arctan") {
+      chain[1, ] = tan( (pi/(bounds[2, ] - bounds[1, ])) * (init - bounds[1,]) - pi/2 )
+    }
+
+      for (iter in 1:niter) {
+          for (i in sample(1:n_ages)) {
       bounds_i = c(LowerPeriod, A[iter, ], UpperPeriod)[IndexBounds[, i]] # (a(iter), b(iter))
       #adaptive sd for RW
 
 
       # MAJ Ai
+      sd = proposal_sd(DataMeasures)
       proposal = chain[iter, i] + rnorm(1, sd = sd[i])
 
       #proposal depends on the transformation
       if (Transformation == "logit") {
-        Aproposal = (exp(proposal) * bounds_i[2] + bounds_i[1]) / (1 + exp(proposal))
+        Aproposal = logitT(proposal, bounds_i)
 
         top = GibbsDensity(DataMeasures, A[iter, ], Aproposal, i, bounds_i[1], bounds_i[2]) *
           (bounds_i[2]-bounds_i[1]) * exp(proposal) / ( (1 + exp(proposal))**2)
@@ -159,7 +191,7 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
       }
 
       else if (Transformation == "arctan") {
-      Aproposal = atan(proposal) *(bounds_i[2]-bounds_i[1]) / pi +pi/2 + bounds_i[1]
+      Aproposal = arctanT(proposal, bounds_i)
 
       top = GibbsDensity(DataMeasures, A[iter, ], Aproposal, i, bounds_i[1], bounds_i[2]) *
         (bounds_i[2]-bounds_i[1]) / (pi* (1 + proposal**2))
@@ -172,8 +204,6 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
 
       u = runif(1)
 
-      # print(paste("Iter", iter, "A", i, "| proposal", Aproposal, "| densitytop", top,
-      #             "| densityBottom",bottom, "|bounds", bounds_i[1], bounds_i[2] ))
       if (u < ratio) {
         chain[iter+1, i] = proposal
         A[iter+1, i] = Aproposal
@@ -186,31 +216,137 @@ GibbsSampler <- function(DataMeasures,  sd, nchain, burnin, Sc,
         }
 
 
+    }### END OF COORDINATE LOOP
+
+    ## MESSAGE FOR EACH THOUSAND ITER
+    if (iter%% 5000 == 0) {
+      cat(sprintf("\r -------- Chain %d & Iteration: %d -------", c,  iter))
     }
-  ## message
-    if (iter%/% 1000) {
-      cat(sprintf("\rIteration: %d", iter))
-    }
+  }#### END OF ITER LOOP
+
+    seq_lag = seq(burnin, (niter+1), lag)
+    chain = chain[seq_lag, ]
+    A = A[seq_lag, ]
+
+
+    #ADD chains, As, acceptances
+    chains[[paste("chain", c)]] <- coda::mcmc(chain)
+    As[[paste("chain", c)]] <- coda::mcmc(A)
+    acceptances[[paste("acceptance", c)]] <- acceptance / niter
+
   }
-  seq_lag = seq(burnin, (nchain+1), lag)
-  chain = chain[seq_lag, ]
-  A = A[seq_lag, ]
-  colnames(A) <- DtMeasures$Measures$SampleNames
 
   ##plot
-  #--- Gelman Rubin test ---#
+  if (plotChain) {
+    try(plot(As))
+  }
+  #---Gelman and Rubin test of convergence of the MCMC ####
+  CV <- gelman.diag(As, multivariate = FALSE)
+  cat(paste(
+    "\n\n>> Results of the Gelman and Rubin criterion of convergence <<\n"
+  ))
+  for (i in 1:DataMeasures$Measures$Nb_sample) {
+    cat("----------------------------------------------\n")
+    cat(paste(" Sample name: ", DataMeasures$SampleNames[i], "\n"))
+    cat("---------------------\n")
+    cat(paste("\t\t", "Point estimate", "Uppers confidence interval\n"))
+    cat(paste(
+      paste("A_", DataMeasures$Measures$SampleNames[i], sep = ""),
+      "\t",
+      round(CV$psrf[i, 1], roundingOfValue),
+      "\t\t",
+      round(CV$psrf[i, 2], roundingOfValue),
+      "\n"
+    ))
+
+  }
 
   cat("\n\n ------------------------------------------------------------------------------\n\n")
   message(".   *****  The following information are only valid if the MCMC chains have converged.   ****    ")
   cat("\n\n ------------------------------------------------------------------------------\n\n")
 
-  summA <- summary(coda::as.mcmc(A))
+  #---print results ####
+  sample = as.data.frame(runjags::combine.mcmc(As))
+  rnames <- paste0("A_", DataMeasures$Measures$SampleNames)
+  ##Matrix of results
+  rnames <- paste0("A_", DataMeasures$Measures$SampleNames)
 
-  print(summA$statistics)
+  R <- matrix(
+    data = NA,
+    ncol = 7,
+    nrow = DataMeasures$Measures$Nb_sample,
+    dimnames = list(rnames,
+                    c(
+                      "lower bound at 95%",
+                      "lower bound at 68%",
+                      "Bayes estimate",
+                      "upper bound at 68%",
+                      "upper bound at 95%",
+                      "Convergencies: Point estimate",
+                      "Convergencies: uppers confidence interval"
+                    )
+    )
+  )
 
 
+  #Bayes Estimate and credibal iterval
+  cat(
+    "\n\n>> Bayes estimates of Age, Palaeodose and its dispersion for each sample and credible interval <<\n"
+  )
 
-  return(list(A = A, chain = chain, acceptance = acceptance / nchain))
+  credible95 <-  apply(sample, 2, CredibleInterval, level = .95)[ 2:3, ]
+  credible68 <- apply(sample, 2, CredibleInterval, level = .68)[2:3, ]
+  estimate <- apply(sample, 2, mean)
+
+  R[, c(1,5)] <- round(credible95, roundingOfValue)
+  R[, c(2,4)] <- round(credible68, roundingOfValue)
+  R[, 3] <-   round(estimate, roundingOfValue)
+
+  R[, c(6, 7)] <- round(CV$psrf, roundingOfValue)
+
+  print(R )
+  cat("\n----------------------------------------------\n")
+
+  #---Create return object ####
+  .list_BayLum <- function(..., originator = sys.call(which = -1)[[1]]){
+    ## set list
+    l <- list(...)
+
+    ## update originators
+    attr(l, "class") <- "BayLum.list"
+    attr(l, "originator") <- as.character(originator)
+
+    return(l)
+
+  }
+
+  summaryMCMC <- summary(As)
+  name_chains = paste(as.character(Transformation), "Sampling", sep ="_")
+  output <- .list_BayLum(
+    "Ages" = data.frame(
+      SAMPLE = Measures$SampleNames,
+      AGE = estimate,
+      HPD68.MIN = credible68[ 1,],
+      HPD68.MAX = credible68[2, ],
+      HPD95.MIN = credible95[1, ],
+      HPD95.MAX = credible95[2, ],
+      stringsAsFactors = FALSE
+    ),
+    "Sampling" = As,
+    "UpperLowerBounds" = c(UpperPeriod, LowerPeriod),
+    "StratiConstraints" = Sc,
+    "CovarianceMatrix" = list(DataMeasures$Theta, DataMeasures$covD),
+    # "model" = ,
+    "acceptance" = acceptances,
+    SummaryMCMC = summaryMCMC,
+    name_chains = chains
+  )
+
+  BayLum::plot_Ages(object = output, legend.pos = "bottomleft")
+
+  return(
+    output
+  )
 }
 
 

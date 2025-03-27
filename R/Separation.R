@@ -272,7 +272,7 @@ Compute_AgeS_D <- function(
 
   R <- matrix(
     data = NA,
-    ncol = 8,
+    ncol = 7,
     nrow = Measures$Nb_sample,
     dimnames = list(rnames,
                   c(
@@ -281,7 +281,6 @@ Compute_AgeS_D <- function(
                       "Bayes estimate",
                       "upper bound at 68%",
                       "upper bound at 95%",
-                      "",
                       "Convergencies: Point estimate",
                       "Convergencies: uppers confidence interval"
                     )
@@ -302,7 +301,7 @@ Compute_AgeS_D <- function(
   R[, c(2,4)] <- round(credible68, roundingOfValue)
   R[, 3] <-   round(estimate, roundingOfValue)
 
-  R[, c(7, 8)] <- round(CV$psrf, roundingOfValue)
+  R[, c(6, 7)] <- round(CV$psrf, roundingOfValue)
 
   print(dplyr::tibble(R) )
   cat("\n----------------------------------------------\n")

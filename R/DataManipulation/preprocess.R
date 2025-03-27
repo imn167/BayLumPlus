@@ -16,9 +16,7 @@ covD = diag(as.numeric(Measures$sD))
 DtMeasures <- list(Theta = Theta, Measures = Measures, covD = covD)
 
 ## RW step
-Ahat = as.numeric(Measures$D)/as.numeric(Measures$ddot)
-vAhat = Ahat *sqrt((as.numeric(Measures$sD / Measures$D))**2 +
-                     as.numeric(Measures$sddot/Measures$ddot)**2)
+
 
 #### Try inverse
 invVhat <- vAhat
@@ -54,13 +52,18 @@ init_dist <- replicate(1000, initialize_SC(Sc, 1, 150))
 ldensity <- apply(init_dist, 1, function(l) plot(density(l)))
 
 
-GibbsOutput = GibbsSampler(DtMeasures,  vAhat, 50000, 30000,Sc, 1, 150, "logit")
+GibbsOutput = GibbsSampler(DtMeasures,  3, 50000, 30000,Sc, 1, 150, "logit")
 invGibbsOutput = GibbsSampler(invDtMeasures,  invVhat, 50000, 30000,Sc, 1, 150, "logit")
 
 plot(coda::as.mcmc.list(coda::as.mcmc(GibbsOutput$A)))
 
-
-
+traceplot(mcmc(GibbsOutput$A))
+densplot(mcmc(GibbsOutput$A))
+summary(mcmc(GibbsOutput$A))
+autocorr.diag(mcmc(GibbsOutput$A))
+acfplot(mcmc(GibbsOutput$A))
+pairs(GibbsOutput$A)
+gelman.diag(mcmc(GibbsOutput$A))
 
 
 ###-------------------------------------------------------------------------------@

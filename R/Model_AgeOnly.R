@@ -15,7 +15,7 @@
 
 
 ### Model with Jeffreys prior
-ModelAgePrior <- list()
+# ModelAgePrior <- list()
 
 Jeffreys <- " model {
   ###### Likelyhood ####
@@ -51,7 +51,7 @@ Jeffreys <- " model {
 ## saving the model to data in rda form
 
 
-ModelAgePrior$Jeffreys <- Jeffreys
+# ModelAgePrior$Jeffreys <- Jeffreys
 
 
 
@@ -81,6 +81,6 @@ StrictOrder <- " model {
 
 }"
 
-ModelAgePrior$StrictOrder <- StrictOrder
-
-usethis::use_data(ModelAgePrior, overwrite = T)
+# ModelAgePrior$StrictOrder <- StrictOrder
+#
+# usethis::use_data(ModelAgePrior, overwrite = T)
