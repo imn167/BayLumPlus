@@ -128,8 +128,8 @@ initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F) {
 #'@export
 GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
                       LowerPeriod, UpperPeriod, Transformation = "arctan",
-                      lag = 10, plotGraph = T, plotChain = T,
-                      roundingOfValue = 3) {
+                      lag = 10, plotGraph = T, plotChain = T, plotACF = T,
+                      roundingOfValue = 3, proposal_magnitude = 1) {
 
   #---------------- Pre-seting -----------------#@
   n_ages = DataMeasures$Measures$Nb_sample
@@ -176,7 +176,7 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
 
 
       # MAJ Ai
-      sd = proposal_sd(DataMeasures)
+      sd = proposal_magnitude * proposal_sd(DataMeasures)
       proposal = chain[iter, i] + rnorm(1, sd = sd[i])
 
       #proposal depends on the transformation
@@ -262,18 +262,29 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
   }
 
   cat("\n\n ------------------------------------------------------------------------------\n\n")
+  cat(paste(
+    "\n\n>> Results of sampling autocorrelation <<\n"
+  ))
+  print(coda::autocorr.diag(As))
+
+  if (plotACF) {
+   print( coda::acfplot(As))
+  }
+
+  cat("\n\n ------------------------------------------------------------------------------\n\n")
   message(".   *****  The following information are only valid if the MCMC chains have converged.   ****    ")
   cat("\n\n ------------------------------------------------------------------------------\n\n")
 
   #---print results ####
   sample = as.data.frame(runjags::combine.mcmc(As))
   rnames <- paste0("A_", DataMeasures$Measures$SampleNames)
+  summaryMCMC <- summary(As)
   ##Matrix of results
   rnames <- paste0("A_", DataMeasures$Measures$SampleNames)
 
   R <- matrix(
     data = NA,
-    ncol = 7,
+    ncol = 8,
     nrow = DataMeasures$Measures$Nb_sample,
     dimnames = list(rnames,
                     c(
@@ -283,7 +294,8 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
                       "upper bound at 68%",
                       "upper bound at 95%",
                       "Convergencies: Point estimate",
-                      "Convergencies: uppers confidence interval"
+                      "Convergencies: uppers confidence interval",
+                      "Time Series SE"
                     )
     )
   )
@@ -303,6 +315,7 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
   R[, 3] <-   round(estimate, roundingOfValue)
 
   R[, c(6, 7)] <- round(CV$psrf, roundingOfValue)
+  R[, 8] <- round(summaryMCMC$statistics[, 4], roundingOfValue)
 
   print(R )
   cat("\n----------------------------------------------\n")
@@ -320,7 +333,6 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
 
   }
 
-  summaryMCMC <- summary(As)
   name_chains = paste(as.character(Transformation), "Sampling", sep ="_")
   output <- .list_BayLum(
     "Ages" = data.frame(
@@ -342,7 +354,7 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
     name_chains = chains
   )
 
-  BayLum::plot_Ages(object = output, legend.pos = "bottomleft")
+  BayLum::plot_Ages(object = output, legend.pos = "bottomleft", model = "Jeffreys prior")
 
   return(
     output

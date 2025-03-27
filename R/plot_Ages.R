@@ -63,6 +63,7 @@ plot_Ages <- function(
   sample_names = NULL,
   sample_order = NULL,
   plot_mode = "ages",
+  model = "Baylum",
   ...
 ){
 
@@ -126,7 +127,7 @@ plot_Ages <- function(
          } else {
          c(min(df[["HPD95.MIN"]]),max(df[["HPD95.MAX"]]))
          },
-      main = "Age Results",
+      main = paste("Age Results -", model),
       xlab = "Age (ka)",
       grid = TRUE,
       col = if(plot_mode == "density") {

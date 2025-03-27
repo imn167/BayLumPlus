@@ -356,7 +356,7 @@ Compute_AgeS_D <- function(
   cat("\n==============================\n")
 
   #---Plot ages ####
-  BayLum::plot_Ages(object = output, legend.pos = "bottomleft")
+  BayLum::plot_Ages(object = output, legend.pos = "bottomleft", model = paste("BayLum", prior))
 
   ##TODO: get rid of this ... at some point
   if (SavePdf) {
