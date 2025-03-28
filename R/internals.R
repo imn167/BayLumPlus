@@ -72,3 +72,95 @@ CredibleInterval <- function(a_chain, level = 0.95, roundingOfValue = 0) {
     )
   )
 }
+
+#======================= GGplot Theme ======#
+#'@description Setting ggplot
+#'@author Bouafia Imène (LMJL)
+#'@md
+#'@noRd
+
+ICAgeTheme <- function(rotation_x = F) {
+  tt <-  ggplot2::theme_minimal() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text( face = 'bold', color = "#993355", size = 12),
+          axis.text.y = ggplot2::element_text(face = "bold", color = "#993355", size = 12),
+          axis.title.x = ggplot2::element_text(face = 'bold', size = 14, color = "black"),
+          axis.title.y = ggplot2::element_text(face = 'bold', size = 14, color = "black"),
+
+          legend.text = ggplot2::element_text(size = 12, face = "bold", color = "black"),
+          legend.key.size = ggplot2::unit(1.5, "cm"))
+  if (rotation_x) {
+    tt <- ggplot2::theme_minimal() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text( face = 'bold', color = "#993355",
+                                                          size = 12, angle = 90),
+            axis.text.y = ggplot2::element_text(face = "bold", color = "#993355", size = 12),
+            axis.title.x = ggplot2::element_text(face = 'bold', size = 14, color = "black"),
+            axis.title.y = ggplot2::element_text(face = 'bold', size = 14, color = "black"),
+            legend.text = ggplot2::element_text(size = 8, face = "bold", color = "black"),
+            legend.title = ggplot2::element_text(face = "bold", size = 12, color = "black"))
+  }
+  return(tt)
+}
+
+
+#=========== HPD Regions ===========#
+#'@description This function compute the HPD regions
+#'@author Bouafia Imène (LMJL)
+#'@md
+#'@noRd
+
+
+HPDRegions <- function(X, level = .95) {
+  ### estimation density
+  kde = stats::density(X)
+  #@ values
+  N = length(kde$y)
+  quant <- floor(N*(1-level)) #
+
+  #sort probabilities s
+  sorted_y = sort(kde$y)
+  Kq <- sorted_y[quant]
+
+  density_X <- approx(kde$x, kde$y, xout = X)$y
+  ind <-  which(density_X > Kq)
+  sim_HPD = X[ind]
+
+  return(sim_HPD)
+}
+
+pallet <- c("#FFF0AAAA", "#0000FFA0", "#00AAA0", "#D44D20", "#9DDF3E", "#3BBFDF", "#F3EC5E", "#ED5524")
+
+
+
+
+Transform_HPD <- function(all_hpd) {
+  max_length <- max(sapply(all_hpd, length))
+
+  pad_vector <- function(vec, max_length) rep(vec, length.out = max_length)
+
+  D <- lapply(all_hpd, pad_vector, max_length = max_length)
+  return(sapply(D, identity))
+}
+
+hpd_method <- function(name, chain, level = .95) {
+  hpd_output <- apply(chain, 2, arkhe::interval_hdr, level = level)
+  if (is.list(hpd_output)) {
+    HPD <- data.frame()
+    ## list manip
+    for (var in names(hpd_output)) {
+      d = dim(hpd_output[[var]])[1]
+      hpd <- matrix(hpd_output[[var]][, 1:2], nrow = d)
+      tab <- data.frame(age = rep(var, d), inf = hpd[, 1], sup = hpd[, 2])
+      HPD <- HPD %>% dplyr::bind_rows(tab)
+    }
+    HPD <- HPD  %>% dplyr::mutate(Models = name)
+  }
+  else {
+    tab = t(hpd_output[1:2, ])
+    HPD <- data.frame( Samples = rownames(tab), inf = tab[, 1], sup = tab[, 2])  %>%
+      dplyr::mutate(Models = name)
+  }
+  return(HPD)
+}
+
+
+

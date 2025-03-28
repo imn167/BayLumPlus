@@ -81,7 +81,45 @@ covD = diag(as.numeric(Measures$sD))
 DtMeasures <- list(Theta = Theta, Measures = Measures, covD = covD)
 
 GibbsOutput <-  GibbsSampler(DtMeasures, 3, 70000, 50000, Sc, 1, 500, "logit", proposal_magnitude = .8)
+AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 70000, burnin = 50000, t = 15,
+                             PriorAge = rep(c(1, 500),  Measures$Nb_sample))
+
+plotHpd(list(GibbsOutput, AgeAsBayLum), c("Gibbs", "BayLum"))
+
 ###-------------------------------------------------------------------------------@
+datasets2 <- readxl::read_excel("R/DataManipulation/dataOSL_3sites.xlsx")
+colnames(datasets2)[3:6] <- c("ddot", "sddot", "D", "sD")
+
+BlockLength <- datasets2 %>% dplyr::mutate(block = stringr::str_extract(Sample, "Dhab\\d+")) %>%
+  dplyr::group_by(block) %>%
+  dplyr::summarise(blockLength = dplyr::n()) %>% dplyr::select(blockLength)
+
+Sc = as.matrix(Matrix::bdiag(sapply((BlockLength$blockLength), function(n) upper.tri(matrix(1, nrow = n, ncol = n)))))
+Sc = as.matrix( rbind(rep(1, dim(datasets2)[1]), Sc))
+
+Measures = list(ddot = datasets2$ddot, sddot = datasets2$sddot, D = datasets2$D, sD = datasets2$sD,
+                sddot_shared = rep(0,dim(datasets2)[1]), Nb_sample = dim(datasets2)[1],
+                SampleNames = datasets2$Sample)
+
+
+Theta = diag(as.numeric(Measures$sddot)) +
+  as.numeric(Measures$sddot_shared) %*% t(as.numeric(Measures$sddot_shared))
+
+covD = diag(as.numeric(Measures$sD))
+
+DtMeasures <- list(Theta = Theta, Measures = Measures, covD = covD)
+
+GibbsOutput <-  GibbsSampler(DtMeasures, 3, 90000, 70000, Sc, 1, 1400, "logit", proposal_magnitude = .6,
+                             plotlegend.pos = locator(1))
+pdf("R/DataManipulation/blockdataset.pdf", width = 12)
+plot(GibbsOutput$Sampling)
+coda::acfplot(GibbsOutput$Sampling)
+dev.off()
+AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 70000, burnin = 50000, t = 10,
+                             PriorAge = rep(c(1, 1400),  Measures$Nb_sample))
+
+plotHpd(list(GibbsOutput, AgeAsBayLum), c("Gibbs", "BayLum"))
+
 # DATA4 <-  combine_DataFiles(DATA2, DATA3 , DATA1)
 # DATA4$SampleNames <-  c( "GDB5", "FER1","GDB3")
 #

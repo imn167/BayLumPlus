@@ -231,9 +231,20 @@ Compute_AgeS_D <- function(
   ##try makes sure that the function runs
   try(plot_MCMC(echantillon, sample_names = Measures$SampleNames))
 
+  #autocorrelation diagnosis
+  cat("\n\n ------------------------------------------------------------------------------\n\n")
+  cat(paste(
+    "\n\n>> Results of sampling autocorrelation <<\n"
+  ))
+  print(coda::autocorr.diag(echantillon))
+
+  try(plot(coda::acfplot(echantillon)))
+
   if (SavePdf) {
     dev.off()
   }
+
+  cat("\n\n ------------------------------------------------------------------------------\n\n")
 
   #---Gelman and Rubin test of convergence of the MCMC ####
   CV <- gelman.diag(echantillon, multivariate = FALSE)

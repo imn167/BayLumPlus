@@ -129,7 +129,8 @@ initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F) {
 GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
                       LowerPeriod, UpperPeriod, Transformation = "arctan",
                       lag = 10, plotGraph = T, plotChain = T, plotACF = T,
-                      roundingOfValue = 3, proposal_magnitude = 1) {
+                      roundingOfValue = 3, proposal_magnitude = 1,
+                      ...) {
 
   #---------------- Pre-seting -----------------#@
   n_ages = DataMeasures$Measures$Nb_sample
@@ -230,9 +231,9 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
 
 
     #ADD chains, As, acceptances
-    chains[[paste("chain", c)]] <- coda::mcmc(chain)
-    As[[paste("chain", c)]] <- coda::mcmc(A)
-    acceptances[[paste("acceptance", c)]] <- acceptance / niter
+    chains[[paste0("chain", c)]] <- coda::mcmc(chain)
+    As[[paste0("chain", c)]] <- coda::mcmc(A)
+    acceptances[[paste0("acceptance", c)]] <- acceptance / niter
 
   }
 
@@ -267,9 +268,9 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
   ))
   print(coda::autocorr.diag(As))
 
-  if (plotACF) {
-   print( coda::acfplot(As))
-  }
+  try(plot(coda::acfplot(As)))
+
+  dev.off()
 
   cat("\n\n ------------------------------------------------------------------------------\n\n")
   message(".   *****  The following information are only valid if the MCMC chains have converged.   ****    ")
@@ -348,13 +349,13 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
     "UpperLowerBounds" = c(UpperPeriod, LowerPeriod),
     "StratiConstraints" = Sc,
     "CovarianceMatrix" = list(DataMeasures$Theta, DataMeasures$covD),
-    # "model" = ,
+    "model" = "Gibbs",
     "acceptance" = acceptances,
     SummaryMCMC = summaryMCMC,
     name_chains = chains
   )
 
-  BayLum::plot_Ages(object = output, legend.pos = "bottomleft", model = "Jeffreys prior")
+  BayLum::plot_Ages(object = output, model = "Jeffreys prior")
 
   return(
     output

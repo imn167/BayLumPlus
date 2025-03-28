@@ -137,7 +137,7 @@ plot_Ages <- function(
         },
       legend = TRUE,
       legend.text = c("Bayes estimator", "68% credible interval", "95% credible interval"),
-      legend.pos = c("topright"),
+      legend.pos = NULL,
       legend.cex = 0.9,
       d_scale = 0.6,
       show_ages = FALSE
@@ -147,6 +147,7 @@ plot_Ages <- function(
       plot_settings <- modifyList(x = plot_settings, val = list(...))
 
   ##PLOTTING
+  graphics::plot.new()
   ##adjust par and make sure that it resets
   old_par <- par(
     mfrow=c(1,1),
@@ -257,7 +258,9 @@ plot_Ages <- function(
     }
 
   ## ======== STANDARD PLOT ============
-  } else {
+  }
+
+  else {
     ##ADD HDP95 and HDP58
     for(i in 1:nrow(df)){
       ##HDP95
@@ -290,7 +293,7 @@ plot_Ages <- function(
         alpha = 100, maxColorValue = 255),
       lwd = plot_settings$cex * 2
     )
-
+  plot_settings$legend.pos <- locator(1)
     ##add legend
     if(plot_settings$legend){
       legend(
@@ -301,10 +304,10 @@ plot_Ages <- function(
         lty = c(0, 1, 1),
         lwd = 2,
         cex = plot_settings$legend.cex,
-        col = plot_settings$col,
-        horiz = if(plot_settings$legend.pos == "top" || plot_settings$legend.pos == "bottom")
-          TRUE else FALSE)
-    }
+        col = plot_settings$col)
+        # horiz = if(plot_settings$legend.pos == "top" || plot_settings$legend.pos == "bottom")
+        #   TRUE else FALSE)
+     }
   }
 
   # Return --------------------------------------------------------------------------------------

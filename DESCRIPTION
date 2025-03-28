@@ -59,7 +59,9 @@ Imports:
     runjags (>= 2.2.2.4),
     yaml (>= 2.3.9),
     truncnorm,
-    igraph (>= 2.1.2)
+    igraph (>= 2.1.2),
+    ggplot2 (>= 3.5.1),
+    graphics (>= 4.4.2)
 Suggests: 
     knitr,
     rmarkdown,
