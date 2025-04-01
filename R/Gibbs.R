@@ -86,7 +86,7 @@ arctanT <- function(u, bounds) {
 
 #=================================================================================@
 #'@export
-initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F) {
+initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F, order= T) {
   Sc = Sc[-1, ] #del first line
   n = nrow(Sc)
   rownames(Sc) = colnames(Sc) = paste0("A", 1:n)
@@ -95,31 +95,49 @@ initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F) {
   if (plotGraph) {
     plot(network)
   }
-  A = rep(NA, n)
-  ##topological order
+
+  if (order) {
+    e = rexp((n+1))
+    u = cumsum(e[1:n]) / sum(e)
+    A = (UpperPeriod-LowerPeriod) * u + LowerPeriod
+  }
+  else {
+    A = rep(NA, n)
+  ##Source nodes
+  indegree = igraph::V(network)[igraph::degree(network, mode = "in") == 0] #in-degree
+  outdegree = igraph::V(network)[igraph::degree(network, mode = "out") == 0] #out-degree
+
+  #shift
+  shift = runif(length(indegree), max = (UpperPeriod-LowerPeriod))
+  A[indegree] = runif(length(indegree), min = LowerPeriod, max = (UpperPeriod - shift))
+  A[outdegree] = A[indegree] + shift
+
+  intermed = igraph::V(network)[igraph::degree(network, mode = "out") > 0 & igraph::degree(network, mode = "in") >0 ]
+  print(A)
   topo_order = igraph::topo_sort(network, mode = "out")
-  for (i in topo_order) {
-    max_bound = UpperPeriod
-    min_bound = LowerPeriod
+  in_topo_order = topo_order[topo_order %in% intermed]
+  for (i in in_topo_order) {
+    max_bounds = A[igraph::neighbors(network, i, mode = "out")]
+    min_bounds = A[igraph::neighbors(network, i, mode = "in")]
     #MAJ max_bound
-    older_ages = A[which(Sc[i, ] == 1 )]
-    if ( any(!is.na(older_ages))) {
-      max_bound = min(max_bound, min(older_ages, na.rm = T))
+    if ( any(!is.na(max_bounds))) {
+      max_bound = min(max_bounds, na.rm = T)
     }
 
     #MAJ min_bound
-    younger_ages = A[which(Sc[, i] == 1)]
-    if (any(!is.na(younger_ages ))) {
-      min_bound = max(min_bound, max(younger_ages, na.rm =T))
+    if (any(!is.na(min_bounds ))) {
+      min_bound =  max(min_bounds, na.rm =T)
     }
 
+    print(c(min_bound, max_bound))
     ##simulation
     if (min_bound < max_bound) {
       A[i] = runif(1, min_bound, max_bound)
+      print("yes")
     }
 
     else { A[i] = min_bound}
-  }
+  }}
   return(A)
 }
 
@@ -151,7 +169,7 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
     }
     init = initialize_SC(Sc, LowerPeriod, UpperPeriod, plotGraph)
 
-    bounds = apply(IndexBounds, 2, function(b) c(LowerPeriod, init, UpperPeriod)[b])
+    bounds = apply(IndexBounds, 2, function(b) c(LowerPeriod, init, UpperPeriod)[b]) # 2 x n_ages
     #creating array for iteration
     chain <- A <- matrix(NA, nrow = niter+1, ncol = n_ages)
     colnames(A) <- DataMeasures$Measures$SampleNames
@@ -170,11 +188,10 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
       chain[1, ] = tan( (pi/(bounds[2, ] - bounds[1, ])) * (init - bounds[1,]) - pi/2 )
     }
 
+      X = A[1, ] #vector of proposition
       for (iter in 1:niter) {
           for (i in sample(1:n_ages)) {
-      bounds_i = c(LowerPeriod, A[iter, ], UpperPeriod)[IndexBounds[, i]] # (a(iter), b(iter))
-      #adaptive sd for RW
-
+      bounds_i = c(LowerPeriod, X, UpperPeriod)[IndexBounds[, i]] # (bounds for Ai whithin Gibbs)
 
       # MAJ Ai
       sd = proposal_magnitude * proposal_sd(DataMeasures)
@@ -183,41 +200,43 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
       #proposal depends on the transformation
       if (Transformation == "logit") {
         Aproposal = logitT(proposal, bounds_i)
-
-        top = GibbsDensity(DataMeasures, A[iter, ], Aproposal, i, bounds_i[1], bounds_i[2]) *
+        top = GibbsDensity(DataMeasures, X, Aproposal, i, bounds_i[1], bounds_i[2]) *
           (bounds_i[2]-bounds_i[1]) * exp(proposal) / ( (1 + exp(proposal))**2)
 
-        bottom = GibbsDensity(DataMeasures, A[iter, ], A[iter, i], i, bounds_i[1], bounds_i[2]) *
+        bottom = GibbsDensity(DataMeasures, X, A[iter, i], i, bounds_i[1], bounds_i[2]) *
           ((bounds_i[2]-bounds_i[1]) * exp(chain[iter, i]) / (( 1+exp(chain[iter, i]))**2 ) )
       }
 
       else if (Transformation == "arctan") {
       Aproposal = arctanT(proposal, bounds_i)
 
-      top = GibbsDensity(DataMeasures, A[iter, ], Aproposal, i, bounds_i[1], bounds_i[2]) *
+      top = GibbsDensity(DataMeasures, X, Aproposal, i, bounds_i[1], bounds_i[2]) *
         (bounds_i[2]-bounds_i[1]) / (pi* (1 + proposal**2))
-      bottom = GibbsDensity(DataMeasures, A[iter, ], A[iter, i], i, bounds_i[1], bounds_i[2]) *
+      bottom = GibbsDensity(DataMeasures, X, A[iter, i], i, bounds_i[1], bounds_i[2]) *
         ((bounds_i[2]-bounds_i[1]) / (pi *(1+chain[iter, i]**2)) )
 
       }##### END OF ARCTAN TRANSFORMATION
-
+      # print(bounds_i)
+      # print(paste("X:", X))
       ratio = top /bottom
 
       u = runif(1)
 
       if (u < ratio) {
-        chain[iter+1, i] = proposal
-        A[iter+1, i] = Aproposal
+        chain[(iter+1), i] = proposal
+        X[i] = Aproposal
         acceptance[i] = acceptance[i] + 1
       }
 
       else {
-        chain[iter+1, i] = chain[iter, i]
-        A[iter+1, i] = A[iter, i]
+        chain[(iter+1), i] = chain[iter, i]
         }
 
 
     }### END OF COORDINATE LOOP
+
+      #MAJ A for (iter+1)
+      A[(iter + 1), ] = X
 
     ## MESSAGE FOR EACH THOUSAND ITER
     if (iter%% 5000 == 0) {
@@ -337,7 +356,7 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
   name_chains = paste(as.character(Transformation), "Sampling", sep ="_")
   output <- .list_BayLum(
     "Ages" = data.frame(
-      SAMPLE = Measures$SampleNames,
+      SAMPLE = DataMeasures$Measures$SampleNames,
       AGE = estimate,
       HPD68.MIN = credible68[ 1,],
       HPD68.MAX = credible68[2, ],

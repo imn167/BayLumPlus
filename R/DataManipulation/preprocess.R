@@ -80,11 +80,16 @@ covD = diag(as.numeric(Measures$sD))
 
 DtMeasures <- list(Theta = Theta, Measures = Measures, covD = covD)
 
-GibbsOutput <-  GibbsSampler(DtMeasures, 3, 70000, 50000, Sc, 1, 500, "logit", proposal_magnitude = .8)
-AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 70000, burnin = 50000, t = 15,
+GibbsOutput <-  GibbsSampler(DtMeasures, 3, 70000, 50000, Sc, 1, 500, "logit", proposal_magnitude = 1)
+pdf("R/DataManipulation/dataOSL.pdf", width = 18)
+plot(GibbsOutput$Sampling)
+coda::acfplot(GibbsOutput$Sampling)
+dev.off()
+AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 2000, burnin = 50000, t = 10,adapt = 0,
                              PriorAge = rep(c(1, 500),  Measures$Nb_sample))
 
 plotHpd(list(GibbsOutput, AgeAsBayLum), c("Gibbs", "BayLum"))
+
 
 ###-------------------------------------------------------------------------------@
 datasets2 <- readxl::read_excel("R/DataManipulation/dataOSL_3sites.xlsx")
@@ -109,25 +114,49 @@ covD = diag(as.numeric(Measures$sD))
 
 DtMeasures <- list(Theta = Theta, Measures = Measures, covD = covD)
 
-GibbsOutput <-  GibbsSampler(DtMeasures, 3, 90000, 70000, Sc, 1, 1400, "logit", proposal_magnitude = .6,
+GibbsOutput <-  GibbsSampler(DtMeasures, 3, 90000, 70000, Sc, 1, 1400, "logit", proposal_magnitude = 1,
                              plotlegend.pos = locator(1))
-pdf("R/DataManipulation/blockdataset.pdf", width = 12)
+pdf("R/DataManipulation/blockdataset.pdf", width = 17)
 plot(GibbsOutput$Sampling)
 coda::acfplot(GibbsOutput$Sampling)
 dev.off()
-AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 70000, burnin = 50000, t = 10,
+AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 2000, burnin = 50000, t = 10, adapt = 0,
                              PriorAge = rep(c(1, 1400),  Measures$Nb_sample))
 
-plotHpd(list(GibbsOutput, AgeAsBayLum), c("Gibbs", "BayLum"))
 
-# DATA4 <-  combine_DataFiles(DATA2, DATA3 , DATA1)
-# DATA4$SampleNames <-  c( "GDB5", "FER1","GDB3")
-#
-# P <- Palaeodose_Computation(DATA4, DATA4$SampleNames, DATA4$Nb_sample)
-#
-#
-# DtMeasures <- create_MeasuresDataFrame(P, DATA4,alpha[1], sdc[1:3])
-# DtMeasures$Measures$D
+plotHpd(list(GibbsOutput, AgeAsBayLum), c("Gibbs", "JagsBayLum"))
+
+## ============ Elaine data sets ======== ##
+
+extractElaine <- function() {
+    #strati
+  SampleNames <- readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 3)[, 1]
+  OSLestimate <- as.matrix(readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 3)[, c(4,7)])
+  Theta <- as.matrix(readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 5))
+  Sc <- as.matrix(readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 6))
+  n = dim(Theta)[1]
+  ddot =  as.numeric(readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 4)[3,c(12,13)])
+
+  Measures = list(SampleNames = SampleNames$Layer, D = OSLestimate[, 1], sD = OSLestimate[, 2], Nb_sample = n ,
+                  ddot = rep(ddot[1], n), sddot = rep(ddot[2], n), sddot_shared = rep(0, n))
+
+  return( list(Measures = Measures, Theta = Theta, covD = diag(Measures$sD), Sc = Sc))
+
+}
+
+DtMeasures <- extractElaine()
+GibbsOutput <- GibbsSampler(DtMeasures,3,  90000, 70000, DtMeasures$Sc, 5, 500, "logit", proposal_magnitude = 2, order = T)
+initialize_SC(DtMeasures$Sc, 5, 300)
+pdf("R/DataManipulation/Elainedataset.pdf", width = 17)
+plot(GibbsOutput$Sampling)
+coda::acfplot(GibbsOutput$Sampling)
+dev.off()
+
+AgeAsBayLum <-Compute_AgeS_D(DtMeasures, DtMeasures$Sc, ModelAgePrior$Jeffreys, Iter = 2000, burnin = 50000, t = 10,
+                             PriorAge = rep(c(1, 500),  DtMeasures$Measures$Nb_sample))
+
+AgeCorrected <- Compute_AgeS_D(DtMeasures, DtMeasures$Sc, prior = "StrictOrder", Iter = 2000, burnin = 50000, t = 10, adapt = 0,
+                               PriorAge = rep(c(1, 500),  DtMeasures$Measures$Nb_sample))
 
 
 
