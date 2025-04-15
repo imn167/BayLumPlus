@@ -99,13 +99,13 @@ Conditional <- " model {
 
   #i = 1
   u[1]~dunif(0,1)
-  A[1]=exp( log(T2)- (u[1])^(1/n) * log(T2/T1) ) # simulation ~ pi(A1)
+  A[1]=exp( log(T2)- (u[1])^(1/I) * log(T2/T1) ) # simulation ~ pi(A1)
 
   # i>2
   for(i in 2:I){
     u[i]~dunif(0,1)
 
-    A[i]=exp((u[i])^(1 / (n-i+1))*log(A[i-1]/T2)+log(T2)) #simulation ~ pi(Ai | A1...A(i-1))
+    A[i]=exp((u[i])^(1 / (I-i+1))*log(A[i-1]/T2)+log(T2)) #simulation ~ pi(Ai | A1...A(i-1))
   }
 
 

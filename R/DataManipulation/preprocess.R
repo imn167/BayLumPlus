@@ -199,18 +199,21 @@ dev.off()
 GibbsOutput$Ages$AGE
 
 
-plotHpd(list(GibbsOutput), "Gibbs") + ggplot2::geom_point(mapping = ggplot2::aes(SAMPLE, AGE), data = GibbsOutput$Ages, inherit.aes = F)
+plotHpd(list(GibbsOutput), "Gibbs") + ggplot2::geom_point(mapping = ggplot2::aes(SAMPLE, AGE), data = GibbsOutput$Ages, inherit.aes = F) +
+  ggplot2::geom_point(ggplot2::aes(Sample,Age ), data = simulated, inherit.aes = F, color = "blue")
 
-AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 2000, burnin = 50000, t = 10,
+AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, prior = "Jeffreys", Iter = 2000, burnin = 50000, t = 10,
                              PriorAge = rep(c(1, 200),  DtMeasures$Measures$Nb_sample))
 AgeCorrected <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder", Iter = 2000, burnin = 50000,t = 10,
                                PriorAge = rep(c(1, 200),  Measures$Nb_sample))
+AgeConditional <- Compute_AgeS_D(DtMeasures, Sc, prior = "Conditional", Iter = 2000, burnin = 50000, t = 10,
+                                 PriorAge = rep(c(1, 200),  Measures$Nb_sample))
 
-plotHpd(list(GibbsOutput, AgeCorrected), c("Gibbs", "BayLumCorr")) +
-  ggplot2::geom_point(mapping = ggplot2::aes(SAMPLE, AGE), data = AgeAsBayLum$Ages, inherit.aes = F,
-                                                                                    color = "blue") +
-  ggplot2::geom_point(ggplot2::aes(SAMPLE, AGE), data = GibbsOutput$Ages, inherit.aes = F, color = "orange") +
-  ggplot2::geom_point(ggplot2::aes(Sample,Age ), data = simulated, inherit.aes = F)
+plotHpd(list(GibbsOutput, AgeConditional), c("Gibbs", "Conditional")) +
+  ggplot2::geom_point(mapping = ggplot2::aes(SAMPLE, AGE), data = AgeConditional$Ages, inherit.aes = F,
+                                                                                    color = "red") +
+  ggplot2::geom_point(ggplot2::aes(SAMPLE, AGE), data = GibbsOutput$Ages, inherit.aes = F, color = "lightblue") +
+  ggplot2::geom_point(ggplot2::aes(Sample,Age ), data = simulated, inherit.aes = F, alpha = .4)
 
 
 

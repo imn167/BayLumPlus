@@ -133,7 +133,7 @@ Compute_AgeS_D <- function(
     #write model in tempfile
     temp_file <- tempfile(fileext = ".txt")
     writeLines(model, con = temp_file)
-    if ( prior == "Jeffreys") {
+    if ( prior == "Jeffreys" | prior == "Conditional") {
 
   inits = list(
     list(u = runif(Measures$Nb_sample)), #chain 1
