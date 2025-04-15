@@ -314,7 +314,7 @@ Compute_AgeS_D <- function(
 
   R[, c(6, 7)] <- round(CV$psrf, roundingOfValue)
 
-  print(dplyr::tibble(R) )
+  print(data.frame(R) )
   cat("\n----------------------------------------------\n")
 
 

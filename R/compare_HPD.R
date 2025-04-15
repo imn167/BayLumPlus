@@ -3,6 +3,7 @@
 #'@author Imène Bouafia (LMJL)
 #'@md
 #'@export
+
 plotHpd <- function(
     list_object,
     ModelNames,
@@ -24,6 +25,7 @@ plotHpd <- function(
          call. = FALSE
     )
   samples = runjags::combine.mcmc(object$Sampling)
+  Estimate = object$Age$AGE ## return estimate (mean)
 
   #if user wants other names
   colnames(samples) <- sampleNames

@@ -81,6 +81,38 @@ StrictOrder <- " model {
 
 }"
 
+
+Conditional <- " model {
+  ###### Likelyhood ####
+  for (i in 1:I) {
+    for (j in 1:I) {
+      Sigma[i, j] = A[i]* A[j] * Theta[i,j]
+    }
+    mu[i] = A[i] * ddot[i]
+  }
+  invSigma = inverse(Sigma + covD) #DP and symmetric ?
+  D ~ dmnorm(mu, invSigma)
+
+  ###### Prior #####
+  T1=xbound[1]
+  T2 = xbound[2]
+
+  #i = 1
+  u[1]~dunif(0,1)
+  A[1]=exp( log(T2)- (u[1])^(1/n) * log(T2/T1) ) # simulation ~ pi(A1)
+
+  # i>2
+  for(i in 2:I){
+    u[i]~dunif(0,1)
+
+    A[i]=exp((u[i])^(1 / (n-i+1))*log(A[i-1]/T2)+log(T2)) #simulation ~ pi(Ai | A1...A(i-1))
+  }
+
+
+}"
+
+
+
 # ModelAgePrior$StrictOrder <- StrictOrder
-#
-# usethis::use_data(ModelAgePrior, overwrite = T)
+ModelAgePrior$Conditional <- Conditional
+usethis::use_data(ModelAgePrior, overwrite = T)

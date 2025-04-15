@@ -80,13 +80,19 @@ covD = diag(as.numeric(Measures$sD))
 
 DtMeasures <- list(Theta = Theta, Measures = Measures, covD = covD)
 
-GibbsOutput <-  GibbsSampler(DtMeasures, 3, 70000, 50000, Sc, 1, 500, "logit", proposal_magnitude = 1)
+GibbsOutput <-  GibbsSampler(DtMeasures, 3, 70000, 50000, Sc, 1, 500, "logit", proposal_magnitude = 2, lambda = .1, lag = 20, n_logitStep = 10)
 pdf("R/DataManipulation/dataOSL.pdf", width = 18)
 plot(GibbsOutput$Sampling)
 coda::acfplot(GibbsOutput$Sampling)
+plot(GibbsOutput$name_chains)
+coda::acfplot(GibbsOutput$name_chains)
 dev.off()
 AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 2000, burnin = 50000, t = 10,adapt = 0,
                              PriorAge = rep(c(1, 500),  Measures$Nb_sample))
+
+AgeCorrected <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder", Iter = 20000, burnin = 50000,t = 10,
+                               PriorAge = rep(c(1, 500),  Measures$Nb_sample))
+
 
 plotHpd(list(GibbsOutput, AgeAsBayLum), c("Gibbs", "BayLum"))
 
@@ -114,11 +120,12 @@ covD = diag(as.numeric(Measures$sD))
 
 DtMeasures <- list(Theta = Theta, Measures = Measures, covD = covD)
 
-GibbsOutput <-  GibbsSampler(DtMeasures, 3, 90000, 70000, Sc, 1, 1400, "logit", proposal_magnitude = 1,
-                             plotlegend.pos = locator(1))
+GibbsOutput <-  GibbsSampler(DtMeasures, 3, 90000, 70000, Sc, 1, 1400, "logit", proposal_magnitude = 2, lambda = 1)
 pdf("R/DataManipulation/blockdataset.pdf", width = 17)
 plot(GibbsOutput$Sampling)
 coda::acfplot(GibbsOutput$Sampling)
+plot(GibbsOutput$name_chains)
+coda::acfplot(GibbsOutput$name_chains)
 dev.off()
 AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 2000, burnin = 50000, t = 10, adapt = 0,
                              PriorAge = rep(c(1, 1400),  Measures$Nb_sample))
@@ -130,10 +137,10 @@ plotHpd(list(GibbsOutput, AgeAsBayLum), c("Gibbs", "JagsBayLum"))
 
 extractElaine <- function() {
     #strati
-  SampleNames <- readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 3)[, 1]
-  OSLestimate <- as.matrix(readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 3)[, c(4,7)])
-  Theta <- as.matrix(readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 5))
-  Sc <- as.matrix(readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 6))
+  SampleNames <- readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 3)[4:15, 1]
+  OSLestimate <- as.matrix(readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 3)[4:15, c(4,7)])
+  Theta <- as.matrix(readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 5))[4:15, 4:15]
+  Sc <- as.matrix(readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 6))[-(1:3), -(1:3)]
   n = dim(Theta)[1]
   ddot =  as.numeric(readxl::read_xlsx("R/DataManipulation/All_Qz_Grains_BayLum_doses.xlsx", sheet = 4)[3,c(12,13)])
 
@@ -145,11 +152,13 @@ extractElaine <- function() {
 }
 
 DtMeasures <- extractElaine()
-GibbsOutput <- GibbsSampler(DtMeasures,3,  90000, 70000, DtMeasures$Sc, 5, 500, "logit", proposal_magnitude = 2, order = T)
+GibbsOutput <- GibbsSampler(DtMeasures,2,  150000, 130000, DtMeasures$Sc, 1, 500, "logit", proposal_magnitude = 1, order = T, lambda = .1, n_logitStep = 10)
 initialize_SC(DtMeasures$Sc, 5, 300)
 pdf("R/DataManipulation/Elainedataset.pdf", width = 17)
 plot(GibbsOutput$Sampling)
 coda::acfplot(GibbsOutput$Sampling)
+plot(GibbsOutput$name_chains)
+coda::acfplot(GibbsOutput$name_chains)
 dev.off()
 
 AgeAsBayLum <-Compute_AgeS_D(DtMeasures, DtMeasures$Sc, ModelAgePrior$Jeffreys, Iter = 2000, burnin = 50000, t = 10,
@@ -157,6 +166,53 @@ AgeAsBayLum <-Compute_AgeS_D(DtMeasures, DtMeasures$Sc, ModelAgePrior$Jeffreys, 
 
 AgeCorrected <- Compute_AgeS_D(DtMeasures, DtMeasures$Sc, prior = "StrictOrder", Iter = 2000, burnin = 50000, t = 10, adapt = 0,
                                PriorAge = rep(c(1, 500),  DtMeasures$Measures$Nb_sample))
+
+##-----------------------------------------------
+simulated = read.csv("R/DataManipulation/osl_constrained_data.csv")
+commonError = .03
+colnames(simulated)[2:7] <- c("D", "sD", "ddot", "sddot", "Age", "sAge" )
+simulated
+Measures <- list(SampleNames = simulated$Sample,
+                 ddot = simulated$ddot,  # Environmental dose rate (Gy/ka)
+                 sddot = simulated$sddot, # Error on dose rate (Gy/ka)
+                 D = simulated$D,  # OSL Dose (Gy)
+                 sD = simulated$sD,  # Error on dose (Gy)
+                 sddot_shared = rep(commonError, 15),  # Common error term (Gy)
+                 Nb_sample = 15)
+
+Sc = rbind(rep(1, Measures$Nb_sample), upper.tri(matrix(rep(1), ncol = Measures$Nb_sample, nrow = Measures$Nb_sample))*1)
+Sc = rbind(rep(1, Measures$Nb_sample), matrix(rep(0), ncol = Measures$Nb_sample, nrow = Measures$Nb_sample))
+
+Theta = diag(as.numeric(Measures$sddot)) +
+  as.numeric(Measures$sddot_shared) %*% t(as.numeric(Measures$sddot_shared))
+covD = diag(as.numeric(Measures$sD))
+
+DtMeasures <- list(Theta = Theta, Measures = Measures, covD = covD)
+GibbsOutput = GibbsSampler(DtMeasures, 3, 70000, 50000, Sc, 1, 200, "logit", lambda = .5, n_logitStep = 5)
+pdf("R/DataManipulation/simulated15.pdf", width = 18)
+plot(GibbsOutput$Sampling)
+coda::acfplot(GibbsOutput$Sampling)
+plot(GibbsOutput$name_chains)
+coda::acfplot(GibbsOutput$name_chains)
+dev.off()
+
+GibbsOutput$Ages$AGE
+
+
+plotHpd(list(GibbsOutput), "Gibbs") + ggplot2::geom_point(mapping = ggplot2::aes(SAMPLE, AGE), data = GibbsOutput$Ages, inherit.aes = F)
+
+AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, ModelAgePrior$Jeffreys, Iter = 2000, burnin = 50000, t = 10,
+                             PriorAge = rep(c(1, 200),  DtMeasures$Measures$Nb_sample))
+AgeCorrected <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder", Iter = 2000, burnin = 50000,t = 10,
+                               PriorAge = rep(c(1, 200),  Measures$Nb_sample))
+
+plotHpd(list(GibbsOutput, AgeCorrected), c("Gibbs", "BayLumCorr")) +
+  ggplot2::geom_point(mapping = ggplot2::aes(SAMPLE, AGE), data = AgeAsBayLum$Ages, inherit.aes = F,
+                                                                                    color = "blue") +
+  ggplot2::geom_point(ggplot2::aes(SAMPLE, AGE), data = GibbsOutput$Ages, inherit.aes = F, color = "orange") +
+  ggplot2::geom_point(ggplot2::aes(Sample,Age ), data = simulated, inherit.aes = F)
+
+
 
 
 

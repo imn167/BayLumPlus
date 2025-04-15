@@ -55,21 +55,51 @@ GibbsDensity <- function(DataMeasures, A, Ai, index, a, b) {
 
 #=================================================================================@
 #'@export
-proposal_sd <- function(DataMeasures) {
+proposal_sd <- function(DataMeasures, lowerPeriod, upperPeriod, indexbounds, lambda) {
+  ##
   Measures = DataMeasures$Measures
-  Ahat = as.numeric(Measures$D)/as.numeric(Measures$ddot)
-  sdAhat = Ahat *sqrt((as.numeric(Measures$sD / Measures$D))**2 +
-                       as.numeric(Measures$sddot/Measures$ddot)**2)
-  return(sdAhat)
+  D = as.numeric(Measures$D)
+  ddot = as.numeric(Measures$ddot)
+  sD = as.numeric(Measures$sD)
+  sddot = as.numeric(Measures$sddot)
+  ## bounds
+  Ahat = D/ ddot
+  bounds = apply(indexbounds, 2, function(b) c(lowerPeriod, Ahat, upperPeriod)[b])
+  upper = bounds[2, ]
+  lower = bounds[1, ]
+  ##
+  const =( Ahat * (upper - lower)  / ( (upper - Ahat) * (Ahat - lower)))
+  sdhat = abs(const)*sqrt( (sD/D)**2  + (sddot / ddot)**2 )
+  #
+  return(sdhat)
 
 }
 #=================================================================================@
 #'@export
-logitT <- function(u, bounds) {
+sigmoidT <- function(u, bounds, lambda) {
   lowerbound = bounds[1]
   upperbound = bounds[2]
   return(
-    (exp(u) * upperbound + lowerbound) / (1+ exp(u))
+    (exp(lambda * u) * upperbound + lowerbound) / (1+ exp(lambda*u))
+  )
+}
+
+#'@export
+logitT <- function(u, bounds, lambda) {
+  lowerbound = bounds[1]
+  upperbound = bounds[2]
+  return(
+    log((u-lowerbound) / (upperbound - u)) / lambda
+  )
+}
+
+#'@export
+logitJacobien <- function(u, bounds, lambda) {
+  lowerbound = bounds[1]
+  upperbound = bounds[2]
+
+  return(
+    (upperbound - lowerbound) * lambda * exp(lambda * u) / (1+exp(lambda * u))**2
   )
 }
 
@@ -86,7 +116,7 @@ arctanT <- function(u, bounds) {
 
 #=================================================================================@
 #'@export
-initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F, order= T) {
+initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F, order= F) {
   Sc = Sc[-1, ] #del first line
   n = nrow(Sc)
   rownames(Sc) = colnames(Sc) = paste0("A", 1:n)
@@ -113,7 +143,6 @@ initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F, order= T)
   A[outdegree] = A[indegree] + shift
 
   intermed = igraph::V(network)[igraph::degree(network, mode = "out") > 0 & igraph::degree(network, mode = "in") >0 ]
-  print(A)
   topo_order = igraph::topo_sort(network, mode = "out")
   in_topo_order = topo_order[topo_order %in% intermed]
   for (i in in_topo_order) {
@@ -133,7 +162,7 @@ initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F, order= T)
     ##simulation
     if (min_bound < max_bound) {
       A[i] = runif(1, min_bound, max_bound)
-      print("yes")
+
     }
 
     else { A[i] = min_bound}
@@ -147,19 +176,19 @@ initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, plotGraph = F, order= T)
 GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
                       LowerPeriod, UpperPeriod, Transformation = "arctan",
                       lag = 10, plotGraph = T, plotChain = T, plotACF = T,
-                      roundingOfValue = 3, proposal_magnitude = 1,
+                      roundingOfValue = 3, proposal_magnitude = 1, lambda, n_logitStep,
                       ...) {
 
-  #---------------- Pre-seting -----------------#@
+  #---------------- Pre-setting -----------------#@
   n_ages = DataMeasures$Measures$Nb_sample
   chains = coda::mcmc.list() #list of chains
   As = coda::mcmc.list()
   acceptances = list()
+  length_bound = list()
   ### Bounds Index according to SC
   IndexBounds = sapply(1:n_ages, findbound, Sc) + 1 # 2 x n_ages
   IndexBounds[which(IndexBounds == 0, arr.ind = T)] = n_ages + 2
 
-  ## standard deviation for kernel proposal
 
 
   for (c in 1:nchain) {
@@ -170,41 +199,50 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
     init = initialize_SC(Sc, LowerPeriod, UpperPeriod, plotGraph)
 
     bounds = apply(IndexBounds, 2, function(b) c(LowerPeriod, init, UpperPeriod)[b]) # 2 x n_ages
-    #creating array for iteration
-    chain <- A <- matrix(NA, nrow = niter+1, ncol = n_ages)
-    colnames(A) <- DataMeasures$Measures$SampleNames
 
+    ## standard deviation for kernel proposal
+    sd = proposal_magnitude * proposal_sd(DataMeasures, LowerPeriod, UpperPeriod, IndexBounds, lambda)
+  print(sd)
+    #creating array for iteration
+    chain <- A <- lbound <- matrix(NA, nrow = niter+1, ncol = n_ages)
+
+    lbound[1,] = bounds[2, ] - bounds[1, ]
     A[1, ] = init
     acceptance = rep(0, n_ages)
     names(acceptance) <- paste("rate", DataMeasures$Measures$SampleNames, sep = "-")
 
 
-    if (Transformation == "logit") { #Test Sigmoid with parameter lambda
+    if (Transformation == "logit") {
     ##logit transformation for init
-    chain[1, ] = log((init-bounds[1,]) / (bounds[2,] - init)) # n_ages
+    chain[1, ] = log((init-bounds[1,]) / (bounds[2,] - init)) / lambda # n_ages
     }
 
     else if (Transformation == "arctan") {
       chain[1, ] = tan( (pi/(bounds[2, ] - bounds[1, ])) * (init - bounds[1,]) - pi/2 )
     }
+   # sink("R/DataManipulation/output.txt")
+   print(data.frame(lower = bounds[1,], A = init, upper = bounds[ 2, ]))
 
       X = A[1, ] #vector of proposition
-      for (iter in 1:niter) {
-          for (i in sample(1:n_ages)) {
-      bounds_i = c(LowerPeriod, X, UpperPeriod)[IndexBounds[, i]] # (bounds for Ai whithin Gibbs)
 
-      # MAJ Ai
-      sd = proposal_magnitude * proposal_sd(DataMeasures)
-      proposal = chain[iter, i] + rnorm(1, sd = sd[i])
+      for (iter in 1:niter) {
+          for (i in 1:n_ages) {
+      bounds_i = c(LowerPeriod, X, UpperPeriod)[IndexBounds[, i]] # (bounds for Ai whithin Gibbs)
+      lbound[(iter+1), i] = bounds_i[2]-bounds_i[1]
+
+      logitstep = matrix(, nrow = 1, ncol = (n_logitStep + 1))
+      Ak = matrix(, nrow = 1, ncol = (n_logitStep + 1))
+      logitstep[1] = chain[iter, i]
+      Ak[1] = X[i]
+      for (k in 1:n_logitStep) {
+        proposal = logitstep[k] + rnorm(1, sd = sd[i])
 
       #proposal depends on the transformation
       if (Transformation == "logit") {
-        Aproposal = logitT(proposal, bounds_i)
-        top = GibbsDensity(DataMeasures, X, Aproposal, i, bounds_i[1], bounds_i[2]) *
-          (bounds_i[2]-bounds_i[1]) * exp(proposal) / ( (1 + exp(proposal))**2)
-
-        bottom = GibbsDensity(DataMeasures, X, A[iter, i], i, bounds_i[1], bounds_i[2]) *
-          ((bounds_i[2]-bounds_i[1]) * exp(chain[iter, i]) / (( 1+exp(chain[iter, i]))**2 ) )
+        Aproposal = sigmoidT(proposal, bounds_i, lambda)
+        top = GibbsDensity(DataMeasures, X, Aproposal, i, bounds_i[1], bounds_i[2]) * logitJacobien(proposal, bounds_i, lambda)
+        bottom = GibbsDensity(DataMeasures, X, Ak[k], i, bounds_i[1], bounds_i[2]) *
+          logitJacobien(logitstep[k], bounds_i, lambda)
       }
 
       else if (Transformation == "arctan") {
@@ -216,21 +254,38 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
         ((bounds_i[2]-bounds_i[1]) / (pi *(1+chain[iter, i]**2)) )
 
       }##### END OF ARCTAN TRANSFORMATION
-      # print(bounds_i)
-      # print(paste("X:", X))
-      ratio = top /bottom
+        ratio = top / bottom
 
-      u = runif(1)
+        if (runif(1) <= ratio) {
+          logitstep[k+1] = proposal
+          Ak[k+1] = Aproposal
+          acceptance[i] = acceptance[i] + 1
+        }
+        else {
+          logitstep[k+1] = logitstep[k]
+          Ak[k+1] = Ak[k]
+        }
 
-      if (u < ratio) {
-        chain[(iter+1), i] = proposal
-        X[i] = Aproposal
-        acceptance[i] = acceptance[i] + 1
+
       }
 
-      else {
-        chain[(iter+1), i] = chain[iter, i]
+      # print(bounds_i)
+      # print(paste("X:", X))
+      # print(data.frame(index = i, lambda_star = proposal, A_star = Aproposal, A = X[i], lambda = chain[iter, i],
+      # lower = bounds_i[1], upper = bounds_i[2], ratio = top/bottom ))
+
+      X[i] = Ak[(n_logitStep +1)]
+      chain[(iter+1), i] = logitstep[(n_logitStep+1)]
+
+
+      if (iter < 2000 & iter%%100 == 0) {
+        if (acceptance[i] > .4) {
+          sd[i] = sd[i] * 1.1
         }
+        else {
+          sd[i] = .9 * sd[i]
+          }
+      }
 
 
     }### END OF COORDINATE LOOP
@@ -243,7 +298,9 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
       cat(sprintf("\r -------- Chain %d & Iteration: %d -------", c,  iter))
     }
   }#### END OF ITER LOOP
+    # sink(file = NULL)
 
+    colnames(A) <- DataMeasures$Measures$SampleNames
     seq_lag = seq(burnin, (niter+1), lag)
     chain = chain[seq_lag, ]
     A = A[seq_lag, ]
@@ -252,8 +309,8 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
     #ADD chains, As, acceptances
     chains[[paste0("chain", c)]] <- coda::mcmc(chain)
     As[[paste0("chain", c)]] <- coda::mcmc(A)
-    acceptances[[paste0("acceptance", c)]] <- acceptance / niter
-
+    acceptances[[paste0("acceptance", c)]] <- acceptance /(n_logitStep* niter)
+    length_bound[[paste0("chain", c)]] <- lbound
   }
 
   ##plot
@@ -287,9 +344,14 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
   ))
   print(coda::autocorr.diag(As))
 
-  try(plot(coda::acfplot(As)))
+  # try(plot(coda::acfplot(As)))
 
-  dev.off()
+
+
+  plot(1:n_ages, seq(0,1, length.out = n_ages), ylab = "acceptation rate", xlab = "samples", type = "n")
+  a = sapply(acceptances, lines, col = 1:n_ages)
+  a = sapply(acceptances, points, col = 1:n_ages)
+
 
   cat("\n\n ------------------------------------------------------------------------------\n\n")
   message(".   *****  The following information are only valid if the MCMC chains have converged.   ****    ")
@@ -371,7 +433,8 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
     "model" = "Gibbs",
     "acceptance" = acceptances,
     SummaryMCMC = summaryMCMC,
-    name_chains = chains
+    name_chains = chains,
+    length_bound = length_bound
   )
 
   BayLum::plot_Ages(object = output, model = "Jeffreys prior")
