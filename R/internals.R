@@ -102,6 +102,23 @@ ICAgeTheme <- function(rotation_x = F) {
 }
 
 
+####
+#'@description general Theme
+#'@author Bouafia Imène (LMJL)
+#'@md
+#'@noRd
+
+BayLumTheme <- function() {
+
+  theme <- ggplot2::theme_minimal() + ggplot2::theme(axis.text = ggplot2::element_text(face = "bold", color = "black", size = 12),
+                                                     axis.title =  ggplot2::element_text(face = "bold", color = "#342F2E", size = 12),
+                                                     legend.text = ggplot2::element_text(size = 8, face = "bold", color = "black"),
+                                                     legend.title = ggplot2::element_text(size = 10, face = "bold", color = "black"))
+
+}
+
+
+
 #=========== HPD Regions ===========#
 #'@description This function compute the HPD regions
 #'@author Bouafia Imène (LMJL)
@@ -161,6 +178,166 @@ hpd_method <- function(name, chain, level = .95) {
   }
   return(HPD)
 }
+
+#=================================================================================@
+AgeApprox <- function(DataMeasures) {
+  D = as.numeric(DataMeasures$Measures$D)
+  sD = as.numeric(DataMeasures$Measures$sD)
+  ddot = as.numeric( DataMeasures$Measures$ddot)
+  sddot = as.numeric( DataMeasures$Measures$sddot)
+  Ahat = D/ddot
+  sdAhat = Ahat * sqrt( (sD/D)**2 + (sddot/ddot)**2 )
+  return(list(Ahat = Ahat, sdAhat = sdAhat))
+
+}
+
+#=================================================================================@
+
+strictify_monotonic <-  function(A, min_gap= .5, jitter_strength=1e-2) {
+  n = length(A)
+  jitter = cumsum(runif(n, min_gap, min_gap + jitter_strength))
+  A_strict = A + jitter
+
+  return(A_strict)
+}
+
+
+#### Initialization over the whole study period [T1, T2]
+nichollsInit <- function(I, upper, lower) {
+  s = runif(1, min = 0, max = (upper-lower))
+  first = runif(1, min = lower, max = (upper-s))
+  e = rexp((I-1))
+
+  return(list(s =s , e= e, first = first))
+}
+
+nichollsBRInit <- function(I, upper, lower) {
+  s = runif(1, min = 0, max = (upper-lower))
+  first = runif(1, min = lower, max = (upper-s))
+  e = rexp((I-1))
+  b = rbeta((I-2), .5,(I-2))
+  z = rbinom((I-2), 1, .5)
+
+  return(list(s =s , e= e, first = first, b =b, z =z))
+}
+
+
+#=================================================================================@
+remove_transitive_edges <- function(G) {
+  reduced_G = rlang::duplicate(G)
+  vertices = igraph::V(G)
+  for (u in vertices) {
+    message(paste("----------------- traitement sommet", u, "--------------"))
+    #get all the neighbors of the vertices u
+    u_neighbors = igraph::neighbors(G, u, mode = "out")
+    #look for the descendants of each neighbors
+    for (nei in u_neighbors) {
+      message(paste("traitement voisin", nei))
+      childs = igraph::subcomponent(G, nei, mode = "out")[-1]
+      for (child in childs) {
+        if (igraph::are_adjacent(reduced_G, u, child)) {
+          print(igraph::E(reduced_G, c(u, child)))
+          reduced_G = igraph::delete_edges(reduced_G, igraph::E(reduced_G, P = c(u,child)))
+        }
+      }
+    }
+  }
+  return(reduced_G)
+}
+
+
+## Network Visualization
+
+network_vizualization <- function(network, vertices_labels, interactive = FALSE, ...) {
+
+  ##layout for stratigraphic constraints
+  layout = igraph::layout_with_sugiyama(network)$layout
+  n = length(igraph::V(network))
+  if (interactive) {
+    nodes <- data.frame(id = 1:n,
+      label = vertices_labels,
+      size = 25,
+      shape = "dot",
+      font = list(size = 20, face = "bold"),
+      stringsAsFactors = FALSE,
+      x = layout[, 1] * 100,
+      y = -layout[, 2] * 100   # invert Y for visNetwork
+    )
+
+    edges = igraph::as_data_frame(network, what = "edges")
+    names(edges)[1:2] <- c("from", "to")
+
+    visNetwork::visNetwork(nodes, edges) %>%
+      visNetwork::visEdges(arrows = "to") %>%
+      visNetwork::visOptions(highlightNearest = TRUE, nodesIdSelection = TRUE) %>%
+      visNetwork::visLayout(randomSeed = 123)
+
+  }
+
+
+  else {
+  plot(
+    network,
+    layout = layout,
+    vertex.label = vertices_labels,
+    vertex.size = 20,
+    vertex.color = adjustcolor("lightblue", alpha.f = 0.6),
+    edge.arrow.size = 0.4,  # Smaller arrowheads
+    edge.width = 2,
+    asp = 0,
+    edge.curved = 0.1
+  )}
+}
+
+
+
+
+#=================================================================================@
+IsotonicRegDAG = function(network, Ahat, weights) {
+
+  n = length(Ahat)
+  # cp variables
+  A = CVXR::Variable(n, name = "A")
+
+  #graph
+  m = length(igraph::E(network))
+  ##quadratic expression
+  objectif = CVXR::Minimize(CVXR::sum_squares( CVXR::multiply(weights, (A-Ahat)) ))
+  #optimization matrix
+  M = matrix(0, nrow = m, ncol = n)
+  edges_list = igraph::as_edgelist(network, names = F)
+  for (i in 1:m) {
+    M[i, edges_list[i, ]] = c(1,-1)
+  }
+
+  constraints = M %*% A <= 0
+  problem = CVXR::Problem(objectif, list(constraints))
+  results = CVXR::solve(problem)
+  IsoA = results$getValue(A)
+  return(list(A=IsoA, solver = results))
+}
+
+ISotonicCurve <- function(network, object) {
+  #get all mcmc samples
+  sample = runjags::combine.mcmc(object$Sampling) ## mcmc sample
+
+  w = 1/ as.numeric(object$Summary[, 8])^2 #inv of the estimated variance
+
+  ## apply for each age vector the Isotonic Regression
+  IsoSamples = apply(sample, 1, function(Ahat, network, weights) IsotonicRegDAG(network, Ahat, weights ),
+                     network = network , weights = w)
+
+  IsoSamples
+
+
+
+}
+
+
+
+
+
+
 
 
 

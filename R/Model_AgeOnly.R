@@ -81,6 +81,75 @@ StrictOrder <- " model {
 
 }"
 
+Strict_nicholls <- "model {
+  ###### Likelyhood ####
+  for (i in 1:I) {
+    for (j in 1:I) {
+      Sigma[i, j] = A[i]* A[j] * Theta[i,j]
+    }
+    mu[i] = A[i] * ddot[i]
+  }
+  invSigma = inverse(Sigma + covD) #DP and symmetric ?
+  D ~ dmnorm(mu, invSigma)
+
+  #bounds
+  alpha = xbound[1]
+  beta = xbound[2]
+###### Prior #####
+  for (i in 1: (I-1)) {
+  e[i] ~ dexp(1)
+  }
+
+  s ~ dunif(0, 1)
+  first ~ dunif(0, (1-s))
+  u[1]= first
+  u[I]= s + first
+
+  for (i in 2:(I-1)) {
+    u[i] = (sum(e[1:(i-1)]) / sum(e[1:(I-1)])) *s + first
+  }
+  for (i in 1:I) {
+    A[i] = u[i] * (beta - alpha) + alpha
+
+  }
+
+}"
+
+nichollsBR <- "model {
+  ###### Likelyhood ####
+  for (i in 1:I) {
+    for (j in 1:I) {
+      Sigma[i, j] = A[i]* A[j] * Theta[i,j]
+    }
+    mu[i] = A[i] * ddot[i]
+  }
+  invSigma = inverse(Sigma + covD) #DP and symmetric ?
+  D ~ dmnorm(mu, invSigma)
+
+  #bounds
+  alpha = xbound[1]
+  beta = xbound[2]
+###### Prior #####
+  for (i in 1: (I-1)) {
+  e[i] ~ dexp(1)
+  }
+
+  s ~ dunif(0, 1)
+  first ~ dunif(0, (1-s))
+  A[1]= first * (beta-alpha) + alpha
+  A[I]= (s + first) * (beta-alpha) + alpha
+
+  for (i in 1:(I-2)) {
+    u[i] = (sum(e[1:(i)]) / sum(e[1:(I-1)])) *s + first
+    z[i] ~ dbinom(.5, 1)
+    b[i] ~ dbeta(1, (I-2))
+  }
+  for (i in 2:(I-1)) {
+    A[i] = (u[i-1] + z[i-1]*b[i-1]) * (beta - alpha) + alpha
+  }
+
+}"
+
 
 Conditional <- " model {
   ###### Likelyhood ####
@@ -112,7 +181,9 @@ Conditional <- " model {
 }"
 
 
-
+#
 # ModelAgePrior$StrictOrder <- StrictOrder
-ModelAgePrior$Conditional <- Conditional
-usethis::use_data(ModelAgePrior, overwrite = T)
+# ModelAgePrior$StrictNicholls <- Strict_nicholls
+# ModelAgePrior$nichollsBR <- nichollsBR
+# usethis::use_data(ModelAgePrior, overwrite = T)
+# ModelAgePrior$Conditional <- Conditional

@@ -61,7 +61,9 @@ Imports:
     truncnorm,
     igraph (>= 2.1.2),
     ggplot2 (>= 3.5.1),
-    graphics (>= 4.4.2)
+    graphics (>= 4.4.2),
+    Iso (>= 0.0.21),
+    visNetwork (>= 2.1.2)
 Suggests: 
     knitr,
     rmarkdown,

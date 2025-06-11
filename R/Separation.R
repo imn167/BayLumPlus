@@ -151,6 +151,26 @@ Compute_AgeS_D <- function(
       list(e = rexp(Measures$Nb_sample+ 1)) #chain 3
     )
   }
+
+    else if (prior == "StrictNicholls") {    ######
+      temp_file <- tempfile(fileext = ".txt")
+      writeLines(model, con = temp_file)
+      inits = list(
+       nichollsInit(Measures$Nb_sample, 1, 0) , #chain 1
+       nichollsInit(Measures$Nb_sample, 1, 0), #chain 2
+       nichollsInit(Measures$Nb_sample, 1, 0) #chain 3
+      )
+    }
+
+    else if (prior == "nichollsBR") {    ######
+      temp_file <- tempfile(fileext = ".txt")
+      writeLines(model, con = temp_file)
+      inits = list(
+        nichollsBRInit(Measures$Nb_sample, 1, 0) , #chain 1
+        nichollsBRInit(Measures$Nb_sample, 1, 0), #chain 2
+        nichollsBRInit(Measures$Nb_sample, 1, 0) #chain 3
+      )
+    }
     #run JAGS
     results_runjags <-
       runjags::run.JAGS(
@@ -283,7 +303,7 @@ Compute_AgeS_D <- function(
 
   R <- matrix(
     data = NA,
-    ncol = 7,
+    ncol = 8,
     nrow = Measures$Nb_sample,
     dimnames = list(rnames,
                   c(
@@ -293,7 +313,8 @@ Compute_AgeS_D <- function(
                       "upper bound at 68%",
                       "upper bound at 95%",
                       "Convergencies: Point estimate",
-                      "Convergencies: uppers confidence interval"
+                      "Convergencies: uppers confidence interval",
+                      "Bayes sd"
                     )
                   )
   )
@@ -307,12 +328,14 @@ Compute_AgeS_D <- function(
   credible95 <-  apply(sample, 2, CredibleInterval, level = .95)[ 2:3, ]
   credible68 <- apply(sample, 2, CredibleInterval, level = .68)[2:3, ]
   estimate <- apply(sample, 2, mean)
+  standardError <- apply(sample, 2, sd)
 
-  R[, c(1,5)] <- round(credible95, roundingOfValue)
-  R[, c(2,4)] <- round(credible68, roundingOfValue)
+  R[, c(1,5)] <- round(t(credible95), roundingOfValue)
+  R[, c(2,4)] <- round(t(credible68), roundingOfValue)
   R[, 3] <-   round(estimate, roundingOfValue)
 
   R[, c(6, 7)] <- round(CV$psrf, roundingOfValue)
+  R[, 8] <- round(standardError, roundingOfValue)
 
   print(data.frame(R) )
   cat("\n----------------------------------------------\n")
@@ -359,7 +382,8 @@ Compute_AgeS_D <- function(
     "StratiConstraints" = results_runjags$args$StratiConstraints,
     "CovarianceMatrix" = results_runjags$args$CovarianceMatrix,
     "model" = results_runjags$model,
-    "runjags_object" = results_runjags
+    "runjags_object" = results_runjags,
+    "Summary" = R
   )
 
   cat("\n ===================================\n")
