@@ -592,9 +592,22 @@ GibbsSamplerTrunc <- function(DataMeasures, nchain,niter, burnin, Sc,
   acceptances = list()
   length_bound = list()
 
-  ### Bounds For each Age
-  IndexBounds = sapply(1:n_ages, findbound, Sc) + 1 # 2 x n_ages
-  IndexBounds[which(IndexBounds == 0, arr.ind = T)] = n_ages + 2
+  ### Network from Sc
+  SC = Sc[-1, ] ## KEEP IT UNTIL FUTHER UPDATES
+  network = igraph::graph_from_adjacency_matrix()
+  reduced_network = remove_transitive_edges(network)
+
+  ## vizualisation 2 modes
+  if ("interactive" %in% list(...)) {
+
+  network_vizualization(reduced_network, DataMeasures$Measures$SampleNames, list(...)$interactive)
+  }
+
+  network_vizualization(reduced_network, DataMeasures$Measures$SampleNames)
+
+
+  ### Index of bounds for each age
+  IndexBounds = findbounds(reduced_network) # list of list
 
   # observation's values
   D = as.numeric(DataMeasures$Measures$D)

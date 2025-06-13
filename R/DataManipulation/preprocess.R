@@ -525,7 +525,7 @@ AgeAsBayLum <- Compute_AgeS_D(DtMeasures, Sc, prior = "Jeffreys", Iter = 2000, b
 
 Sc = rbind(rep(1, Measures$Nb_sample), upper.tri(matrix(rep(0), ncol = Measures$Nb_sample, nrow = Measures$Nb_sample))*0)
 
-Independant <-Compute_AgeS_D(DtMeasures, , prior = "Jeffreys", Iter = 2000, burnin = 50000, t = 10,
+Independant <-Compute_AgeS_D(DtMeasures, Sc, prior = "Jeffreys", Iter = 2000, burnin = 50000, t = 10,
                              PriorAge = rep(c(1, 1400),  DtMeasures$Measures$Nb_sample))
 
 plotHpd(list(AgeCorrected, AgeNicholls, AgeAsBayLum, Independant,
@@ -552,14 +552,80 @@ OslJingbian <- readxl::read_xlsx("R/DataManipulation/OSL_EastMound.xlsx", sheet 
 colnames(OslJingbian)[c(4, 7)] <- c("Depth", "std")
 dim_data <- dim(OslJingbian)
 OslJingbian <- OslJingbian %>% dplyr::select(Depth, Age, std)
-IsoJingbian = Iso::pava(OslJingbian$Age, 1/(OslJingbian$std)**2)
-OslJingbian <- OslJingbian %>% dplyr::mutate(iso = IsoJingbian)
-ggplot2::ggplot(data = OslJingbian, ggplot2::aes(x = Depth, y = Age, color = "Measures")) + ggplot2::geom_point(size = 2, shape = 15) +
-  ggplot2::geom_point(ggplot2::aes(x = Depth, y= iso, color = "IsotonicReg"), size = 2) + BayLumTheme() +ggplot2::labs(colour = "Method")
 
-## apply the uncertainty after only using the independant bayesian model
+n_draws = 1000
+simulations <- t(as.matrix(replicate(n_draws, rnorm(10, OslJingbian$Age, OslJingbian$std))))
+
+# Create the edges: 1->2, 2->3, ..., 9->10
+edges <- cbind(1:9, 2:10)
+
+# Create the graph
+g <- graph_from_edgelist(edges, directed = TRUE)
+length(E(g))
+# Plot
+plot(g,
+     vertex.label = V(g)$name,
+     vertex.color = "lightblue",
+     vertex.size = 10,
+     edge.arrow.size = 0.5,
+     layout = layout_with_sugiyama(g))
+
+IsoJingbian <- apply(simulations, 1, function(Ahat, network, weights) IsotonicRegDAG(network, Ahat, weights )$A,
+      network = g , weights = 1/(OslJingbian$std)**2)
 
 
+df <- data.frame(lower = apply(t(IsoJingbian), 2, arkhe::interval_hdr)[1,], upper = apply(t(IsoJingbian), 2, arkhe::interval_hdr)[2,],
+                 Unit = 1:10, avg = apply(t(IsoJingbian), 2, mean))
+df %>%  ggplot2::ggplot(ggplot2::aes(x = Unit, ymin = lower, ymax = upper), fill = "orange") +
+  ggplot2::geom_ribbon(alpha = .4) +
+  ggplot2::geom_line(ggplot2::aes(y = lower), color = "orange", group = 1) +
+  ggplot2::geom_line(ggplot2::aes(y = upper), color = "orange", group = 1) +
+  ggplot2::geom_line(ggplot2::aes(y = avg), color = "orange", group = 1, size =1.5) +
+  ggplot2::geom_point(ggplot2::aes(x = Unit, y = lower), color = "blue") +
+  ggplot2::geom_point(ggplot2::aes(x = Unit, y = upper), color = "red") +
+  ggplot2::geom_point(ggplot2::aes(x = Unit, y = avg), color = "black") +
+  BayLumTheme() + ggplot2::ylab("IsotonicRegression") + ggplot2::xlab("Samples") +
+  ggplot2::scale_x_continuous(breaks = 1:10, labels = Jingbian$SampleID) +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
+
+
+Jingbian <- readxl::read_xlsx("R/DataManipulation/Jingbian_De_DoseRates.xlsx")
+Jingbian <- Jingbian %>% tidyr::unite(col = SampleID, `Sample ID`, `...2`, `...3`, sep = "_", remove = T)
+Jingbian
+Measures <- list(SampleNames = Jingbian$SampleID, Nb_sample = dim(Jingbian)[1],
+                 ddot = Jingbian$d, sddot = Jingbian$Sigma_d,
+                 D = Jingbian$D, sD = Jingbian$Sigma_D)
+Theta = as.matrix(read.csv("R/DataManipulation/CovarianceMatrix_Jingbian.csv", col.names = paste0("A", 1:10), sep = ";"))
+
+DtMeasures <- list(Measures = Measures, Theta = Theta, covD = diag(Measures$sD**2))
+Sc = rbind(rep(1, Measures$Nb_sample), upper.tri(matrix(rep(1), ncol = Measures$Nb_sample, nrow = Measures$Nb_sample))*0)
+AgeJingbian <- Compute_AgeS_D(DtMeasures, Sc, prior = "Jeffreys",  Iter = 6000, burnin = 50000, t = 10,
+                              PriorAge = rep(c(1, 500),  DtMeasures$Measures$Nb_sample))
+IsoJingbian <- IsotonicCurve(g, AgeJingbian)
+IsoJingbian
+apply(IsoJingbian[1:300, ], 2, arkhe::interval_hdr, level = .95)
+df <- data.frame(lower = apply(t(IsoJingbian), 1, arkhe::interval_hdr, level = .68)[1,],
+                 upper = apply(t(IsoJingbian), 1, arkhe::interval_hdr, level = .68)[2,],
+                 Unit = 1:10, avg = apply(t(IsoJingbian), 1, mean), SAMPLE = Jingbian$SampleID)
+df
+
+PlotIsotonicCurve(g, AgeJingbian, level = .68)
+
+
+NicholsJingbian <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictNicholls", PriorAge = rep(c(.001, 500), DtMeasures$Measures$Nb_sample))
+UOJingbian <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder", PriorAge = rep(c(.001, 500), DtMeasures$Measures$Nb_sample),
+                                  Iter = 2000, burnin = 50000, t = 10 )
+plotHpd(list(UOJingbian, NicholsJingbian), c("UO", "Nicholls"))   +
+  ggplot2::geom_line(data = NicholsJingbian$Ages, ggplot2::aes(SAMPLE, AGE), inherit.aes = F, group =1, size = 1, color = "#F57559") +
+  BayLumTheme() +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45)) +
+  ggplot2::geom_ribbon(data = df, alpha = .3, ggplot2::aes(x = Unit, ymin = lower, ymax = upper), inherit.aes = F) +
+  ggplot2::geom_line(data = df, ggplot2::aes(x = Unit, y = lower), color = "orange", group = 1, inherit.aes = F) +
+  ggplot2::geom_line(data = df, ggplot2::aes(x = Unit, y = upper), color = "orange", group = 1, inherit.aes = F) +
+  ggplot2::geom_line(data = df, ggplot2::aes(x = Unit, y = avg), color = "orange", group = 1, size =1.5, inherit.aes = F) +
+  ggplot2::geom_point(data = df, ggplot2::aes(x = Unit, y = lower), color = "blue", inherit.aes = F) +
+  ggplot2::geom_point(data = df, ggplot2::aes(x = Unit, y = upper), color = "red", inherit.aes = F) +
+  ggplot2::geom_point(data = df, ggplot2::aes(x = Unit, y = avg), color = "black", inherit.aes = F)
 ##======================================================================================#
 
 #### Graph Clustering ####
@@ -809,8 +875,6 @@ visNetwork(nodes, edges) %>%
 
 all_bounds = findbounds(reduced_network)
 all_bounds[[2]]
-
-
 
 
 

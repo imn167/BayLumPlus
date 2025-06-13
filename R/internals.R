@@ -223,6 +223,8 @@ nichollsBRInit <- function(I, upper, lower) {
 
 
 #=================================================================================@
+#### Networks Functions ####
+
 remove_transitive_edges <- function(G) {
   reduced_G = rlang::duplicate(G)
   vertices = igraph::V(G)
@@ -293,6 +295,9 @@ network_vizualization <- function(network, vertices_labels, interactive = FALSE,
 
 
 #=================================================================================@
+
+#### Isotonic Regression ####
+
 IsotonicRegDAG = function(network, Ahat, weights) {
 
   n = length(Ahat)
@@ -317,23 +322,52 @@ IsotonicRegDAG = function(network, Ahat, weights) {
   return(list(A=IsoA, solver = results))
 }
 
-ISotonicCurve <- function(network, object) {
+
+
+IsotonicCurve <- function(network, object, level = .95) {
   #get all mcmc samples
   sample = runjags::combine.mcmc(object$Sampling) ## mcmc sample
+  SampleNames = object$Ages$SAMPLE
+
+  n = length(SampleNames)
 
   w = 1/ as.numeric(object$Summary[, 8])^2 #inv of the estimated variance
 
   ## apply for each age vector the Isotonic Regression
-  IsoSamples = apply(sample, 1, function(Ahat, network, weights) IsotonicRegDAG(network, Ahat, weights ),
-                     network = network , weights = w)
+  IsoSamples = as.matrix(pbapply::pbapply(sample, 1, function(Ahat, network, weights) {
+    Sys.sleep(.003)
+    t(IsotonicRegDAG(network, Ahat, weights )$A)},
+                     network = network , weights = w)) # n_ages x n_iter
+  IsoSamples = t(IsoSamples)
+  HPD = apply(IsoSamples, 2, arkhe::interval_hdr, level = level)
+  print(HPD)
 
-  IsoSamples
+  IsoSummary = data.frame(lower = HPD[1, ], upper = HPD[2, ], avg = apply(IsoSamples, 2, mean),
+                          Samples = factor(SampleNames, levels = SampleNames), Unit = 1:n )
 
-
+  return(list(chain = IsoSamples, summary = IsoSummary))
 
 }
 
+PlotIsotonicCurve <- function(network, object, level = .95) {
 
+  df <- IsotonicCurve(network, object, level)[[2]]
+  n = dim(df)[1]
+
+  df %>% ggplot2::ggplot(ggplot2::aes(x = Unit, ymin = lower, ymax = upper), fill = "orange") +
+    ggplot2::geom_ribbon(alpha = .4) +
+    ggplot2::geom_line(ggplot2::aes(y = lower), color = "orange", group = 1) +
+    ggplot2::geom_line(ggplot2::aes(y = upper), color = "orange", group = 1) +
+    ggplot2::geom_line(ggplot2::aes(y = avg), color = "orange", group = 1, size =1.5) +
+    ggplot2::geom_point(ggplot2::aes(x = Unit, y = lower), color = "blue") +
+    ggplot2::geom_point(ggplot2::aes(x = Unit, y = upper), color = "red") +
+    ggplot2::geom_point(ggplot2::aes(x = Unit, y = avg), color = "black") +
+    BayLumTheme() + ggplot2::ylab("IsotonicRegression") +
+    ggplot2::scale_x_continuous(breaks = df$Unit, labels = df$Samples) +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
+
+
+}
 
 
 

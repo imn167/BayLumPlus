@@ -41,7 +41,7 @@ create_MeasuresDataFrame <- function(
                          sD = Obs[(DATA$Nb_sample+1): (2*DATA$Nb_sample)],
                    sddot_shared = contamination_degree, symetric_error = symetric_error)
   Theta = diag(Measures$sddot) + (contamination_degree %*% t(contamination_degree)) * symetric_error
-  CovD = diag(Measures$sD)
+  CovD = diag(Measures$sD**2)
 
   return(list(Theta = Theta, Measures = Measures, covD = covD))
 }
