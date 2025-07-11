@@ -129,6 +129,14 @@ points(1:40, Agehat, pch =15, col = "green")
 
 
 
+tg = tidygraph::as_tbl_graph(reduced_G)
+library(ggraph)
+ggraph(tg, layout = "sugiyama") +
+  geom_node_point(aes(color = "blue"), size = 5) +
+  scale_color_viridis_c() +
+  theme_void() + theme(legend.position = "right")
+
+
 #### données Anne en bloc
 G <- graph_from_adjacency_matrix(Sc, mode = "directed")
 E(G)

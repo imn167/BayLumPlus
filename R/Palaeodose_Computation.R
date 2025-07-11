@@ -155,7 +155,8 @@ Palaeodose_Computation<-function(
   distribution = c("cauchy"),
   Iter = 50000,
   t = 5,
-  n.chains = 3
+  n.chains = 3,
+  monitors = c("D", "sD")
 ){
 
   PriorPalaeodose=c(0,400)
@@ -220,6 +221,8 @@ Palaeodose_Computation<-function(
   update(jags,Iter)
   echantillon =  rjags::coda.samples(jags,c("D","sD"),min(Iter,10000),thin=t)
 
+  De = rjags::coda.samples(jags, c("De"), min(Iter,10000),thin=t)
+
   sample=echantillon[[1]]
   for(i in 2:n.chains){
     sample=rbind(sample,echantillon[[i]])
@@ -261,9 +264,15 @@ Palaeodose_Computation<-function(
     rnames[i]=c(paste("D_",SampleNames[i],sep=""))
     rnames[Nb_sample+i]=c(paste("sD_",SampleNames[i],sep=""))
   }
-  R=matrix(data=NA,ncol=8,nrow=2*Nb_sample,
-           dimnames=list(rnames,c("lower bound at 95%","lower bound at 68%","Bayes estimate","upper bound at 68%","upper bound at 95%",
-                                  "","Convergencies: Point estimate","Convergencies: uppers confidence interval")))
+  R=matrix(data=NA,ncol=9,nrow=2*Nb_sample,
+           dimnames=list(rnames,c("lower bound at 95%",
+                                  "lower bound at 68%",
+                                  "Bayes estimate",
+                                  "upper bound at 68%",
+                                  "upper bound at 95%",
+                                  "Bayes sd",
+                                  "","Convergencies: Point estimate",
+                                  "Convergencies: uppers confidence interval")))
 
   ##- Bayes estimate and credible interval
   cat(paste("\n\n>> Bayes estimates of Age, Palaeodose and its dispersion for each sample and credible interval <<\n"))
@@ -303,7 +312,8 @@ Palaeodose_Computation<-function(
     R[Nb_sample+i,c(2,4)]=round(HPD_68[2:3],3)
 
   }
-  R[,c(7,8)]=round(CV$psrf,2)
+  R[,c(8,9)]=round(CV$psrf,2)
+  R[, 7] = apply(sample, 2, sd)
 
   cat("\n----------------------------------------------\n")
 
@@ -311,7 +321,15 @@ Palaeodose_Computation<-function(
     write.csv(R,file=c(paste(OutputTablePath,"Estimates",OutputTableName,".csv",sep="")))
   }
 
-  Info=list("Sampling"=echantillon,"Model_GrowthCurve"=Model_GrowthCurve, "Distribution"=distribution)
+  Info=.list_BayLum("Sampling"=echantillon,
+                    "Model_GrowthCurve"=Model_GrowthCurve,
+                    "Distribution"=distribution,
+                    "Doses" = data.frame(
+                      Dose = R[,3],
+                      sdDose = R[, 7],
+                      Nb_sample = Nb_sample,
+                      SampleNames = SampleNames
+                    ))
   return(Info)
 
 }

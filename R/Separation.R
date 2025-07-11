@@ -26,6 +26,9 @@
 #'
 #' @seealso [Computation_AgeS_D], [Palaeodose_Computation], [Generate_DataFile], [Generate_DataFile_MG]
 #' @export
+#'
+
+
 create_MeasuresDataFrame <- function(
     PalaeodoseObject,
     DATA,
@@ -64,7 +67,11 @@ sepSC <- NULL
 
 
 Compute_AgeS_D <- function(
-    DATAMeasures,
+    DATA,
+    Nb_sample,
+    SampleNames,
+    ThetaMatrix,
+    PalaeodoseObject = NULL,
     StratiConstraints = c(),
     model = NULL,
     Iter = 10000,
@@ -73,7 +80,7 @@ Compute_AgeS_D <- function(
     t = 5, #thin
     n.chains = 3,
     prior = "Jeffreys",
-    PriorAge = rep(c(0.01, 100), Measures$Nb_sample),
+    PriorAge = rep(c(0.01, 100), Nb_sample),
     jags_method = "rjags",
     autorun = F,
     quiet = F,
@@ -87,38 +94,56 @@ Compute_AgeS_D <- function(
     ...
 ) {
 
-  Measures = DATAMeasures$Measures
+  ### read csv file of Palaeodose output
 
 
-  ## StratigraphicConstraints
-  ##no Strati
-  if (length(StratiConstraints) == 0) {
-    StratiConstraints <- matrix(
-      data = c(rep(1, Measures$Nb_sample), rep(0, Measures$Nb_sample * Measures$Nb_sample)),
-      ncol = Measures$Nb_sample,
-      nrow = (Measures$Nb_sample + 1),
-      byrow = T
-    )
-  }
-  ## Strati
-  else{
-    if (is(StratiConstraints)[1] == "character") {
-      SCMatrix <- read.csv(StratiConstraints, sep = sepSC)
-      StratiConstraints <- as.matrix(SCMatrix)
-    }
-  }
+
 
   ### JagsRun
   ## liste of data
-  dataList = list(
-    "I" = Measures$Nb_sample,
-    "Theta" = DATAMeasures$Theta,
-    "covD" = DATAMeasures$covD,
-    "ddot" = Measures$ddot,
-    "StratiConstraints" = StratiConstraints,
-    "xbound" = PriorAge,
-    "D" = Measures$D
-  )
+   if (prior == "StrictOrder" | prior == "StrictNicholls" | prior == "Independance") {
+     dataList = list(
+       "I" = Nb_sample,
+       "Theta" = ThetaMatrix,
+       "covD" = diag(DATA$sD**2),
+       "ddot" = DATA$ddot,
+       "xbound" = PriorAge,
+       "D" = DATA$D
+     )
+   }
+
+  else {
+
+    ## StratigraphicConstraints
+    ##no Strati
+    if (length(StratiConstraints) == 0) {
+      StratiConstraints <- matrix(
+        data = c(rep(1, Nb_sample), rep(0, Nb_sample * Nb_sample)),
+        ncol = Nb_sample,
+        nrow = (Nb_sample + 1),
+        byrow = T
+      )
+    }
+    ## Strati
+    else{
+      if (is(StratiConstraints)[1] == "character") {
+        SCMatrix <- read.csv(StratiConstraints, sep = sepSC)
+        StratiConstraints <- as.matrix(SCMatrix)
+      }
+    }
+
+
+    dataList = list(
+      "I" = Nb_sample,
+      "Theta" = ThetaMatrix,
+      "covD" = diag(DATA$sD**2),
+      "ddot" = DATA$ddot,
+      "StratiConstraints" = StratiConstraints,
+      "xbound" = PriorAge,
+      "D" = DATA$D
+    )
+
+  }
 
   ModelAgePrior <- 0
   data(ModelAgePrior, envir = environment())
@@ -133,12 +158,12 @@ Compute_AgeS_D <- function(
     #write model in tempfile
     temp_file <- tempfile(fileext = ".txt")
     writeLines(model, con = temp_file)
-    if ( prior == "Jeffreys" | prior == "Conditional") {
+    if ( prior == "Jeffreys" | prior == "Conditional" | prior == "Independance") {
 
   inits = list(
-    list(u = runif(Measures$Nb_sample)), #chain 1
-    list(u = runif(Measures$Nb_sample)), # chain 2
-    list(u = runif(Measures$Nb_sample)) #chain 3
+    list(u = runif(Nb_sample)), #chain 1
+    list(u = runif(Nb_sample)), # chain 2
+    list(u = runif(Nb_sample)) #chain 3
   )
     }
 
@@ -146,9 +171,9 @@ Compute_AgeS_D <- function(
     temp_file <- tempfile(fileext = ".txt")
     writeLines(model, con = temp_file)
     inits = list(
-     list( e = rexp(Measures$Nb_sample + 1)), #chain 1
-     list( e = rexp(Measures$Nb_sample+ 1)), #chain 2
-      list(e = rexp(Measures$Nb_sample+ 1)) #chain 3
+     list( e = rexp(Nb_sample + 1)), #chain 1
+     list( e = rexp(Nb_sample+ 1)), #chain 2
+      list(e = rexp(Nb_sample+ 1)) #chain 3
     )
   }
 
@@ -156,9 +181,9 @@ Compute_AgeS_D <- function(
       temp_file <- tempfile(fileext = ".txt")
       writeLines(model, con = temp_file)
       inits = list(
-       nichollsInit(Measures$Nb_sample, 1, 0) , #chain 1
-       nichollsInit(Measures$Nb_sample, 1, 0), #chain 2
-       nichollsInit(Measures$Nb_sample, 1, 0) #chain 3
+       nichollsInit(Nb_sample, 1, 0) , #chain 1
+       nichollsInit(Nb_sample, 1, 0), #chain 2
+       nichollsInit(Nb_sample, 1, 0) #chain 3
       )
     }
 
@@ -166,9 +191,9 @@ Compute_AgeS_D <- function(
       temp_file <- tempfile(fileext = ".txt")
       writeLines(model, con = temp_file)
       inits = list(
-        nichollsBRInit(Measures$Nb_sample, 1, 0) , #chain 1
-        nichollsBRInit(Measures$Nb_sample, 1, 0), #chain 2
-        nichollsBRInit(Measures$Nb_sample, 1, 0) #chain 3
+        nichollsBRInit(Nb_sample, 1, 0) , #chain 1
+        nichollsBRInit(Nb_sample, 1, 0), #chain 2
+        nichollsBRInit(Nb_sample, 1, 0) #chain 3
       )
     }
     #run JAGS
@@ -230,7 +255,7 @@ Compute_AgeS_D <- function(
   results_runjags$args <- list(
     "PriorAge" = PriorAge,
     "StratiConstraints" = StratiConstraints,
-    "CovarianceMatrix" = DATAMeasures$Theta,
+    "CovarianceMatrix" = ThetaMatrix,
     "model" = model
   )
 
@@ -241,6 +266,7 @@ Compute_AgeS_D <- function(
   #---processing of JAGS results
   ##extract mcmc list from runjags object
   echantillon <- results_runjags$mcmc
+  SummaryMCMC <- summary(echantillon)
 
   ##remove mcmc-list from runjags output to reduce output object size
   results_runjags$mcmc <- list("MCMC-list is not here. Go to first level -> object named *Sampling*")
@@ -271,7 +297,7 @@ Compute_AgeS_D <- function(
   cat(paste(
     "\n\n>> Results of the Gelman and Rubin criterion of convergence <<\n"
   ))
-  for (i in 1:Measures$Nb_sample) {
+  for (i in 1:Nb_sample) {
     cat("----------------------------------------------\n")
     cat(paste(" Sample name: ", Measures$SampleNames[i], "\n"))
     cat("---------------------\n")
@@ -303,8 +329,8 @@ Compute_AgeS_D <- function(
 
   R <- matrix(
     data = NA,
-    ncol = 8,
-    nrow = Measures$Nb_sample,
+    ncol = 9,
+    nrow = Nb_sample,
     dimnames = list(rnames,
                   c(
                       "lower bound at 95%",
@@ -312,9 +338,10 @@ Compute_AgeS_D <- function(
                       "Bayes estimate",
                       "upper bound at 68%",
                       "upper bound at 95%",
+                      "Bayes sd",
                       "Convergencies: Point estimate",
                       "Convergencies: uppers confidence interval",
-                      "Bayes sd"
+                      "Time Series SE"
                     )
                   )
   )
@@ -334,8 +361,10 @@ Compute_AgeS_D <- function(
   R[, c(2,4)] <- round(t(credible68), roundingOfValue)
   R[, 3] <-   round(estimate, roundingOfValue)
 
-  R[, c(6, 7)] <- round(CV$psrf, roundingOfValue)
-  R[, 8] <- round(standardError, roundingOfValue)
+  R[, c(7, 8)] <- round(CV$psrf, roundingOfValue)
+  R[, 6] <- round(standardError, roundingOfValue)
+  R[, 9] <- round(SummaryMCMC$statistics[, 4], roundingOfValue)
+
 
   print(data.frame(R) )
   cat("\n----------------------------------------------\n")
@@ -391,7 +420,7 @@ Compute_AgeS_D <- function(
   cat("\n==============================\n")
 
   #---Plot ages ####
-  BayLum::plot_Ages(object = output, legend.pos = "bottomleft", model = paste("BayLum", prior))
+  plot_Ages(object = output, legend.pos = "bottomleft", model = paste("BayLum", prior))
 
   ##TODO: get rid of this ... at some point
   if (SavePdf) {

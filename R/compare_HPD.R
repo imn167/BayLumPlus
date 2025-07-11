@@ -38,7 +38,7 @@ plotHpd <- function(
    DtHpd <- DtHpd %>% dplyr::mutate(Samples = factor(Samples, levels = sampleNames))
   #
   plotting <- DtHpd %>% ggplot2::ggplot(ggplot2::aes(x = Samples, ymin= inf, ymax = sup, colour = Models)) +
-    ggplot2::geom_linerange(position = ggplot2::position_dodge(.3)) + ICAgeTheme(rotation_x = T)
+    ggplot2::geom_linerange(position = ggplot2::position_dodge(.5), ) + ICAgeTheme(rotation_x = T)
 
   return(plotting)
 }

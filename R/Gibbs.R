@@ -568,7 +568,7 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
     "Summary" = R
   )
 
-  BayLum::plot_Ages(object = output, model = "Jeffreys prior")
+  plot_Ages(object = output, model = "Jeffreys prior")
 
   return(
     output
@@ -825,7 +825,7 @@ GibbsSamplerTrunc <- function(DataMeasures, nchain,niter, burnin, Sc,
     "Summary" = R
   )
 
-  BayLum::plot_Ages(object = output, model = "Jeffreys prior")
+  plot_Ages(object = output, model = "Jeffreys prior")
 
   return(
     output

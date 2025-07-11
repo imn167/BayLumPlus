@@ -159,7 +159,7 @@ Conditional <- " model {
     }
     mu[i] = A[i] * ddot[i]
   }
-  invSigma = inverse(Sigma + covD) #DP and symmetric ?
+  invSigma = inverse(Sigma + covD) #DP and symmetric
   D ~ dmnorm(mu, invSigma)
 
   ###### Prior #####
@@ -180,10 +180,36 @@ Conditional <- " model {
 
 }"
 
+Independance <-  "model {
+  #### Likelyhood #####
+  for (i in 1:I) {
+    for (j in 1:I) {
+
+      Sigma[i, j] = A[i]* A[j] * Theta[i,j]
+
+    }
+    mu[i] = A[i] * ddot[i]
+  }
+  invSigma = inverse(Sigma + covD)
+
+  D ~dmnorm(mu, invSigma)
+
+  T1 = xbound[1]
+  T2 = xbound[2]
+  ### Prior ####
+
+  for(i in 1:I) {
+    u[i] ~ dunif(0,1)
+    A[i] = exp(u[i] * log(T2/T1) + log(T1))
+  }
+
+}"
+
 
 #
 # ModelAgePrior$StrictOrder <- StrictOrder
 # ModelAgePrior$StrictNicholls <- Strict_nicholls
 # ModelAgePrior$nichollsBR <- nichollsBR
+# ModelAgePrior$Independance <- Independance
 # usethis::use_data(ModelAgePrior, overwrite = T)
 # ModelAgePrior$Conditional <- Conditional

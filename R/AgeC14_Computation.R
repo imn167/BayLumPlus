@@ -187,6 +187,7 @@ AgeC14_Computation <- function(Data_C14Cal,
  Nb_sample,
  PriorAge = rep(c(10, 50), Nb_sample),
  SavePdf = FALSE,
+ monitors = c('Age', "Z"),
  OutputFileName = c('MCMCplot', "HPD_CalC-14Curve", "summary"),
  OutputFilePath = c(""),
  SaveEstimates = FALSE,
@@ -264,18 +265,18 @@ AgeC14_Computation <- function(Data_C14Cal,
    if(quiet) progress.bar <- 'none' else progress.bar <- 'text'
 
    update(jags,Iter, progress.bar = progress.bar)
-   echantillon <- rjags::coda.samples(jags,c('Age','Z'),min(Iter,10000),thin=t, progress.bar = progress.bar)
+   echantillon <- rjags::coda.samples(jags,monitors ,min(Iter,10000),thin=t, progress.bar = progress.bar)
    U <- summary(echantillon)
 
-   Sample=echantillon[[1]]
-   for(i in 2:n.chains){
-     Sample=rbind(Sample,echantillon[[i]])
-   }
+   Sample= runjags::combine.mcmc(echantillon)  ## echantillon[[1]]
+   # for(i in 2:n.chains){
+   #   Sample=rbind(Sample,echantillon[[i]])
+   # }
 
-   nom=c()
-   for(i in 1:Nb_sample){
-     nom=c(nom,paste("A_",SampleNames[i],sep=""))
-   }
+   nom= paste0("A", SampleNames, sep = "_")
+   # for(i in 1:Nb_sample){
+   #   nom=c(nom,paste("A_",SampleNames[i],sep=""))
+   # }
 
    ##plot MCMC
    if(SavePdf){
@@ -288,7 +289,7 @@ AgeC14_Computation <- function(Data_C14Cal,
     dev.off()
    }
 
-   Outlier <- SampleNames[which(U$statistics[(Nb_sample+1):(2*Nb_sample),1]<1.5)]
+   Outlier <- SampleNames[which(U$statistics[ ,1]<1.5)] #distinction if length(monitors) > 1 ((Nb_sample+1):(2*Nb_sample))
 
    ##if Outliers are detect, return warning
     if(length(Outlier) > 0){
@@ -319,8 +320,8 @@ AgeC14_Computation <- function(Data_C14Cal,
    }
    R=matrix(data=NA,ncol=8,nrow=Nb_sample,
             dimnames=list(rnames,c("lower bound at 95%","lower bound at 68%","Bayes estimate",
-                                   "upper bound at 68%","upper bound at 95%","",
-                                   "Convergencies: Bayes estimate","Convergencies: uppers credible interval")))
+                                   "upper bound at 68%","upper bound at 95%",
+                                   "Convergencies: Bayes estimate","Convergencies: uppers credible interval", "Bayes sd")))
 
    ##- Bayes estimate and credible interval
    cat(paste("\n\n>> Bayes estimates of Age for each sample and credible interval <<\n"))
@@ -346,9 +347,9 @@ AgeC14_Computation <- function(Data_C14Cal,
      R[i,3]=(mean(Sample[,i]))
      R[i,c(1,5)]=(HPD_95[2:3])
      R[i,c(2,4)]=(HPD_68[2:3])
-     R[i,6]=c('')
-     R[i,7]=round(CV$psrf[i,1],roundingOfValue)
-     R[i,8]=round(CV$psrf[i,2],roundingOfValue)
+     R[i,8]= sd(Sample[, i])
+     R[i,6]=round(CV$psrf[i,1],roundingOfValue)
+     R[i,7]=round(CV$psrf[i,2],roundingOfValue)
 
    }
 
@@ -404,7 +405,8 @@ AgeC14_Computation <- function(Data_C14Cal,
       "Model" = Model,
       "CalibrationCurve" = CalibrationCurve,
       "PriorAge" = PriorAge,
-      "StratiConstraints" = StratiConstraints
+      "StratiConstraints" = StratiConstraints,
+      "Summary" = R
    )
 
    # Plot ages ----------------------------------------------------------------------------------

@@ -1,11 +1,6 @@
 library(ArchaeoPhases)
 
 
-#reinitialize memory
-rm(list=ls())
-
-setwd("D:/Users/Pc/Desktop")
-
 Path=c("R/DataManipulation/")
 
 ########### sans micocouliers et sans UCIAMS-109995 (reconnu par BayLum comme un outlier)
@@ -32,6 +27,7 @@ AC14_WithStratiWithout109995= AgeC14_Computation(Data_C14Cal=C14ages, Data_Sigma
                                                 SampleNames=C14_SampleNames, Nb_sample = C14_Nb_sample,
                                                 PriorAge = rep(c(7, 13), C14_Nb_sample), SavePdf
                                                 = TRUE,
+                                                monitors = c("Age"),
                                                 OutputFileName = c("MCMCplot",
                                                                    "HPD_CalC-14Curve", "summary"),
                                                 OutputFilePath = Path, SaveEstimates = TRUE,
@@ -39,23 +35,67 @@ AC14_WithStratiWithout109995= AgeC14_Computation(Data_C14Cal=C14ages, Data_Sigma
                                                 = c(""),
                                                 StratiConstraints = c(), sepSC = c(","), Model       #contraintes stratigraphiques
                                                 = c("full"),
-                                                CalibrationCurve = c("IntCal20"), Iter = 5000,
+                                                CalibrationCurve = c("IntCal20"), Iter = 50000,
                                                 t = 5,
                                                 n.chains = 3, quiet = FALSE)
+
+
+network <-igraph::graph_from_adjacency_matrix( Sc)
+reduced_network = remove_transitive_edges(network)
+
+sample = runjags::combine.mcmc(AC14_WithStratiWithout109995$Sampling)[1:200, ]
+
+iso = as.matrix(pbapply::pbapply(sample, 1, function(Ahat, network, weights) {
+  Sys.sleep(.003)
+  t(IsotonicRegDAG(network, Ahat, weights )$A)},
+  network = reduced_network , weights = rep(1, 40)))
+
+iso = t(iso)
+
+hpd = apply(iso, 2, CredibleInterval, level = .68, roundingOfValue = 3)
+AC14_WithStratiWithout109995$Ages$SAMPLE
+
+IsoC14 <- IsotonicCurve(reduced_network, object = AC14_WithStratiWithout109995, level = .68)
+IsoC14$summary
+
+
+## creation du graphe
+tg = tidygraph::as_tbl_graph(reduced_network)
+tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::mutate(Samples = C14_SampleNames)
+
+tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::left_join(IsoC14$summary, by = "Samples") %>%
+  tidygraph::mutate(translation = (upper-lower)/2)
+layout <- ggraph::create_layout(tg, layout = "sugiyama") %>% dplyr::mutate(x1 = x-translation, x2 = x + translation)
+
+ggraph::ggraph(layout) + ggraph::geom_edge_link(arrow = grid::arrow(length = grid::unit(.8, 'mm')),end_cap = ggraph::circle(3, 'mm'), alpha = 0.2) +
+  ggplot2::geom_segment(data = layout, ggplot2::aes(x = x1, xend = x2, y = y, color = avg), size = 2) + ggraph::theme_graph() +
+  ggplot2::geom_text(ggplot2::aes(x = x, y = y, label = Samples), vjust = -1, size = 3)
+
+
+
+creape_subPlot <- function(x1, x2) {
+
+  ggplot2::ggplot() + ggplot2::geom_segment(ggplot2::aes(x = .5, xend = .5, y = x1, yend = x2), size = 2) +
+    ggplot2::theme_void()
+}
+
+layout
+
+
+ggraph::ggraph(tg, layout = "sugiyama") + ggraph::geom_node_point() + ggraph::theme_graph() ##ggreppel
 
 edges <- cbind(1:(C14_Nb_sample-1), 2:C14_Nb_sample)
 G = igraph::graph_from_edgelist(edges)
 
 plot(G,
-     vertex.label = V(G)$name,
+     vertex.label = igraph::V(G)$name,
      vertex.color = "lightblue",
      vertex.size = 5,
      edge.arrow.size = 0.5,
-     layout = layout_with_sugiyama(G))
+     layout = igraph::layout_with_sugiyama(G))
 
-AC14_WithStratiWithout109995$Sampling[[1]]
 
 PlotIsotonicCurve(G, AC14_WithStratiWithout109995, level = .68)
-
+AC14_WithStratiWithout109995$
 
 

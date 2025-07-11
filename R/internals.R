@@ -225,6 +225,31 @@ nichollsBRInit <- function(I, upper, lower) {
 #=================================================================================@
 #### Networks Functions ####
 
+buildNetwork <- function(StratiConstraints) {
+  ##no Strati
+  if (length(StratiConstraints) == 0) {
+    StratiConstraints <- matrix(
+      data = c(rep(1, Nb_sample), rep(0, Nb_sample * Nb_sample)),
+      ncol = Nb_sample,
+      nrow = (Nb_sample + 1),
+      byrow = T
+    )
+  }
+  ## Strati
+  else{
+    if (is(StratiConstraints)[1] == "character") {
+      SCMatrix <- read.csv(StratiConstraints, sep = sepSC)
+      StratiConstraints <- as.matrix(SCMatrix)
+    }
+  }
+
+  Sc = StratiConstraints[-1, ]
+  network = igraph::graph_from_adjacency_matrix(Sc)
+
+  return(network)
+
+}
+
 remove_transitive_edges <- function(G) {
   reduced_G = rlang::duplicate(G)
   vertices = igraph::V(G)
@@ -234,7 +259,7 @@ remove_transitive_edges <- function(G) {
     u_neighbors = igraph::neighbors(G, u, mode = "out")
     #look for the descendants of each neighbors
     for (nei in u_neighbors) {
-      message(paste("traitement voisin", nei))
+      message(paste("treatement for the neighbours", nei))
       childs = igraph::subcomponent(G, nei, mode = "out")[-1]
       for (child in childs) {
         if (igraph::are_adjacent(reduced_G, u, child)) {
@@ -282,10 +307,11 @@ network_vizualization <- function(network, vertices_labels, interactive = FALSE,
     network,
     layout = layout,
     vertex.label = vertices_labels,
-    vertex.size = 20,
+    vertex.size = 10,
     vertex.color = adjustcolor("lightblue", alpha.f = 0.6),
     edge.arrow.size = 0.4,  # Smaller arrowheads
     edge.width = 2,
+    edge.arrow.length = 10,
     asp = 0,
     edge.curved = 0.1
   )}
@@ -298,6 +324,8 @@ network_vizualization <- function(network, vertices_labels, interactive = FALSE,
 
 #### Isotonic Regression ####
 
+## Several solver are available by default ECOS / clarabel (Rust) / OSQP /SCS
+
 IsotonicRegDAG = function(network, Ahat, weights) {
 
   n = length(Ahat)
@@ -307,7 +335,7 @@ IsotonicRegDAG = function(network, Ahat, weights) {
   #graph
   m = length(igraph::E(network))
   ##quadratic expression
-  objectif = CVXR::Minimize(CVXR::sum_squares( CVXR::multiply(weights, (A-Ahat)) ))
+  objectif = CVXR::Minimize(CVXR::sum_squares( CVXR::multiply(weights, (A-Ahat)) )) # Solver by default ECOS
   #optimization matrix
   M = matrix(0, nrow = m, ncol = n)
   edges_list = igraph::as_edgelist(network, names = F)
@@ -324,50 +352,7 @@ IsotonicRegDAG = function(network, Ahat, weights) {
 
 
 
-IsotonicCurve <- function(network, object, level = .95) {
-  #get all mcmc samples
-  sample = runjags::combine.mcmc(object$Sampling) ## mcmc sample
-  SampleNames = object$Ages$SAMPLE
 
-  n = length(SampleNames)
-
-  w = 1/ as.numeric(object$Summary[, 8])^2 #inv of the estimated variance
-
-  ## apply for each age vector the Isotonic Regression
-  IsoSamples = as.matrix(pbapply::pbapply(sample, 1, function(Ahat, network, weights) {
-    Sys.sleep(.003)
-    t(IsotonicRegDAG(network, Ahat, weights )$A)},
-                     network = network , weights = w)) # n_ages x n_iter
-  IsoSamples = t(IsoSamples)
-  HPD = apply(IsoSamples, 2, arkhe::interval_hdr, level = level)
-  print(HPD)
-
-  IsoSummary = data.frame(lower = HPD[1, ], upper = HPD[2, ], avg = apply(IsoSamples, 2, mean),
-                          Samples = factor(SampleNames, levels = SampleNames), Unit = 1:n )
-
-  return(list(chain = IsoSamples, summary = IsoSummary))
-
-}
-
-PlotIsotonicCurve <- function(network, object, level = .95) {
-
-  df <- IsotonicCurve(network, object, level)[[2]]
-  n = dim(df)[1]
-
-  df %>% ggplot2::ggplot(ggplot2::aes(x = Unit, ymin = lower, ymax = upper), fill = "orange") +
-    ggplot2::geom_ribbon(alpha = .4) +
-    ggplot2::geom_line(ggplot2::aes(y = lower), color = "orange", group = 1) +
-    ggplot2::geom_line(ggplot2::aes(y = upper), color = "orange", group = 1) +
-    ggplot2::geom_line(ggplot2::aes(y = avg), color = "orange", group = 1, size =1.5) +
-    ggplot2::geom_point(ggplot2::aes(x = Unit, y = lower), color = "blue") +
-    ggplot2::geom_point(ggplot2::aes(x = Unit, y = upper), color = "red") +
-    ggplot2::geom_point(ggplot2::aes(x = Unit, y = avg), color = "black") +
-    BayLumTheme() + ggplot2::ylab("IsotonicRegression") +
-    ggplot2::scale_x_continuous(breaks = df$Unit, labels = df$Samples) +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
-
-
-}
 
 
 

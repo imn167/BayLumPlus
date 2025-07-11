@@ -180,22 +180,22 @@ extractElaine <- function(name) {
   path = paste0("R/DataManipulation/", name)
   #strati
   SampleNames <- readxl::read_xlsx(path, sheet = 2)[, 1]
-  OSLestimate <- as.matrix(readxl::read_xlsx(path, sheet = 3)[, c(4,7)]) # Central Dose and Their uncertainties with No Strati
-
+  OSLestimate <- as.matrix(readxl::read_xlsx(path, sheet = 3)[, c(5, 3, 7)]) # Central Dose and Their uncertainties with No Strati
   Theta <- as.matrix(readxl::read_xlsx(path, sheet = 5))
   Sc <- as.matrix(readxl::read_xlsx(path, sheet = 6))
   n = dim(Theta)[1]
   ddot =  as.numeric(readxl::read_xlsx(path, sheet = 4)[3,c(12,13)])
 
-  Measures = list(SampleNames = SampleNames$Layer, D = OSLestimate[,1], sD = OSLestimate[,2], Nb_sample = n ,
-                  ddot = rep(ddot[1], n), sddot = rep(ddot[2], n), sddot_shared = rep(0, n))
+  Measures = list(SampleNames = SampleNames$Layer, D = OSLestimate[1:15,1], sDerror = OSLestimate[16:30, 1], Nb_sample = n ,
+                  ddot = rep(ddot[1], n), sddot = rep(ddot[2], n), sddot_shared = rep(0, n),
+                  sD = (OSLestimate[1:15, 3]-OSLestimate[1:15, 2])/(2*1.96))
 
   return( list(Measures = Measures, Theta = Theta, covD = diag(as.numeric(Measures$sD)**2), Sc = Sc))
 
 }
 
-DtMeasures <- extractElaine("All_Qz_Grains_BayLum_doses.xlsx")
-DtMeasures
+DtMeasures <- extractElaine("D0_filtered_BayLum_doses.xlsx")
+DtMeasures$Measures
 # depth = read.csv("R/DataManipulation/Layer_DepthsElaine.csv")
 # colnames(depth) <- c("samples", "depth")
 
@@ -259,7 +259,7 @@ plotHpd(list(GibbsOutput, GibbsTrunc), c("WithTrans", "WithoutTrans"))
 
 
 AgeAsBayLum <-Compute_AgeS_D(DtMeasures, DtMeasures$Sc, prior = "Jeffreys", Iter = 2000, burnin = 30000, t = 10,
-                             PriorAge = rep(c(1, 1400),  DtMeasures$Measures$Nb_sample))
+                             PriorAge = rep(c(1, 1000),  DtMeasures$Measures$Nb_sample))
 
 plotHpd(list(AgeAsBayLum, GibbsTrunc), c("WithTrans", "WithoutTrans"))
 
@@ -267,8 +267,14 @@ plotHpd(list(AgeAsBayLum, GibbsTrunc), c("WithTrans", "WithoutTrans"))
 IndepSc = rlang::duplicate(DtMeasures$Sc)
 IndepSc[2:16, ] = IndepSc[2:16, ] *0
 IndepSc
-Independant  <- GibbsSamplerTrunc(DtMeasures, 3, 70000, 50000, IndepSc, 1, 1400, type = "isotonic")
+# Independant  <- GibbsSamplerTrunc(DtMeasures, 3, 70000, 50000, IndepSc, 1, 1400, type = "isotonic")
+Independant <- Compute_AgeS_D(DtMeasures, IndepSc, prior = "Jeffreys", Iter = 3000, burnin = 50000, t = 10,
+                              PriorAge = rep(c(1, 1000),  DtMeasures$Measures$Nb_sample))
+Independant$Ages$AGE
+IsoAllGrains <- PlotIsotonicCurve(network = G, object = Independant, level = .95)
 
+IsoAllGrains$data
+write.csv(IsoAllGrains$data, "../Elaine/D0filtered.csv")
 DtIso <- Independant$Summary[, c(1,3, 5, 9)]
 lower = IsotonicRegDAG(reduced_G, Ahat = DtIso[, 1], weights = 1/ (DtIso[, 4])**2)$A
 upper = IsotonicRegDAG(reduced_G, Ahat = DtIso[, 3], weights = 1/ (DtIso[, 4])**2)$A
@@ -281,14 +287,14 @@ data.frame(lower = lower, upper = upper, depth = DtMeasures$Measures$Depth) %>%
   ggplot2::geom_point(mapping = ggplot2::aes(depth, lower), inherit.aes = F, color = "red")
 
 AgeCorrected <- Compute_AgeS_D(DtMeasures, DtMeasures$Sc, prior = "StrictOrder", Iter = 2000, burnin = 50000, t = 10,
-                               PriorAge = rep(c(1, 1400),  DtMeasures$Measures$Nb_sample))
+                               PriorAge = rep(c(1, 1000),  DtMeasures$Measures$Nb_sample))
 
-AgeNicholls <- Compute_AgeS_D(DtMeasures, DtMeasures$Sc, prior = "StrictNicholls", Iter = 2000, burnin = 30000, t = 10,
-                               PriorAge = rep(c(1, 1400),  DtMeasures$Measures$Nb_sample))
+AgeNicholls <- Compute_AgeS_D(DtMeasures, DtMeasures$Sc, prior = "StrictNicholls", Iter = 2000, burnin = 50000, t = 10,
+                               PriorAge = rep(c(1, 1000),  DtMeasures$Measures$Nb_sample))
 
 IsoData = rlang::duplicate(AgeNicholls$Ages[, 1:2]) %>% dplyr::mutate(AGE = IsoBloc$A, depth = DtMeasures$Measures$Depth)
 
-methods = list(AgeCorrected, AgeNicholls, Independant)
+methods = list(AgeCorrected, AgeNicholls, Independant, AgeAsBayLum)
 
 my_list <- lapply(methods, function(inner_list){
   inner_list$Ages$depth = DtMeasures$Measures$Depth
@@ -299,13 +305,15 @@ plot_Ages(AgeAsBayLum)
 my_list[[1]]$Ages
 
 plotHpd(methods,
-        c( "BayLum", "Nicholls", "Independant")) +
-  ggplot2::geom_point(mapping = ggplot2::aes(SAMPLE, AGE), data = methods[[3]]$Ages, inherit.aes = F,
-                                                                                   color = "green") +
-  ggplot2::geom_point(ggplot2::aes(SAMPLE, AGE ), data = methods[[1]]$Ages, inherit.aes = F, color = "red") +
-  ggplot2::geom_point(ggplot2::aes(SAMPLE, AGE ), data = methods[[2]]$Ages, inherit.aes = F, color = "blue") +
-  ggplot2::geom_point(ggplot2::aes(SAMPLE, AGE ), data = IsoData, inherit.aes = F, color = "black", shape = 18,
-                      size = 3)
+        c( "Correction", "Nicholls", "Independant", "Baylum")) +
+  ggplot2::geom_linerange(ggplot2::aes(x= Samples, ymin = lower, ymax = upper, color = "IsotonicReg"), data =  IsoAllGrains$data)
+# +
+#   ggplot2::geom_point(mapping = ggplot2::aes(SAMPLE, AGE), data = methods[[3]]$Ages, inherit.aes = F,
+#                                                                                    color = "") +
+#   ggplot2::geom_point(ggplot2::aes(SAMPLE, AGE ), data = methods[[1]]$Ages, inherit.aes = F, color = "green") +
+#   ggplot2::geom_point(ggplot2::aes(SAMPLE, AGE ), data = methods[[2]]$Ages, inherit.aes = F, color = "blue") +
+#   ggplot2::geom_point(ggplot2::aes(Samples, avg ), data = IsoAllGrains$data, inherit.aes = F, color = "black", shape = 18,
+#                       size = 3)
 ##-----------------------------------------------##
 simulated = read.csv("R/DataManipulation/osl_constrained_data.csv")
 commonError = .03
@@ -389,6 +397,23 @@ dt <- readxl::read_xlsx("R/DataManipulation/DoseAndDRestimates-forModelling.xlsx
 colnames(dt) <- c("unit", "samples", "lower95", "lower68", "estimate", "upper68", "upper95",
                   "ddot", "varddot")
 dt
+Theta <- as.matrix(read.csv("R/DataManipulation/CovarianceMatrix_1313.csv", sep = ";",
+                            col.names = paste0("A", 1:Measures$Nb_sample)))
+Nb_sample <- dim(dt)[1]
+
+Independant <- Compute_AgeS_D(list(D = dt$estimate, sD = (dt$upper95-dt$lower95) /(2*1.96), ddot = dt$ddot),
+                              Nb_sample = Nb_sample, SampleNames = dt$samples,
+                              ThetaMatrix = Theta, prior = "Independance", PriorAge = rep(c(1, 1400), 13),
+                              Iter = 2000, burnin = 50000, t = 10)
+
+Sc = rbind(rep(1, Nb_sample), upper.tri(matrix(rep(1), ncol = Nb_sample, nrow = Nb_sample))*1)
+
+IsoChezPinaud = PlotIsotonicCurve(Sc, Independant )
+plotHpd()
+
+IsoChezPinaud
+
+
 Measures <- list(
   SampleNames = dt$samples,
   ddot = dt$ddot,  # Environmental dose rate (Gy/ka)
@@ -398,15 +423,12 @@ Measures <- list(
   Nb_sample = length(dt$unit)
 )
 
-Measures
 
 
-Theta <- as.matrix(read.csv("R/DataManipulation/CovarianceMatrix_1313.csv", sep = ";",
-                            col.names = paste0("A", 1:Measures$Nb_sample)))
+
 
 covD = diag(Measures$sD**2)
 DtMeasures <- list(Measures = Measures, Theta = Theta, covD = covD)
-Sc = rbind(rep(1, Measures$Nb_sample), upper.tri(matrix(rep(1), ncol = Measures$Nb_sample, nrow = Measures$Nb_sample))*1)
 
 G = igraph::graph_from_adjacency_matrix(Sc[-1, ])
 plot(
@@ -443,8 +465,12 @@ AgeAsBayLum <- Compute_AgeS_D(DtMeasures, Sc, prior = "Jeffreys", Iter = 2000, b
 
 Sc = rbind(rep(1, Measures$Nb_sample), upper.tri(matrix(rep(0), ncol = Measures$Nb_sample, nrow = Measures$Nb_sample))*0)
 
-Independant <-Compute_AgeS_D(DtMeasures, , prior = "Jeffreys", Iter = 2000, burnin = 50000, t = 10,
-                             PriorAge = rep(c(1, 1400),  DtMeasures$Measures$Nb_sample))
+
+Independant <- Compute_AgeS_D(DtMeasures, Sc , prior = "Independance", Iter = 2000, burnin = 50000, t = 10,
+                              PriorAge = rep(c(1, 1400),  DtMeasures$Measures$Nb_sample))
+
+
+
 
 sample = as.matrix(runjags::combine.mcmc(Independant$Sampling))
 w
@@ -626,6 +652,11 @@ plotHpd(list(UOJingbian, NicholsJingbian), c("UO", "Nicholls"))   +
   ggplot2::geom_point(data = df, ggplot2::aes(x = Unit, y = lower), color = "blue", inherit.aes = F) +
   ggplot2::geom_point(data = df, ggplot2::aes(x = Unit, y = upper), color = "red", inherit.aes = F) +
   ggplot2::geom_point(data = df, ggplot2::aes(x = Unit, y = avg), color = "black", inherit.aes = F)
+
+
+#using gpava of isotone
+fitted = isotone::gpava(OslJingbian$Depth, OslJingbian$Age, 1/OslJingbian$std**2)
+fitted$x
 ##======================================================================================#
 
 #### Graph Clustering ####
