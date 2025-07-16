@@ -1,5 +1,5 @@
 Type: Package
-Package: BayLum
+Package: BayLumPlus
 Title: Chronological Bayesian Models Integrating Optically Stimulated
     Luminescence and Radiocarbon Age Dating
 Version: 0.3.3.9000-13
@@ -63,7 +63,12 @@ Imports:
     ggplot2 (>= 3.5.1),
     graphics (>= 4.4.2),
     Iso (>= 0.0.21),
-    visNetwork (>= 2.1.2)
+    visNetwork (>= 2.1.2),
+    CVXR (>= 1.0.15),
+    IsotoneOptimization (>= 0.0.0.9000),
+    pbapply (>= 1.7.2),
+    rlang (>= 1.1.6),
+    arkhe (>= 1.10.0)
 Suggests: 
     knitr,
     rmarkdown,

@@ -5,7 +5,11 @@
 \title{Bayesian Models for Age Estimation with Priors from ModelAgePrior Dataset}
 \usage{
 Compute_AgeS_D(
-  DATAMeasures,
+  DATA,
+  Nb_sample,
+  SampleNames,
+  ThetaMatrix,
+  PalaeodoseObject = NULL,
   StratiConstraints = c(),
   model = NULL,
   Iter = 10000,
@@ -14,7 +18,7 @@ Compute_AgeS_D(
   t = 5,
   n.chains = 3,
   prior = "Jeffreys",
-  PriorAge = rep(c(0.01, 100), Measures$Nb_sample),
+  PriorAge = rep(c(0.01, 100), Nb_sample),
   jags_method = "rjags",
   autorun = F,
   quiet = F,

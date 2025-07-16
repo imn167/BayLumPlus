@@ -9,6 +9,7 @@ plot_Ages(
   sample_names = NULL,
   sample_order = NULL,
   plot_mode = "ages",
+  model = "Baylum",
   ...
 )
 }

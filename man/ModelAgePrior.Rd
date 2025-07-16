@@ -5,7 +5,15 @@
 \alias{ModelAgePrior}
 \title{JAGS Models for OSL Age Estimation in \code{\link[=Compute_AgeS_D]{Compute_AgeS_D()}}}
 \format{
-An object of class \code{list} of length 2.
+BayLum's Old Age Model (wrong vector law)
+
+Jeffrey's Age Model with log-uniform order settings
+
+Nicholls' Age Model applied on ages directly
+
+Jeffrey's Age Model with conditional setting
+
+Independance Age Model
 }
 \usage{
 ModelAgePrior

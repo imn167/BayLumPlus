@@ -1,5 +1,9 @@
 #### HPDPlot ####
-#'@description
+#' Compute High Posterior Density (HPD) Interval
+#'@description This function compute the HPD intervals for a set of posterior law
+#'@param list_object : A list of returned objects from the used methods for example `Compute_AgeS_D()`
+#'@param ModelNames : the names given to each method for the legend
+#'@param level : Level of the desired HPD region. Default is 0.95
 #'@author Imène Bouafia (LMJL)
 #'@md
 #'@export

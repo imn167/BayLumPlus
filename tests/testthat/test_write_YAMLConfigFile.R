@@ -4,7 +4,7 @@ test_that("Full function test", {
 
 # Prepare test ------------------------------------------------------------
   ##set path to YAML reference file file
-  yaml_file <- system.file("extdata/example.yml", package = "BayLum")
+  yaml_file <- system.file("extdata/example.yml", package = "BayLumPlus")
 
 # Simple runs -------------------------------------------------------------
 

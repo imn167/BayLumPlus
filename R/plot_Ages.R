@@ -243,11 +243,12 @@ plot_Ages <- function(
     }
 
     ##add legend
+    plot_settings$legend.pos <- "top"
     if(plot_settings$legend){
       legend(
         plot_settings$legend.pos,
         legend = if(plot_settings$show_ages[1]) plot_settings$legend.text[1:3] else plot_settings$legend.text[2:3],
-        pch = c(if(plot_settings$show_ages) plot_settings$pch else NA_integer_, NA_integer_, NA_integer_),
+        pch = c(if(plot_settings$show_ages) plot_settings$pch else  NA_integer_, NA_integer_),
         bty = "n",
         lty = if(plot_settings$show_ages[1]) c(0, 1, 1) else c(1,1),
         lwd = 2,
@@ -293,11 +294,12 @@ plot_Ages <- function(
         alpha = 100, maxColorValue = 255),
       lwd = plot_settings$cex * 2
     )
-  plot_settings$legend.pos <- locator(1)
+
+
     ##add legend
     if(plot_settings$legend){
       legend(
-        plot_settings$legend.pos,
+        if(length(plot_settings$legend.pos) == 0) plot_settings$legend.pos <- locator(1) else plot_settings$legend.pos,
         legend = plot_settings$legend.text,
         pch = c(plot_settings$pch, NA_integer_, NA_integer_),
         bty = "n",

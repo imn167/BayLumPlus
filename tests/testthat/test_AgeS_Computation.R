@@ -97,9 +97,9 @@ test_that("Full function test", {
   )), class = "BayLum.list")
 
   ## test output for regression
-  expect_silent(plot_Ages(results))
-  expect_silent(suppressWarnings(plot_MCMC(results)))
-  plot_Scatterplots(results)
+  expect_silent(plot_Ages(results, legend.pos = "topright"))
+  expect_silent(suppressWarnings(plot_MCMC(results, legend.pos = "topright")))
+  plot_Scatterplots(results, legend.pos = "topright")
 
 })
 

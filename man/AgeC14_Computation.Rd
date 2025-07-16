@@ -11,6 +11,7 @@ AgeC14_Computation(
   Nb_sample,
   PriorAge = rep(c(10, 50), Nb_sample),
   SavePdf = FALSE,
+  monitors = c("Age", "Z"),
   OutputFileName = c("MCMCplot", "HPD_CalC-14Curve", "summary"),
   OutputFilePath = c(""),
   SaveEstimates = FALSE,

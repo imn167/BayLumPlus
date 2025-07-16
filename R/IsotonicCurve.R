@@ -14,6 +14,12 @@ IsotonicCurve <- function(StratiConstraints, object, level = .95, method = "SBM"
   ##no Strati
   if (length(StratiConstraints) == 0) {
     StratiConstraints <- rbind(rep(1, n), upper.tri(matrix(rep(1), ncol = n, nrow = n))*1)
+
+    IsoSamples = as.matrix(pbapply::pbapply(sample, 1, function(Ahat, weights) {
+      Sys.sleep(.003)
+      t(Iso::pava(Ahat, w = weights))
+      }, weights = w))
+
   }
   ## Strati
   else{

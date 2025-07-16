@@ -1,4 +1,4 @@
 library(testthat)
-library(BayLum)
+library(BayLumPlus)
 
-test_check("BayLum")
+test_check("BayLumPlus")

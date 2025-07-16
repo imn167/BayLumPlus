@@ -25,7 +25,7 @@ Item <- NULL
 #' @export
 extract_Jags_model <- function() {
     #getting names and purpose of the Models
-  AllData <- as.data.frame(utils::data(package = "BayLum")$results[, c("Item", "Title")]) %>%
+  AllData <- as.data.frame(utils::data(package = "BayLumPlus")$results[, c("Item", "Title")]) %>%
     dplyr::filter(substr(Item, 1, 5) == "Model")
 
   ## interactive consol
@@ -43,7 +43,7 @@ extract_Jags_model <- function() {
 
   temp_env <- new.env()
     ## Global variable carefull
-    data(list = con,  package = "BayLum", envir = temp_env)
+    data(list = con,  package = "BayLumPlus", envir = temp_env)
 
     model <- get(con, envir = temp_env)
     cli::cat_rule(paste("Available type in the ", con))

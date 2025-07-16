@@ -20,7 +20,8 @@ Palaeodose_Computation(
   distribution = c("cauchy"),
   Iter = 50000,
   t = 5,
-  n.chains = 3
+  n.chains = 3,
+  monitors = c("D", "sD")
 )
 }
 \arguments{

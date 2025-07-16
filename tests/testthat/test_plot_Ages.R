@@ -25,17 +25,17 @@ test_that("Full function test", {
                regexp = "Wrong input, only objects of type 'BayLum.list' are allowed. Please check the manual!")
 
   ##test regular output
-  expect_s3_class(plot_Ages(Age), class = "data.frame")
+  expect_s3_class(plot_Ages(Age, legend.pos = "topright"), class = "data.frame")
 
   ##test some features
   expect_silent(plot_Ages(object = Age,
-            sample_names = c("test1", "test2")))
+            sample_names = c("test1", "test2"), legend.pos = "topright"))
 
   ##test AT == NULL
-  expect_silent(plot_Ages(object = Age, sample_order = c(1,2)))
+  expect_silent(plot_Ages(object = Age, sample_order = c(1,2), legend.pos = "topright"))
 
   ##check legend option
-  expect_silent(plot_Ages(object = Age, legend.pos = "top", legend.cex = 0.2))
+  expect_silent(plot_Ages(object = Age, legend.pos = "topright", legend.cex = 0.2))
 
   ## check density plot mode
   expect_silent(plot_Ages(object = Age, plot_mode = "density"))

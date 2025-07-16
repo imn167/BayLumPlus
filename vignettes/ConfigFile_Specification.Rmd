@@ -1,14 +1,14 @@
 ---
-title: "BayLum: Specification of the YAML config file"
+title: "BayLumPlus: Specification of the YAML config file"
 author: "Sebastian Kreutzer"
-date: 'Updated for BayLum package version >= `r packageVersion("BayLum")` (`r Sys.Date()`)'
+date: 'Updated for BayLumPlus package version >= `r packageVersion("BayLumPlus")` (`r Sys.Date()`)'
 output:
   rmarkdown::html_vignette:
     toc: yes
     toc_depth: 4
     number_sections: yes
 vignette: >
-  %\VignetteIndexEntry{BayLum: Specification of the YAML config file}
+  %\VignetteIndexEntry{BayLumPlus: Specification of the YAML config file}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,26 +16,26 @@ vignette: >
 ```{r, echo = FALSE, message = FALSE}
 knitr::opts_chunk$set(comment = "")
 options(max.print = 100)
-library(BayLum)
+library(BayLumPlus)
 ```
 
 # Background and scope
 
-In earlier versions of `'BayLum'` measurement data and settings had to be prepared using a multiple folder 
+In earlier versions of `'BayLumPlus'` measurement data and settings had to be prepared using a multiple folder 
 structure comprising various CVS and BIN/BINX files in a very particular way. This concept 
-proved error-prone and left a lot of frustrated `'BayLum'` users behind, who sometimes spent
-hours trying to understand unclear error messages and then realising that there was a typo in one of the CSV files, or the folder structure was not precisely how `'BayLum'` expected it to be found. By switching to a single-configuration
-file users have more options while the settings are cleaner and less scatters over different files in numerous subfolders. The parameter naming follows the naming convention used in the "old" `'BayLum'` CSV-files.
+proved error-prone and left a lot of frustrated `'BayLumPlus'` users behind, who sometimes spent
+hours trying to understand unclear error messages and then realising that there was a typo in one of the CSV files, or the folder structure was not precisely how `'BayLumPlus'` expected it to be found. By switching to a single-configuration
+file users have more options while the settings are cleaner and less scatters over different files in numerous subfolders. The parameter naming follows the naming convention used in the "old" `'BayLumPlus'` CSV-files.
 
 The purpose of this document is the specification and description of the [YAML](https://en.wikipedia.org/wiki/YAML)
 (file ending `*.yml`) configuration file used by the function `create_DataFile()` to provide data input and settings
-to the `'BayLum'` modelling. The YAML file is an alternative and a future replacement of the previous folder structure with various CSV files required by the functions `Generate_DataFile()` and `Generate_DateFile_MG()`.
+to the `'BayLumPlus'` modelling. The YAML file is an alternative and a future replacement of the previous folder structure with various CSV files required by the functions `Generate_DataFile()` and `Generate_DateFile_MG()`.
 
 # Key concepts
 
 The configuration file uses the [YAML](https://en.wikipedia.org/wiki/YAML) format, which 
 uses indention to nest different parameters. Please see the cited documentation for details, 
-for `'BayLum'` the following features stick out: 
+for `'BayLumPlus'` the following features stick out: 
 
 * Only a single configuration file is needed
 * The path of the file on your hard drive does not matter
@@ -83,7 +83,7 @@ need to be complete (i.e. you cannot just remove a parameter)
 * Sample names need to be **unique**
 
 Other than that, if you keep these simple rules in mind, you will have an easy time 
-preparing your `'BayLum'` analysis. 
+preparing your `'BayLumPlus'` analysis. 
 
 ## Multiple records
 
@@ -150,17 +150,17 @@ file given in quotes. The number of entries under `files` is not limited. Exampl
     - "/yourhardrive/yourfolder/sample_one_b.binx"
 ```
 
-If the entry is `null`, the function `BayLum::create_DataFile()` that uses the settings
+If the entry is `null`, the function `BayLumPlus::create_DataFile()` that uses the settings
 from the YAML file will assume that R objects with the name specified in `sample` are 
 available in the global session environment. For instance, files are imported and  
 treated with `Luminescence::read_BIN2R(...) |> subset(...)` or similar. 
 Setting `files` to `null` gives you all options to pre-process your measurement data
 and is the recommended mode of operation. 
 
-If `files` comes with file path entries, then `BayLum::create_DataFile()` will try 
+If `files` comes with file path entries, then `BayLumPlus::create_DataFile()` will try 
 to import those files using the appropriate import functions. This is very convenient,
 however, except for minimal filtering (e.g., removing non-OSL and non-IRSL curves), 
-the measurement data remain untreated, and `BayLum::create_DataFile()` expects that
+the measurement data remain untreated, and `BayLumPlus::create_DataFile()` expects that
 all data are complete (e.g., identical number of curves), 
 without error and strictly follow the SAR structure. 
 
@@ -275,10 +275,10 @@ l <- write_YAMLConfigFile(output_file = "<your filepath>")
 
 ## Internals
 
-The YAML settings file is loaded and processed by the function `BayLum::create_DataFile()`
+The YAML settings file is loaded and processed by the function `BayLumPlus::create_DataFile()`
 using `yaml::read_yaml()` from the R package `'yaml'`. `yaml::read_yaml()` returns 
-a `list` on R, which is then processed by `BayLum::create_DataFile()`. Sometimes 
+a `list` on R, which is then processed by `BayLumPlus::create_DataFile()`. Sometimes 
 it makes sense to modify the settings on the fly in R. To avoid import and export 
-of YAML files, `BayLum::create_DataFile()` always tries to process the input of
-the parameter `BayLum::create_DataFile(config_file, ...)` as a `list` before trying 
+of YAML files, `BayLumPlus::create_DataFile()` always tries to process the input of
+the parameter `BayLumPlus::create_DataFile(config_file, ...)` as a `list` before trying 
 to load a YAML file from the hard drive. While this option is usually unnecessary, this information may help in more complex R scripts. 

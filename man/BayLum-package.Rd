@@ -2,6 +2,8 @@
 % Please edit documentation in R/BayLum-package.R
 \docType{package}
 \name{BayLum-package}
+\alias{BayLumPlus}
+\alias{BayLumPlus-package}
 \alias{BayLum-package}
 \alias{BayLum}
 \title{Chronological Bayesian Models Integrating Optically Stimulated Luminescence

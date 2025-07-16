@@ -852,7 +852,7 @@ AgeS_Computation <- function(
   )
 
   #---Plot ages ####
-  BayLum::plot_Ages(object = output, legend.pos = "bottomleft")
+  BayLumPlus::plot_Ages(object = output, legend.pos = "bottomleft")
 
   ##TODO: get rid of this ... at some point
   if (SavePdf) {

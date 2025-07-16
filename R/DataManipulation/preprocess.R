@@ -408,7 +408,7 @@ Independant <- Compute_AgeS_D(list(D = dt$estimate, sD = (dt$upper95-dt$lower95)
 
 Sc = rbind(rep(1, Nb_sample), upper.tri(matrix(rep(1), ncol = Nb_sample, nrow = Nb_sample))*1)
 
-IsoChezPinaud = PlotIsotonicCurve(Sc, Independant )
+IsoChezPinaud = PlotIsotonicCurve(c(), Independant )
 plotHpd()
 
 IsoChezPinaud

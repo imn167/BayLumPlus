@@ -3,7 +3,7 @@ test_that("Full function test", {
   local_edition(3)
 
   ## prepare folder
-  path <- system.file("extdata/FER1", "", package = "BayLum")
+  path <- system.file("extdata/FER1", "", package = "BayLumPlus")
   folder <- ""
   nbsample <- 1
 
