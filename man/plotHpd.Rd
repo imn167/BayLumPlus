@@ -2,12 +2,19 @@
 % Please edit documentation in R/compare_HPD.R
 \name{plotHpd}
 \alias{plotHpd}
-\title{Compute High Posterior Density (HPD) interval}
+\title{Compute High Posterior Density (HPD) Interval}
 \usage{
 plotHpd(list_object, ModelNames, level = 0.95)
 }
+\arguments{
+\item{list_object}{: A list of returned objects from the used methods for example \code{Compute_AgeS_D()}}
+
+\item{ModelNames}{: the names given to each method for the legend}
+
+\item{level}{: Level of the desired HPD region. Default is 0.95}
+}
 \description{
-This function
+This function compute the HPD intervals for a set of posterior law
 }
 \author{
 Imène Bouafia (LMJL)

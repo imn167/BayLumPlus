@@ -1,26 +1,12 @@
 
 #=================================================================================@
-#'
-#'@export
-findbound <- function(index,  Sc) {
-  Sc = Sc[-1, ] #del lower bound line
-
-  lowerbound_index = which(Sc[, index] == 1)
-  if (length(lowerbound_index) > 0) { a = max(lowerbound_index)}
-
-  else { a = 0}
-
-  upperbound_index = which(Sc[index, ] == 1)
-  if (length(upperbound_index) > 0 ) {b = min(upperbound_index)}
-  else {b = -1}
-  return(c(a,b))
-}
 
 
+#' Bounds for each age according to the stratigraphic constraints
 #'@description This function gives the bounds of each age according to the reduced network (better computational time)
 #'it will return a list of list each list within have two vector
-#'-lower : index of the ages that preceed the selected age
-#'- upper : index of the ages that comes after the selected age
+#'\item{lower}{index of the ages that preceed the selected age}
+#'\item{upper}{index of the ages that comes after the selected age}
 #'The index are shift by one to includ the study period for the younger and older :
 #'@export
 findbounds <- function(network) {
@@ -168,6 +154,7 @@ arctanT <- function(u, bounds) {
 }
 
 #=================================================================================@
+#' Initialization of the Gibbs Algorithm according to the fixed stratigraphy
 #' @description
 #' In this function we try different way of initializing our Gibbs Sampler.
 #' Several limitation can be encoutered :

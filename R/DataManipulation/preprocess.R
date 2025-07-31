@@ -1,51 +1,156 @@
-### Data simulated
-Measures <- list(SampleNames = c("OSL-001", "OSL-002", "OSL-003", "OSL-004", "OSL-005"),
-ddot = c(2.50, 2.30, 2.10, 1.90, 1.75),  # Environmental dose rate (Gy/ka)
-sddot = c(0.10, 0.12, 0.15, 0.10, 0.08), # Error on dose rate (Gy/ka)
-D = c(75.0, 85.0, 92.0, 105.0, 115.0),  # OSL Dose (Gy)
-sD = c(3.0, 3.5, 4.0, 5.0, 4.5),  # Error on dose (Gy)
-sddot_shared = c(1.5, 1.6, 1.7, 1.9, 2.0),  # Common error term (Gy)
-Nb_sample = 5)
+#### Jingbian Loess ####
+Jingbian <- readxl::read_xlsx("R/DataManipulation/Jingbian_De_DoseRates.xlsx")
+Jingbian <- Jingbian %>% tidyr::unite(col = SampleID, `Sample ID`, `...2`, `...3`, sep = "_", remove = T)
+Jingbian
+
+Jingb_Nb_sample = length(Jingbian$SampleID)
+Jingb_SampleNames = Jingbian$SampleID
+Jingb_Theta = Theta = as.matrix(read.csv("R/DataManipulation/CovarianceMatrix_Jingbian.csv",
+                                         col.names = paste0("A", 1:Jingb_Nb_sample), sep = ";"))
 
 
-### List of the Measures
-Theta = diag(as.numeric(Measures$sddot)**2) +
-  as.numeric(Measures$sddot_shared) %*% t(as.numeric(Measures$sddot_shared))
-covD = diag(as.numeric(Measures$sD)**2)
+JingbianUnconstrained = Compute_AgeS_D(list(D = Jingbian$D, sD = Jingbian$Sigma_D, ddot = Jingbian$d,
+                                            sddot = Jingbian$Sigma_d),
+                                       Nb_sample = Jingb_Nb_sample, SampleNames = Jingb_SampleNames,
+                                       ThetaMatrix = Jingb_Theta, prior = "Independance",
+                                       PriorAge = rep(c(1, 1400), Jingb_Nb_sample),
+                                       Iter = 2000, burnin = 50000, t = 10
+                                       )
+
+JingbIso = PlotIsotonicCurve(StratiConstraints = c(), object = JingbianUnconstrained, level = .68)
+
+JingbianUO = Compute_AgeS_D(list(D = Jingbian$D, sD = Jingbian$Sigma_D, ddot = Jingbian$d,
+                                 sddot = Jingbian$Sigma_d),
+                            Nb_sample = Jingb_Nb_sample, SampleNames = Jingb_SampleNames,
+                            ThetaMatrix = Jingb_Theta, prior = "Conditional",
+                            PriorAge = rep(c(1, 1400), Jingb_Nb_sample),
+                            Iter = 2000, burnin = 50000, t = 10
+)
+
+JingbianNicholls = Compute_AgeS_D(list(D = Jingbian$D, sD = Jingbian$Sigma_D, ddot = Jingbian$d,
+                                 sddot = Jingbian$Sigma_d),
+                            Nb_sample = Jingb_Nb_sample, SampleNames = Jingb_SampleNames,
+                            ThetaMatrix = Jingb_Theta, prior = "StrictNicholls",
+                            PriorAge = rep(c(1, 1400), Jingb_Nb_sample),
+                            Iter = 2000, burnin = 50000, t = 10
+)
+
+
+plotHpd(list(JingbianUO, JingbIso, JingbianNicholls), c("UO", "Isotonic", "Nicholls"))
+
+##======================================================================================#
+
+#### Chez Pinaud ####
+
+ChezPinaud <- readxl::read_xlsx("R/DataManipulation/DoseAndDRestimates-forModelling.xlsx", skip = 1)[, -8]
+colnames(ChezPinaud) <- c("unit", "samples", "lower95", "lower68", "estimate", "upper68", "upper95",
+                  "ddot", "varddot")
+ChezPinaud
+ChezPinaud_Nb_sample <- dim(ChezPinaud)[1]
+ChezPinaud_Theta <- as.matrix(read.csv("R/DataManipulation/CovarianceMatrix_1313.csv", sep = ";",
+                            col.names = paste0("A", 1:ChezPinaud_Nb_sample)))
+
+ChezPinaud_Independant <- Compute_AgeS_D(list(D = ChezPinaud$estimate,
+                                   sD = (ChezPinaud$upper95-ChezPinaud$lower95) /(2*1.96),
+                                   ddot = ChezPinaud$ddot),
+                              Nb_sample = ChezPinaud_Nb_sample, SampleNames = ChezPinaud$samples,
+                              ThetaMatrix = ChezPinaud_Theta, prior = "Independance",
+                              PriorAge = rep(c(1, 1400), ChezPinaud_Nb_sample),
+                              Iter = 2000, burnin = 50000, t = 10)
+
+IsoChezPinaud = PlotIsotonicCurve(c(), ChezPinaud_Independant )
+
+ChezPinaud_UO <- Compute_AgeS_D(list(D = ChezPinaud$estimate,
+                                     sD = (ChezPinaud$upper95-ChezPinaud$lower95) /(2*1.96),
+                                     ddot = ChezPinaud$ddot),
+                                Nb_sample = ChezPinaud_Nb_sample, SampleNames = ChezPinaud$samples,
+                                ThetaMatrix = ChezPinaud_Theta, prior = "StrictOrder",
+                                PriorAge = rep(c(1, 1400), ChezPinaud_Nb_sample),
+                                Iter = 2000, burnin = 50000, t = 10)
+
+ChezPinaud_Nicholls <- Compute_AgeS_D(list(D = ChezPinaud$estimate,
+                                     sD = (ChezPinaud$upper95-ChezPinaud$lower95) /(2*1.96),
+                                     ddot = ChezPinaud$ddot),
+                                Nb_sample = ChezPinaud_Nb_sample, SampleNames = ChezPinaud$samples,
+                                ThetaMatrix = ChezPinaud_Theta, prior = "StrictNicholls",
+                                PriorAge = rep(c(1, 1400), ChezPinaud_Nb_sample),
+                                Iter = 2000, burnin = 50000, t = 10)
+
+plotHpd(list(ChezPinaud_UO, IsoChezPinaud, ChezPinaud_Nicholls), c("UO", "Iso", "Nicholls"))
+
+##======================================================================================#
+#### Bloc Datasets ####
+datasets2 <- readxl::read_excel("R/DataManipulation/dataOSL_3sites.xlsx")
+colnames(datasets2)[3:6] <- c("ddot", "sddot", "D", "sD")
+
+Bloc_Nb_Sample = dim(datasets2)[1]
+BlockLength <- datasets2 %>% dplyr::mutate(block = stringr::str_extract(Sample, "Dhab\\d+")) %>%
+  dplyr::group_by(block) %>%
+  dplyr::summarise(blockLength = dplyr::n()) %>% dplyr::select(blockLength)
+
+BlocSc = as.matrix(Matrix::bdiag(sapply((BlockLength$blockLength),
+                                    function(n) upper.tri(matrix(1, nrow = n, ncol = n))))) *1
+BlocSc = as.matrix( rbind(rep(1, dim(datasets2)[1]), BlocSc))
+datasets2
+
+BlocTheta = diag(datasets2$sddot**2)
+
+BlocIndependant <- Compute_AgeS_D(list(D = datasets2$D, sD = datasets2$sD, ddot = datasets2$ddot),
+                                  Nb_sample = Bloc_Nb_Sample, SampleNames = datasets2$Sample,
+                                  ThetaMatrix = BlocTheta, prior = "Independance",
+                                  PriorAge = rep(c(1, 1400), ChezPinaud_Nb_sample),
+                                  Iter = 2000, burnin = 50000, t = 10)
+BlocIso = PlotIsotonicCurve(BlocSc, BlocIndependant)
+
+##======================================================================================#
+
+
+
+#### Simulated Data ####
+SampleNames = c("OSL-001", "OSL-002", "OSL-003", "OSL-004", "OSL-005")
+A = c(14, 17, 17.8, 19, 20)
+
+ddot = c(2.50, 2.30, 2.10, 1.90, 1.75)  # Environmental dose rate (Gy/ka)
+sddot = c(0.10, 0.12, 0.15, 0.10, 0.08) # Error on dose rate (Gy/ka)
+sddot_shared = c(.5, .6, .07, .3, .1)  # Common error term (Gy)
+Nb_sample = 5
+sD = c(1.0, 1.5, .9, 1.0, 1.5)  # Error on dose (Gy)
+
+Theta = diag(as.numeric(sddot)**2) +
+  as.numeric(sddot_shared) %*% t(as.numeric(sddot_shared))
+set.seed(123)
+D = MASS::mvrnorm(n = 1, A*ddot, Sigma = diag(A)%*%Theta %*%diag(A) + diag(sD**2)) # OSL Dose (Gy)
+
+SimulatedUnconstrained = Compute_AgeS_D(list(D =D, sD = D, ddot = ddot),
+                                        ThetaMatrix = Theta, Nb_sample = Nb_sample, SampleNames = SampleNames,
+                                        prior = "Independance",
+                                        PriorAge = rep(c(1, 1400), Nb_sample),
+                                        Iter = 2000, burnin = 50000, t = 10)
+
+SimulatedIso = PlotIsotonicCurve(c(), SimulatedUnconstrained)
+
+SimulatedUO = Compute_AgeS_D(list(D =D, sD = D, ddot = ddot),
+                             ThetaMatrix = Theta, Nb_sample = Nb_sample, SampleNames = SampleNames,
+                             prior = "StrictOrder",
+                             PriorAge = rep(c(1, 1400), Nb_sample),
+                             Iter = 2000, burnin = 50000, t = 10)
+
+
+SimulatedNicholls = Compute_AgeS_D(list(D =D, sD = D, ddot = ddot),
+                             ThetaMatrix = Theta, Nb_sample = Nb_sample, SampleNames = SampleNames,
+                             prior = "StrictNicholls",
+                             PriorAge = rep(c(1, 1400), Nb_sample),
+                             Iter = 2000, burnin = 50000, t = 10)
+
+
+
+
+
 
 DtMeasures <- list(Theta = Theta, Measures = Measures, covD = covD)
 
+##======================================================================================#
 
-##-------------------------- True Ages -------------------#@
-Age = c(30.0, 37.0, 43.8, 55.3, 65.7)  # Calculated age (ka)
-##-------------------------- Constraints Matrix -------------------#@
-Sc = rbind(rep(1, 5), upper.tri(matrix(rep(1), ncol = 5, nrow = 5))*1)
-
-AgeAsBayLum <-Compute_AgeS_D(DtMeasures, Sc, prior = "Jeffreys", Iter = 50000, burnin = 30000,
-                             PriorAge = rep(c(1, 1000),  Measures$Nb_sample))
-
-AgeCorrected <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder", Iter = 2000, burnin = 50000,
-                               PriorAge = rep(c(1, 1000),  Measures$Nb_sample))
-AgeCorrected <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictNicholls", Iter = 2000, burnin = 50000,
-                               PriorAge = rep(c(1, 1000),  Measures$Nb_sample))
-
-
-init_dist <- replicate(1000, initialize_SC(Sc, 1, 150))
-ldensity <- apply(init_dist, 1, function(l) plot(density(l)))
-
-
-GibbsOutput = GibbsSampler(DtMeasures,  3, 50000, 30000,Sc, 1, 150, "logit")
-invGibbsOutput = GibbsSampler(invDtMeasures,  invVhat, 50000, 30000,Sc, 1, 150, "logit")
-
-plot(coda::as.mcmc.list(coda::as.mcmc(GibbsOutput$A)))
-
-traceplot(mcmc(GibbsOutput$A))
-densplot(mcmc(GibbsOutput$A))
-summary(mcmc(GibbsOutput$A))
-autocorr.diag(mcmc(GibbsOutput$A))
-acfplot(mcmc(GibbsOutput$A))
-pairs(GibbsOutput$A)
-gelman.diag(mcmc(GibbsOutput$A))
 
 
 ###-------------------------------------------------------------------------------@
@@ -53,11 +158,19 @@ datasets1 <- readxl::read_excel("R/DataManipulation/dataOSL.xlsx")
 colnames(datasets1)[3:6] <- c("ddot", "sddot", "D", "sD")
 Sc = rbind(rep(1, 3), upper.tri(matrix(rep(1), ncol = 3, nrow = 3))*1)
 
+Theta = as.matrix(diag(datasets1$sddot**2), colnames = paste0("A", 1:3) )
+Independant <- Compute_AgeS_D(list(D = datasets1$D, sD = datasets1$sD, ddot = datasets1$ddot),
+                          SampleNames = datasets1$Sample, Nb_sample = 3, ThetaMatrix = Theta,
+                          prior = "Independance",
+                          Iter = 2000, burnin = 50000, t = 10,
+                          PriorAge = rep(c(1, 1400),  3) )
+
+Iso = PlotIsotonicCurve(Sc, Independant)
+
+
 Measures = list(ddot = datasets1$ddot, sddot = datasets1$sddot, D = datasets1$D, sD = datasets1$sD,
                 sddot_shared = rep(0,3), Nb_sample = 3, SampleNames = datasets1$Sample)
 
-Theta = diag(as.numeric(Measures$sddot)**2) +
-  as.numeric(Measures$sddot_shared) %*% t(as.numeric(Measures$sddot_shared))
 covD = diag(as.numeric(Measures$sD)**2)
 
 DtMeasures <- list(Theta = Theta, Measures = Measures, covD = covD)
@@ -81,21 +194,14 @@ AgeNicholls <- Compute_AgeS_D(DtMeasures, DtMeasures$Sc, prior = "StrictNicholls
 
 
 plotHpd(list(AgeNicholls, AgeAsBayLum, AgeCorrected), c("Nicholls", "BayLum", "Exponential")) +
-  ggplot2::geom_point(mapping = ggplot2::aes(SAMPLE, AGE), data = AgeNicholls$Ages, inherit.aes = F, color = "blue") +
+  ggplot2::geom_point(mapping = ggplot2::aes(SAMPLE, AGE),
+                      data = AgeNicholls$Ages, inherit.aes = F, color = "blue") +
   ggplot2::geom_point(ggplot2::aes(SAMPLE, AGE ), data = AgeCorrected$Ages, inherit.aes = F, color = "green") +
   ggplot2::geom_point(ggplot2::aes(SAMPLE, AGE ), data = AgeAsBayLum$Ages, inherit.aes = F, color = "red")
 
 
 ###-------------------------------------------------------------------------------@
-datasets2 <- readxl::read_excel("R/DataManipulation/dataOSL_3sites.xlsx")
-colnames(datasets2)[3:6] <- c("ddot", "sddot", "D", "sD")
 
-BlockLength <- datasets2 %>% dplyr::mutate(block = stringr::str_extract(Sample, "Dhab\\d+")) %>%
-  dplyr::group_by(block) %>%
-  dplyr::summarise(blockLength = dplyr::n()) %>% dplyr::select(blockLength)
-
-Sc = as.matrix(Matrix::bdiag(sapply((BlockLength$blockLength), function(n) upper.tri(matrix(1, nrow = n, ncol = n))))) *1
-Sc = as.matrix( rbind(rep(1, dim(datasets2)[1]), Sc))
 
 network = igraph::graph_from_adjacency_matrix(Sc[-1, ], mode = "directed")
 plot(
@@ -393,22 +499,7 @@ plotHpd(list(GibbsOutput, AgeConditionnal, AgeCorrected, AgeAsBayLum), c("Gibbs"
 # DEMANDER A GUILLAUME DE PARTAGER COMMENT SONT CALCULÉES LES VALEURS DE LA MATRICE DE COV
 # IMPOSSIBLE D'UTILISER LE GIBBS A LA MAIN POUR L'INSTANT CAR IL FAUT AVOIR CERTAINES DONNÉES NON PRÉCISÉES ICI (VOIR LATEX)
 #### POUR TOUS LES ECHANTILLONS
-dt <- readxl::read_xlsx("R/DataManipulation/DoseAndDRestimates-forModelling.xlsx", skip = 1)[, -8]
-colnames(dt) <- c("unit", "samples", "lower95", "lower68", "estimate", "upper68", "upper95",
-                  "ddot", "varddot")
-dt
-Theta <- as.matrix(read.csv("R/DataManipulation/CovarianceMatrix_1313.csv", sep = ";",
-                            col.names = paste0("A", 1:Measures$Nb_sample)))
-Nb_sample <- dim(dt)[1]
 
-Independant <- Compute_AgeS_D(list(D = dt$estimate, sD = (dt$upper95-dt$lower95) /(2*1.96), ddot = dt$ddot),
-                              Nb_sample = Nb_sample, SampleNames = dt$samples,
-                              ThetaMatrix = Theta, prior = "Independance", PriorAge = rep(c(1, 1400), 13),
-                              Iter = 2000, burnin = 50000, t = 10)
-
-Sc = rbind(rep(1, Nb_sample), upper.tri(matrix(rep(1), ncol = Nb_sample, nrow = Nb_sample))*1)
-
-IsoChezPinaud = PlotIsotonicCurve(c(), Independant )
 plotHpd()
 
 IsoChezPinaud
@@ -572,91 +663,7 @@ data.frame(IsoReg = Iso::pava(Approx$Ahat, 1/(Approx$sdAhat**2)), NichollsBR = A
   ggplot2::geom_line() +
   ggplot2::theme_minimal() + ggplot2::ylab("Age")
 
-##======================================================================================#
-#### Jingbian loess ####
-OslJingbian <- readxl::read_xlsx("R/DataManipulation/OSL_EastMound.xlsx", sheet = "Sheet1")
-colnames(OslJingbian)[c(4, 7)] <- c("Depth", "std")
-dim_data <- dim(OslJingbian)
-OslJingbian <- OslJingbian %>% dplyr::select(Depth, Age, std)
 
-n_draws = 1000
-simulations <- t(as.matrix(replicate(n_draws, rnorm(10, OslJingbian$Age, OslJingbian$std))))
-
-# Create the edges: 1->2, 2->3, ..., 9->10
-edges <- cbind(1:9, 2:10)
-
-# Create the graph
-g <- graph_from_edgelist(edges, directed = TRUE)
-length(E(g))
-# Plot
-plot(g,
-     vertex.label = V(g)$name,
-     vertex.color = "lightblue",
-     vertex.size = 10,
-     edge.arrow.size = 0.5,
-     layout = layout_with_sugiyama(g))
-
-IsoJingbian <- apply(simulations, 1, function(Ahat, network, weights) IsotonicRegDAG(network, Ahat, weights )$A,
-      network = g , weights = 1/(OslJingbian$std)**2)
-
-
-df <- data.frame(lower = apply(t(IsoJingbian), 2, arkhe::interval_hdr)[1,], upper = apply(t(IsoJingbian), 2, arkhe::interval_hdr)[2,],
-                 Unit = 1:10, avg = apply(t(IsoJingbian), 2, mean))
-df %>%  ggplot2::ggplot(ggplot2::aes(x = Unit, ymin = lower, ymax = upper), fill = "orange") +
-  ggplot2::geom_ribbon(alpha = .4) +
-  ggplot2::geom_line(ggplot2::aes(y = lower), color = "orange", group = 1) +
-  ggplot2::geom_line(ggplot2::aes(y = upper), color = "orange", group = 1) +
-  ggplot2::geom_line(ggplot2::aes(y = avg), color = "orange", group = 1, size =1.5) +
-  ggplot2::geom_point(ggplot2::aes(x = Unit, y = lower), color = "blue") +
-  ggplot2::geom_point(ggplot2::aes(x = Unit, y = upper), color = "red") +
-  ggplot2::geom_point(ggplot2::aes(x = Unit, y = avg), color = "black") +
-  BayLumTheme() + ggplot2::ylab("IsotonicRegression") + ggplot2::xlab("Samples") +
-  ggplot2::scale_x_continuous(breaks = 1:10, labels = Jingbian$SampleID) +
-  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
-
-
-Jingbian <- readxl::read_xlsx("R/DataManipulation/Jingbian_De_DoseRates.xlsx")
-Jingbian <- Jingbian %>% tidyr::unite(col = SampleID, `Sample ID`, `...2`, `...3`, sep = "_", remove = T)
-Jingbian
-Measures <- list(SampleNames = Jingbian$SampleID, Nb_sample = dim(Jingbian)[1],
-                 ddot = Jingbian$d, sddot = Jingbian$Sigma_d,
-                 D = Jingbian$D, sD = Jingbian$Sigma_D)
-Theta = as.matrix(read.csv("R/DataManipulation/CovarianceMatrix_Jingbian.csv", col.names = paste0("A", 1:10), sep = ";"))
-
-DtMeasures <- list(Measures = Measures, Theta = Theta, covD = diag(Measures$sD**2))
-Sc = rbind(rep(1, Measures$Nb_sample), upper.tri(matrix(rep(1), ncol = Measures$Nb_sample, nrow = Measures$Nb_sample))*0)
-AgeJingbian <- Compute_AgeS_D(DtMeasures, Sc, prior = "Jeffreys",  Iter = 6000, burnin = 50000, t = 10,
-                              PriorAge = rep(c(1, 500),  DtMeasures$Measures$Nb_sample))
-IsoJingbian <- IsotonicCurve(g, AgeJingbian)
-IsoJingbian
-apply(IsoJingbian[1:300, ], 2, arkhe::interval_hdr, level = .95)
-df <- data.frame(lower = apply(t(IsoJingbian), 1, arkhe::interval_hdr, level = .68)[1,],
-                 upper = apply(t(IsoJingbian), 1, arkhe::interval_hdr, level = .68)[2,],
-                 Unit = 1:10, avg = apply(t(IsoJingbian), 1, mean), SAMPLE = Jingbian$SampleID)
-df
-
-PlotIsotonicCurve(g, AgeJingbian, level = .68)
-
-
-NicholsJingbian <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictNicholls", PriorAge = rep(c(.001, 500), DtMeasures$Measures$Nb_sample))
-UOJingbian <- Compute_AgeS_D(DtMeasures, Sc, prior = "StrictOrder", PriorAge = rep(c(.001, 500), DtMeasures$Measures$Nb_sample),
-                                  Iter = 2000, burnin = 50000, t = 10 )
-plotHpd(list(UOJingbian, NicholsJingbian), c("UO", "Nicholls"))   +
-  ggplot2::geom_line(data = NicholsJingbian$Ages, ggplot2::aes(SAMPLE, AGE), inherit.aes = F, group =1, size = 1, color = "#F57559") +
-  BayLumTheme() +
-  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45)) +
-  ggplot2::geom_ribbon(data = df, alpha = .3, ggplot2::aes(x = Unit, ymin = lower, ymax = upper), inherit.aes = F) +
-  ggplot2::geom_line(data = df, ggplot2::aes(x = Unit, y = lower), color = "orange", group = 1, inherit.aes = F) +
-  ggplot2::geom_line(data = df, ggplot2::aes(x = Unit, y = upper), color = "orange", group = 1, inherit.aes = F) +
-  ggplot2::geom_line(data = df, ggplot2::aes(x = Unit, y = avg), color = "orange", group = 1, size =1.5, inherit.aes = F) +
-  ggplot2::geom_point(data = df, ggplot2::aes(x = Unit, y = lower), color = "blue", inherit.aes = F) +
-  ggplot2::geom_point(data = df, ggplot2::aes(x = Unit, y = upper), color = "red", inherit.aes = F) +
-  ggplot2::geom_point(data = df, ggplot2::aes(x = Unit, y = avg), color = "black", inherit.aes = F)
-
-
-#using gpava of isotone
-fitted = isotone::gpava(OslJingbian$Depth, OslJingbian$Age, 1/OslJingbian$std**2)
-fitted$x
 ##======================================================================================#
 
 #### Graph Clustering ####

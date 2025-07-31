@@ -69,7 +69,7 @@ Age <- AgeC14_Computation(
 plot_Ages(Age)
 
 ## plot output
-plot_Ages(Age, plot_mode = "density")
+plot_Ages(Age, plot_mode = "density", legend.pos = "topright")
 
 }
 \seealso{

@@ -294,7 +294,8 @@ network_vizualization <- function(network, vertices_labels, interactive = FALSE,
     edges = igraph::as_data_frame(network, what = "edges")
     names(edges)[1:2] <- c("from", "to")
 
-    visNetwork::visNetwork(nodes, edges) %>%
+    visNetwork::visNetwork(nodes, edges, width = "100%", height = "90vh") %>%
+      visNetwork::visNodes(font = list(size=20, align = "center")) %>%
       visNetwork::visEdges(arrows = "to") %>%
       visNetwork::visOptions(highlightNearest = TRUE, nodesIdSelection = TRUE) %>%
       visNetwork::visLayout(randomSeed = 123)
@@ -303,18 +304,27 @@ network_vizualization <- function(network, vertices_labels, interactive = FALSE,
 
 
   else {
-  plot(
-    network,
-    layout = layout,
-    vertex.label = vertices_labels,
-    vertex.size = 10,
-    vertex.color = adjustcolor("lightblue", alpha.f = 0.6),
-    edge.arrow.size = 0.4,  # Smaller arrowheads
-    edge.width = 2,
-    edge.arrow.length = 10,
-    asp = 0,
-    edge.curved = 0.1
-  )}
+    tg <- tidygraph::as_tbl_graph(network)
+    tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::mutate(Samples = vertices_labels)
+
+    layout <- ggraph::create_layout(tg, layout = "sugiyama")
+
+    ggraph::ggraph(layout) + ggraph::geom_edge_link(arrow = grid::arrow(length = grid::unit(.8, 'mm')),end_cap = ggraph::circle(3, 'mm'), alpha = 0.5, edge_colour = "red") +
+      ggraph::theme_graph() + ggraph::geom_node_circle(ggplot2::aes(r = .05), fill = "lightyellow", color = "blue", size = 1)  +
+      ggrepel::geom_text_repel(ggplot2::aes(x = x, y = y, label = Samples), size = 3.5, max.overlaps = Inf) + g
+  # plot(
+  #   network,
+  #   layout = layout,
+  #   vertex.label = vertices_labels,
+  #   vertex.size = 10,
+  #   vertex.color = adjustcolor("lightblue", alpha.f = 0.6),
+  #   edge.arrow.size = 0.4,  # Smaller arrowheads
+  #   edge.width = 2,
+  #   edge.arrow.length = 10,
+  #   asp = 0,
+  #   edge.curved = 0.1
+  # )
+    }
 }
 
 
@@ -351,7 +361,21 @@ IsotonicRegDAG = function(network, Ahat, weights) {
 }
 
 
+##==================================================================================@
+#'@export
+findbound <- function(index,  Sc) {
+  Sc = Sc[-1, ] #del lower bound line
 
+  lowerbound_index = which(Sc[, index] == 1)
+  if (length(lowerbound_index) > 0) { a = max(lowerbound_index)}
+
+  else { a = 0}
+
+  upperbound_index = which(Sc[index, ] == 1)
+  if (length(upperbound_index) > 0 ) {b = min(upperbound_index)}
+  else {b = -1}
+  return(c(a,b))
+}
 
 
 

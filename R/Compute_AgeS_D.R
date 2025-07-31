@@ -1,5 +1,5 @@
 #' @title Create Input for Age Computation
-#'
+#'@md
 #' @description
 #' This function prepares the necessary data frame entries for the function [Computation_AgeS_D].
 #' It takes structured input data (as defined in [Generate_DataFile()] and [Generate_DataFile_MG()])
@@ -101,7 +101,7 @@ Compute_AgeS_D <- function(
 
   ### JagsRun
   ## liste of data
-   if (prior == "StrictOrder" | prior == "StrictNicholls" | prior == "Independance") {
+   if (prior == "StrictOrder" | prior == "StrictNicholls" | prior == "Independance" | prior =="Conditional"  ) {
      dataList = list(
        "I" = Nb_sample,
        "Theta" = ThetaMatrix,
@@ -275,7 +275,7 @@ Compute_AgeS_D <- function(
   sample <- as.data.frame(runjags::combine.mcmc(echantillon))
 
   ##try makes sure that the function runs
-  try(plot_MCMC(echantillon, sample_names = Measures$SampleNames))
+  try(plot_MCMC(echantillon, sample_names = SampleNames))
 
   #autocorrelation diagnosis
   cat("\n\n ------------------------------------------------------------------------------\n\n")
@@ -299,11 +299,11 @@ Compute_AgeS_D <- function(
   ))
   for (i in 1:Nb_sample) {
     cat("----------------------------------------------\n")
-    cat(paste(" Sample name: ", Measures$SampleNames[i], "\n"))
+    cat(paste(" Sample name: ", SampleNames[i], "\n"))
     cat("---------------------\n")
     cat(paste("\t\t", "Point estimate", "Uppers confidence interval\n"))
     cat(paste(
-      paste("A_", Measures$SampleNames[i], sep = ""),
+      paste("A_", SampleNames[i], sep = ""),
       "\t",
       round(CV$psrf[i, 1], roundingOfValue),
       "\t\t",
@@ -325,7 +325,7 @@ Compute_AgeS_D <- function(
 
   #---print results ####
   ##Matrix of results
-  rnames <- paste0("A_", Measures$SampleNames)
+  rnames <- paste0("A_", SampleNames)
 
   R <- matrix(
     data = NA,
@@ -398,7 +398,7 @@ Compute_AgeS_D <- function(
 
   output <- .list_BayLum(
     "Ages" = data.frame(
-      SAMPLE = Measures$SampleNames,
+      SAMPLE = SampleNames,
       AGE = estimate,
       HPD68.MIN = credible68[ 1,],
       HPD68.MAX = credible68[2, ],

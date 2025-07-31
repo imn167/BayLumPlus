@@ -1,4 +1,4 @@
-library(igraph)
+
 ## matrice des contraintes Catalhöyük
 SC = matrix(data=0,ncol=40,nrow=41)
 SC[1,]=rep(1,40)
@@ -43,7 +43,23 @@ SC[39,]=c(rep(0,38),rep(1,2)) #5329
 SC[40,]=rep(0,40) #pre XII After
 SC[41,]=rep(0,40) #pre XII After
 
-Sc = SC[-1,]
+C14ages = c(8033,7955,7940,7955,8092,7920,8027,7935,7980,7965,7990,7985,8090,
+            8090,7931,7970,7940,7965,8082,7980,8025,8000,8050,7970,8024,8030,8035,8085,8030,7985,8137,8160,8150,8160,8210,8240,8199,8155,8390,8195)
+C14agesEr = c(39,40,30,25,98,25,37,50,55,25,25,50,55,50,38,25,25,30,37,25,25,50,40,25,35,50,30,36,30,55,36,30,50,50,30,55,36,50,90,80)
+
+CalAges = rcarbon::calibrate(x = C14ages, errors = C14agesEr, calCurves = 'intcal20', ids = 1:40)
+
+plot(CalAges, 6, HPD = T, credMass = 0.68,calendar = "BCAD",
+     xlab = "Years BC/AD")
+sum=summary(CalAges, prob = .68)
+sum
+
+
+tg = tidygraph::as_tbl_graph(reduced_network)
+
+
+
+
 Sc = Sc[1:8, 1:8]
 network <-igraph::graph_from_adjacency_matrix( Sc)
 E(network)
@@ -77,16 +93,7 @@ plot(
 levels = distances(reduced_network)
 depth = apply(levels, 2, function(x) ifelse(all(is.infinite(x)), 0, max(x[!is.infinite(x)])))
 depth
-C14ages = c(8033,7955,7940,7955,8092,7920,8027,7935,7980,7965,7990,7985,8090,
-            8090,7931,7970,7940,7965,8082,7980,8025,8000,8050,7970,8024,8030,8035,8085,8030,7985,8137,8160,8150,8160,8210,8240,8199,8155,8390,8195)
-C14agesEr = c(39,40,30,25,98,25,37,50,55,25,25,50,55,50,38,25,25,30,37,25,25,50,40,25,35,50,30,36,30,55,36,30,50,50,30,55,36,50,90,80)
 
-CalAges = rcarbon::calibrate(x = C14ages, errors = C14agesEr, calCurves = 'intcal20', ids = 1:40)
-
-plot(CalAges, 6, HPD = T, credMass = 0.68,calendar = "BCAD",
-     xlab = "Years BC/AD")
-sum=summary(CalAges, prob = .68)
-sum
 l =strsplit(sum$p_0.68_BP_1, "to")
 ll =sapply(l, as.numeric)
 w = 1 / ((ll[1,]-ll[2,]) /2)**2
@@ -112,7 +119,6 @@ plot(
   edge.curved = 0.1,
   vertex.label.degree = -pi/4)
 
-tg = tidygraph::as_tbl_graph(reduced_network)
 library(ggraph)
 ggraph(tg, layout = "sugiyama") +
   geom_node_point(aes(color = estimate), size = 5) +
@@ -132,7 +138,7 @@ points(1:40, Agehat, pch =15, col = "green")
 tg = tidygraph::as_tbl_graph(reduced_G)
 library(ggraph)
 ggraph(tg, layout = "sugiyama") +
-  geom_node_point(aes(color = "blue"), size = 5) +
+  geom_node_point(aes(color = ""), size = 5) +
   scale_color_viridis_c() +
   theme_void() + theme(legend.position = "right")
 

@@ -5,6 +5,11 @@ Path=c("R/DataManipulation/")
 
 ########### sans micocouliers et sans UCIAMS-109995 (reconnu par BayLum comme un outlier)
 
+Catalhoyuk <- list(StratiConstraints = SC,
+                   C14ages = C14ages,
+                   C14agesEr = C14agesEr,
+                   C14_Nb_sample = C14_Nb_sample,
+                   C14_SampleNames = C14_SampleNames)
 
 C14_SampleNames = c("OxA-21261","OxA-21262","UCIAMS-98210","UCIAMS-103134","P-782","UCIAMS-103138","OxA-23247",
                     "OxA-9774","OxA-9946","UCIAMS-98208","UCIAMS-98209","OxA-9947","OxA-9775","OxA-9948","OxA-23523",
@@ -38,40 +43,50 @@ AC14_WithStratiWithout109995= AgeC14_Computation(Data_C14Cal=C14ages, Data_Sigma
                                                 CalibrationCurve = c("IntCal20"), Iter = 50000,
                                                 t = 5,
                                                 n.chains = 3, quiet = FALSE)
+AgeC14_Computation
+
+reduced_network <- remove_transitive_edges(buildNetwork(Catalhoyuk$StratiConstraints))
+
+startSBM = Sys.time()
+IsoC14SBM = PlotIsotonicCurve(Catalhoyuk$StratiConstraints, object = AC14_WithStratiWithout109995, interactive = T)
+endSBM = Sys.time()
+SBMtime = endSBM-startSBM
 
 
-network <-igraph::graph_from_adjacency_matrix( Sc)
-reduced_network = remove_transitive_edges(network)
+start = Sys.time()
+IsoC14 = PlotIsotonicCurve(SC, object = AC14_WithStratiWithout109995, interactive = F, method = "general")
+end = Sys.time()
+CVtime = end-start
 
-sample = runjags::combine.mcmc(AC14_WithStratiWithout109995$Sampling)[1:200, ]
-
-iso = as.matrix(pbapply::pbapply(sample, 1, function(Ahat, network, weights) {
-  Sys.sleep(.003)
-  t(IsotonicRegDAG(network, Ahat, weights )$A)},
-  network = reduced_network , weights = rep(1, 40)))
-
-iso = t(iso)
-
-hpd = apply(iso, 2, CredibleInterval, level = .68, roundingOfValue = 3)
-AC14_WithStratiWithout109995$Ages$SAMPLE
-
-IsoC14 <- IsotonicCurve(reduced_network, object = AC14_WithStratiWithout109995, level = .68)
-IsoC14$summary
+#Let's try to compare both methods
 
 
-## creation du graphe
+
+# creation du graphe
 tg = tidygraph::as_tbl_graph(reduced_network)
 tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::mutate(Samples = C14_SampleNames)
 
-tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::left_join(IsoC14$summary, by = "Samples") %>%
+tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::left_join(IsoC14SBM$data, by = "Samples") %>%
   tidygraph::mutate(translation = (upper-lower)/2)
-layout <- ggraph::create_layout(tg, layout = "sugiyama") %>% dplyr::mutate(x1 = x-translation, x2 = x + translation)
+layout <- ggraph::create_layout(tg, layout = "sugiyama") %>% dplyr::mutate(x1 = x-translation, x2 = x + translation, y = -(avg + avg**2/2))
 
 ggraph::ggraph(layout) + ggraph::geom_edge_link(arrow = grid::arrow(length = grid::unit(.8, 'mm')),end_cap = ggraph::circle(3, 'mm'), alpha = 0.2) +
-  ggplot2::geom_segment(data = layout, ggplot2::aes(x = x1, xend = x2, y = y, color = avg), size = 2) + ggraph::theme_graph() +
-  ggplot2::geom_text(ggplot2::aes(x = x, y = y, label = Samples), vjust = -1, size = 3)
+  ggplot2::geom_segment(data = layout, ggplot2::aes(x = x1, xend = x2, y = y, color = avg), linewidth = 2) + ggraph::theme_graph() +
+  ggplot2::geom_text(ggplot2::aes(x = x, y = y, label = Samples), vjust = -1, size = 3.5)
 
 
+ggraph::ggraph(layout) + ggraph::geom_edge_link(arrow = grid::arrow(length = grid::unit(.8, 'mm')),end_cap = ggraph::circle(3, 'mm'), alpha = 0.2) +
+   ggraph::theme_graph() +
+  ggplot2::geom_text(ggplot2::aes(x = x, y = y, label = Samples), vjust = -1, size = 3.5)
+
+ggraph::ggraph(layout) +
+  ggplot2::geom_segment(data = layout, ggplot2::aes(x = x1, xend = x2, y = y, color = avg), linewidth = 2) + ggraph::theme_graph() +
+  ggrepel::geom_text_repel(ggplot2::aes(x = x, y = y, label = Samples), size = 3.5, max.overlaps = Inf) +
+  ggplot2::scale_color_viridis_c(name = "Ages", breaks = seq(8,10, by = .1)) +
+  ggraph::geom_edge_link(arrow = grid::arrow(length = grid::unit(.8, 'mm')),end_cap = ggraph::circle(3, 'mm'), alpha = 0.1) +
+  ggplot2::theme(legend.position.inside = c(0,-9.2))
+
+########@
 
 creape_subPlot <- function(x1, x2) {
 
@@ -99,3 +114,26 @@ PlotIsotonicCurve(G, AC14_WithStratiWithout109995, level = .68)
 AC14_WithStratiWithout109995$
 
 
+pr <- function(x, ...) {
+  if (t %in% list(...)) {
+    print(t)
+  }
+
+  else print(x)
+}
+
+
+
+
+plot(
+  network,
+  layout = layout,
+  vertex.label = paste0("A", 1:n),
+  vertex.size = 10,
+  vertex.color = adjustcolor("lightblue", alpha.f = 0.9),
+  edge.arrow.size = 0.4,  # Smaller arrowheads
+  edge.width = 2,
+  edge.arrow.length = 10,
+  asp = 0,
+  edge.curved = 0.1
+)

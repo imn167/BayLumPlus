@@ -58,10 +58,10 @@ For more details, please see the package vignette.
 
 \examples{
 ##set path to YAML file
-yaml_file <- system.file("extdata/example.yml", package = "BayLum")
+yaml_file <- system.file("extdata/example.yml", package = "BayLumPlus")
 
-samp1_file <- system.file("extdata/samp1/bin.bin", package = "BayLum")
-samp2_file <- system.file("extdata/samp2/bin.bin", package = "BayLum")
+samp1_file <- system.file("extdata/samp1/bin.bin", package = "BayLumPlus")
+samp2_file <- system.file("extdata/samp2/bin.bin", package = "BayLumPlus")
 
 ## import BIN files
 samp1 <- Luminescence::read_BIN2R(samp1_file, verbose = FALSE) |>

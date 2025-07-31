@@ -54,7 +54,7 @@
 #' plot_Ages(Age)
 #'
 #' ## plot output
-#' plot_Ages(Age, plot_mode = "density")
+#' plot_Ages(Age, plot_mode = "density", legend.pos = "topright")
 #'
 #' @md
 #' @export
@@ -299,7 +299,9 @@ plot_Ages <- function(
     ##add legend
     if(plot_settings$legend){
       legend(
-        if(length(plot_settings$legend.pos) == 0) plot_settings$legend.pos <- locator(1) else plot_settings$legend.pos,
+        if(length(plot_settings$legend.pos) == 0) { if (interactive()) plot_settings$legend.pos <- locator(1)
+        else plot_settings$legend.pos <-  "topright" }
+        else plot_settings$legend.pos,
         legend = plot_settings$legend.text,
         pch = c(plot_settings$pch, NA_integer_, NA_integer_),
         bty = "n",
