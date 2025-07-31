@@ -7,40 +7,23 @@
 
 # BayLum <img width=120px src="man/figures/logo_BayLum.png" align="right" />
 
-<!-- badges: start -->
-
-[![R-CMD-check](https://github.com/crp2a/BayLum/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/crp2a/BayLum/actions/workflows/R-CMD-check.yaml)
-[![codecov](https://codecov.io/gh/crp2a/BayLum/graph/badge.svg?token=cOdZr6imKX)](https://app.codecov.io/gh/crp2a/BayLum)
-
-[![r-universe](https://crp2a.r-universe.dev/badges/BayLum)](https://crp2a.r-universe.dev/BayLum)
-[![CRAN
-Version](https://www.r-pkg.org/badges/version/BayLum)](https://cran.r-project.org/package=BayLum)
-[![CRAN
-checks](https://badges.cranchecks.info/worst/BayLum.svg)](https://cran.r-project.org/web/checks/check_results_BayLum.html)
-[![CRAN
-Downloads](https://cranlogs.r-pkg.org/badges/grand-total/BayLum)](https://cran.r-project.org/package=BayLum)
-
-[![Project Status: Active – The project has reached a stable, usable
-state and is being actively
-developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-
-[![DOI
-Zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.4311266.svg)](https://doi.org/10.5281/zenodo.4311266)
-[![CRAN
-DOI](https://img.shields.io/badge/doi-10.32614/CRAN.package.BayLum-blue.svg)](https://doi.org/10.32614/CRAN.package.BayLum)
-<!-- badges: end -->
-
 An R package for chronological **Bay**esian models integrated for
 Optically Stimulated (OSL) **Lum**inescence Dating
+
+**BayLumPlus** is a a refined fork of the original
+[`BayLum`](https://crp2a.github.io/BayLum/) R package. This update
+introduces several new capabilities, particularly for the Age
+processing, where we aim to test different prior assumptions without
+incurring the computational cost associated with the Palaeodose Model.
 
     To cite the R package 'BayLum' please cite the R package itself and the
     following article:
 
       Christophe C, Philippe A, Kreutzer S, Guérin G, Baumgarten F,
-      Frerebeau N (2024). _BayLum: Chronological Bayesian Models
-      Integrating Optically Stimulated Luminescence and Radiocarbon Age
-      Dating_. R package version 0.3.2,
-      <https://CRAN.R-project.org/package=BayLum>.
+      Frerebeau N, Bouafia I (2024). _BayLumPlus: Chronological Bayesian
+      Models Integrating Optically Stimulated Luminescence and Radiocarbon
+      Age Dating_. R package version 0.3.3.9000-13,
+      <https://CRAN.r-project.org/package=BayLum>.
 
       Philippe A, Guerin G, Kreutzer S (2019). "BayLum - An R package for
       Bayesian analysis of OSL ages: An introduction." _Quaternary
@@ -52,21 +35,81 @@ Optically Stimulated (OSL) **Lum**inescence Dating
 **You need to have [JAGS](https://mcmc-jags.sourceforge.io) installed on
 your computer.**
 
-You can install the released version of **BayLum** from
-[CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("BayLum")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+The package **BayLum** has only a development version from
+[GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("crp2a/BayLum")
+remotes::install_github("imn167/BayLumPLus")
 ```
 
 Please note that development versions may change day by day.
+
+## About this Extension
+
+### Graph Theory for Stratigraphic Constraints
+
+To support the modeling of stratigraphic relationships, we introduce
+graph-based functions:
+
+- `buildNetwork()` – builds a network from stratigraphic input  
+- `network_vizualization()` – visualizes stratigraphic constraints as a
+  graph  
+- `remove_transitive_edges()` – removes redundant edges implied by
+  transitivity
+
+These tools help simplify and explore complex stratigraphic
+relationships more intuitively.
+
+------------------------------------------------------------------------
+
+### Bayesian Age Modeling with `Compute_AgeS_D()`
+
+We introduce a new modeling function: `Compute_AgeS_D()`, focused on
+Bayesian age estimation under various prior structures.
+
+**Supported priors include:**
+
+- `StrictOrder`: Uniform order on the log-scale (chain-like
+  constraints)  
+- `StrictNicholls`: Based on the Uniform Order prior, from the original
+  `BayLum`  
+- `Independence`: For unstructured or weakly constrained stratigraphy
+
+This function behaves similarly to `AgeS_Computation()` but adds two
+additional outputs:
+
+- The **standard deviation** of each estimated age  
+- The **time-series standard error**, useful in detecting
+  heteroscedasticity
+
+------------------------------------------------------------------------
+
+### Isotonic Distortion Framework
+
+`BayLumPlus` introduces a new Bayesian modeling strategy called
+**Isotonic Distortion**, implemented via:
+
+- `IsotonicCurve()` – fits the isotonic model  
+- `PlotIsotonicCurve()` – visualizes the result
+
+This framework supports structured monotonic trends in ages, offering a
+flexible and interpretable alternative to traditional priors.
+
+------------------------------------------------------------------------
+
+### Comparing Priors with `plotHpd()`
+
+To facilitate the comparison of different modeling choices and prior
+structures, the `plotHpd()` function allows visual comparison of
+**Highest Posterior Density (HPD)** intervals under different model
+settings.
+
+This is particularly useful for:
+
+- Sensitivity analysis  
+- Model comparison  
+- Reporting credible intervals with varying assumptions
 
 ## License
 
@@ -85,3 +128,6 @@ Public License for more details.
 The development of **BayLum** received a state financial support managed
 by the Agence Nationale de la Recherche (France) through the program
 *Investissements d’avenir* (ref. ANR-10-LABX-52) between 2015 and 2018.
+
+The development of **BayLumPlus** received a european financial support
+by the European Research Center ERC through the grant QuinaWorld.

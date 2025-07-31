@@ -100,7 +100,15 @@ BlocIndependant <- Compute_AgeS_D(list(D = datasets2$D, sD = datasets2$sD, ddot 
                                   ThetaMatrix = BlocTheta, prior = "Independance",
                                   PriorAge = rep(c(1, 1400), ChezPinaud_Nb_sample),
                                   Iter = 2000, burnin = 50000, t = 10)
-BlocIso = PlotIsotonicCurve(BlocSc, BlocIndependant)
+BlocIso = PlotIsotonicCurve(BlocSc, BlocIndependant, level = .68)
+
+
+plotHpd(list(BlocIso), c("Iso"))
+BlocNicholls <- Compute_AgeS_D(list(D = datasets2$D, sD = datasets2$sD, ddot = datasets2$ddot),
+                                  Nb_sample = Bloc_Nb_Sample, SampleNames = datasets2$Sample,
+                                  ThetaMatrix = BlocTheta, prior = "StrictNicholls",
+                                  PriorAge = rep(c(1, 1400), ChezPinaud_Nb_sample),
+                                  Iter = 2000, burnin = 50000, t = 10)
 
 ##======================================================================================#
 
