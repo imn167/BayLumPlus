@@ -254,16 +254,16 @@ remove_transitive_edges <- function(G) {
   reduced_G = rlang::duplicate(G)
   vertices = igraph::V(G)
   for (u in vertices) {
-    message(paste("----------------- traitement sommet", u, "--------------"))
+    # message(paste("----------------- traitement sommet", u, "--------------"))
     #get all the neighbors of the vertices u
     u_neighbors = igraph::neighbors(G, u, mode = "out")
     #look for the descendants of each neighbors
     for (nei in u_neighbors) {
-      message(paste("treatement for the neighbours", nei))
+      # message(paste("treatement for the neighbours", nei))
       childs = igraph::subcomponent(G, nei, mode = "out")[-1]
       for (child in childs) {
         if (igraph::are_adjacent(reduced_G, u, child)) {
-          print(igraph::E(reduced_G, c(u, child)))
+          # print(igraph::E(reduced_G, c(u, child)))
           reduced_G = igraph::delete_edges(reduced_G, igraph::E(reduced_G, P = c(u,child)))
         }
       }

@@ -5,8 +5,8 @@
 #' Bounds for each age according to the stratigraphic constraints
 #'@description This function gives the bounds of each age according to the reduced network (better computational time)
 #'it will return a list of list each list within have two vector
-#'\item{lower}{index of the ages that preceed the selected age}
-#'\item{upper}{index of the ages that comes after the selected age}
+#' *index of the ages that preceed the selected age (`lower`)
+#'*index of the ages that comes after the selected age (`upper``)
 #'The index are shift by one to includ the study period for the younger and older :
 #'@export
 findbounds <- function(network) {

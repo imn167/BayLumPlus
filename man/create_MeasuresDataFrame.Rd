@@ -12,9 +12,9 @@ create_MeasuresDataFrame(
 )
 }
 \arguments{
-\item{symetric_error}{The $\alpha$ parameter in Combes & Philippe (2017)}
+\item{symetric_error}{The \eqn{\alpha}{ascii} parameter in Combes & Philippe (2017)}
 
-\item{contamination_degree}{The common error $\sigma_c$ in Combes & Philippe (2017)}
+\item{contamination_degree}{The common error \eqn{\sigma}{ascii} in Combes & Philippe (2017)}
 
 \item{Data}{A structured dataset following the format required for OSL sample analysis.}
 
@@ -24,7 +24,7 @@ create_MeasuresDataFrame(
 A list containing:
 \itemize{
 \item \strong{Sigma}: The covariance matrix computed as:
-\deqn{\Theta = A \Sigma A + \text{diag}(sD)}
+\deqn{\Theta = A \Sigma A + \text{diag}(sD)}{Theta = A * Sigma * A + diag(sD)}
 \item \strong{Info}: A list with details including:
 \itemize{
 \item Number of samples (\code{Nb_sample})
@@ -42,5 +42,5 @@ It takes structured input data (as defined in \code{\link[=Generate_DataFile]{Ge
 and computes relevant parameters for age estimation.
 }
 \seealso{
-\link{Computation_AgeS_D}, \link{Palaeodose_Computation}, \link{Generate_DataFile}, \link{Generate_DataFile_MG}
+\code{\link{Computation_AgeS_D}}, \code{\link{Palaeodose_Computation}}, \code{\link{Generate_DataFile}}, \code{\link{Generate_DataFile_MG}}
 }

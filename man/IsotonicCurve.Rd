@@ -9,7 +9,8 @@ IsotonicCurve(
   object,
   level = 0.95,
   method = "SBM",
-  plotNetwork
+  graphPath = file.path(tempdir(), "graph.html"),
+  interactive
 )
 }
 \arguments{

@@ -45,6 +45,7 @@
 
 # -- Exclude build stuff
 ^Makefile$
+^node_modules/
 
 # -- Exclude meta data stuff --
 ^codemeta\.json$
@@ -52,5 +53,7 @@
 
 # -- Package 'BayLum' stuff -- 
 ^BayLum\..*$
-^^DataManipulation$$
+^DataManipulation$
 ^^frames$$
+^doc$
+^Meta$

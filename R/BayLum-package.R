@@ -32,8 +32,8 @@
 #'  This work received a state financial support managed by the Agence Nationale
 #'  de la Recherche (France) through the program *Investissements d'avenir*
 #'  (ref. ANR-10-LABX-52).
-#' @name BayLum-package
-#' @aliases BayLum-package BayLum
+#' @name BayLumPlus-package
+#' @aliases BayLumPlus-package BayLum
 #' @docType package
 #' @keywords internal
 "_PACKAGE"

@@ -12,6 +12,8 @@ A list with 3 elements :
 \item{C14agesEr}{C14 errors}
 \item{C14_Nb_sample}{C14 sample size }
 \item{C14_SampleNames}{C14 sample names}
+\item{Output}{C14 Ages estimation}
+
 }
 }
 \usage{

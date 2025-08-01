@@ -147,7 +147,7 @@ plot_Ages <- function(
       plot_settings <- modifyList(x = plot_settings, val = list(...))
 
   ##PLOTTING
-  graphics::plot.new()
+  # graphics::plot.new()
   ##adjust par and make sure that it resets
   old_par <- par(
     mfrow=c(1,1),

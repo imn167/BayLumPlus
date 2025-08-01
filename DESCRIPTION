@@ -58,17 +58,19 @@ Imports:
     rjags (>= 4-15),
     runjags (>= 2.2.2.4),
     yaml (>= 2.3.9),
-    truncnorm,
     igraph (>= 2.1.2),
     ggplot2 (>= 3.5.1),
     graphics (>= 4.4.2),
     Iso (>= 0.0.21),
     visNetwork (>= 2.1.2),
     CVXR (>= 1.0.15),
-    IsotoneOptimization (>= 0.0.0.9000),
     pbapply (>= 1.7.2),
     rlang (>= 1.1.6),
-    arkhe (>= 1.10.0)
+    arkhe (>= 1.10.0),
+    ggraph (>= 2.2.1),
+    ggrepel (>= 0.9.6),
+    tidygraph (>= 1.3.1),
+    IsotoneOptimization (>= 0.0.0.9000)
 Suggests: 
     knitr,
     rmarkdown,
@@ -83,3 +85,5 @@ RoxygenNote: 7.3.2
 SystemRequirements: JAGS >= 4.3.2 (https://mcmc-jags.sourceforge.io/)
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
+Remotes:  
+    Xiwen1997/IsotoneRpkg

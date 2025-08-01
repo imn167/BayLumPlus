@@ -7,24 +7,19 @@
 #'
 #' @param Data A structured dataset following the format required for OSL sample analysis.
 #' @param P A Palaeodose_computation object
-#' @param symetric_error The $\alpha$ parameter in Combes & Philippe (2017)
-#'@param contamination_degree The common error $\sigma_c$ in Combes & Philippe (2017)
+#' @param symetric_error The \eqn{\alpha}{ascii} parameter in Combes & Philippe (2017)
+#'@param contamination_degree The common error \eqn{\sigma}{ascii} in Combes & Philippe (2017)
 #' @return A list containing:
-#' \itemize{
-#'   \item \strong{Sigma}: The covariance matrix computed as:
-#'   \deqn{\Theta = A \Sigma A + \text{diag}(sD)}
-#'   \item \strong{Info}: A list with details including:
-#'   \itemize{
-#'     \item Number of samples (`Nb_sample`)
-#'     \item Sample names (`NamesOfSamples`)
-#'     \item Dose rate values (`ddot`)
-#'     \item Dose rate uncertainties (`sddot`)
-#'     \item Estimated palaeodose values (`D`)
-#'     \item Estimated palaeodose uncertainties (`sD`)
-#'   }
-#' }
-#'
-#' @seealso [Computation_AgeS_D], [Palaeodose_Computation], [Generate_DataFile], [Generate_DataFile_MG]
+#' * **Sigma**: The covariance matrix computed as:
+#'   \deqn{\Theta = A \Sigma A + \text{diag}(sD)}{Theta = A * Sigma * A + diag(sD)}
+#' * **Info**: A list with details including:
+#'   * Number of samples (`Nb_sample`)
+#'   * Sample names (`NamesOfSamples`)
+#'   * Dose rate values (`ddot`)
+#'   * Dose rate uncertainties (`sddot`)
+#'   * Estimated palaeodose values (`D`)
+#'   * Estimated palaeodose uncertainties (`sD`)
+#' @seealso \code{\link{Computation_AgeS_D}}, \code{\link{Palaeodose_Computation}}, \code{\link{Generate_DataFile}}, \code{\link{Generate_DataFile_MG}}
 #' @export
 #'
 
