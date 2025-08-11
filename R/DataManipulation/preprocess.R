@@ -119,7 +119,37 @@ BlocNicholls <- Compute_AgeS_D(list(D = datasets2$D, sD = datasets2$sD, ddot = d
                                   Iter = 2000, burnin = 50000, t = 10)
 
 ##======================================================================================#
+#### Elaine Datasets ####
+extractElaine <- function(name) {
+  path = paste0("R/DataManipulation/", name)
+  #strati
+  SampleNames <- readxl::read_xlsx(path, sheet = 2)[, 1] #Genral Strat
+  Depth <- as.matrix(readxl::read_xlsx(path, sheet = 3)[, 2])[,1]
+  OSLestimate <- as.matrix(readxl::read_xlsx(path, sheet = 3)[, 5]) # Central Dose and Their uncertainties with No Strati
+  lower95 =  as.matrix(readxl::read_xlsx(path, sheet = 3)[1:15, 3])
+  upper95 = as.matrix(readxl::read_xlsx(path, sheet = 3)[1:15, 7])
+  sD = as.numeric((upper95-lower95)/ (2*1.96))
+  Theta <- as.matrix(readxl::read_xlsx(path, sheet = 5))
+  Sc <- as.matrix(readxl::read_xlsx(path, sheet = 4))
+  n = dim(Theta)[1]
+  ddot =  as.numeric(readxl::read_xlsx(path, sheet = 4)[3,c(12,13)])
 
+  Measures = list(SampleNames = SampleNames$Layer, D = OSLestimate[1:15], sD = sD, Nb_sample = n ,
+                  ddot = rep(ddot[1], n), sddot = rep(ddot[2], n), sddot_shared = rep(0, n),
+                  Depth = sort(Depth, decreasing = F), Theta = Theta)
+
+  return( Measures)
+
+}
+
+D0Filtered = extractElaine("D0_filtered_BayLum_doses.xlsx")
+D0Filtered$Theta
+
+D0Independant <- Compute_AgeS_D(list(D = D0Filtered$D, sD = D0Filtered$sD, ddot = D0Filtered$ddot),
+                                Nb_sample = D0Filtered$Nb_sample, SampleNames = D0Filtered$SampleNames,
+                                ThetaMatrix = D0Filtered$Theta, prior = "Independance",
+                                PriorAge = rep(c(1, 1400), D0Filtered$Nb_sample),
+                                Iter = 2000, burnin = 50000, t = 10)
 
 
 #### Simulated Data ####
@@ -277,26 +307,7 @@ plotHpd(list(GibbsOutput, AgeAsBayLum), c("Gibbs", "JagsBayLum")) +  ggplot2::ge
 
 ## ============ Elaine data sets ======== ##
 library(igraph)
-extractElaine <- function(name) {
-  path = paste0("R/DataManipulation/", name)
-    #strati
-  SampleNames <- readxl::read_xlsx(path, sheet = 2)[, 1] #Genral Strat
-  # Depth <- as.matrix(readxl::read_xlsx(path, sheet = 2)[, 2])[,1]
-  OSLestimate <- as.matrix(readxl::read_xlsx(path, sheet = 3)[, 5]) # Central Dose and Their uncertainties with No Strati
-  lower95 =  as.matrix(readxl::read_xlsx(path, sheet = 3)[16:30, 3])
-  upper95 = as.matrix(readxl::read_xlsx(path, sheet = 3)[16:30, 7])
-  sD = (upper95-lower95)/ (2*1.96)
-  Theta <- as.matrix(readxl::read_xlsx(path, sheet = 6))
-  Sc <- as.matrix(readxl::read_xlsx(path, sheet = 7))
-  n = dim(Theta)[1]
-  ddot =  as.numeric(readxl::read_xlsx(path, sheet = 5)[3,c(12,13)])
 
-  Measures = list(SampleNames = SampleNames$Layer, D = OSLestimate[16:30], sD = sD, Nb_sample = n ,
-                  ddot = rep(ddot[1], n), sddot = rep(ddot[2], n), sddot_shared = rep(0, n), Depth = sort(Depth, decreasing = F))
-
-  return( list(Measures = Measures, Theta = Theta, covD = diag(as.numeric(Measures$sD)**2), Sc = Sc))
-
-}
 
 extractElaine <- function(name) {
   path = paste0("R/DataManipulation/", name)
