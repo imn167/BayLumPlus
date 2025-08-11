@@ -65,6 +65,7 @@ ChezPinaud_Independant <- Compute_AgeS_D(list(D = ChezPinaud$estimate,
 
 IsoChezPinaud = PlotIsotonicCurve(c(), ChezPinaud_Independant )
 
+IsoChezPinaud
 ChezPinaud_UO <- Compute_AgeS_D(list(D = ChezPinaud$estimate,
                                      sD = (ChezPinaud$upper95-ChezPinaud$lower95) /(2*1.96),
                                      ddot = ChezPinaud$ddot),
@@ -80,6 +81,8 @@ ChezPinaud_Nicholls <- Compute_AgeS_D(list(D = ChezPinaud$estimate,
                                 ThetaMatrix = ChezPinaud_Theta, prior = "StrictNicholls",
                                 PriorAge = rep(c(1, 1400), ChezPinaud_Nb_sample),
                                 Iter = 2000, burnin = 50000, t = 10)
+
+
 
 plotHpd(list(ChezPinaud_UO, IsoChezPinaud, ChezPinaud_Nicholls), c("UO", "Iso", "Nicholls"))
 

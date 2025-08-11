@@ -49,7 +49,6 @@ Depends:
 Imports: 
     cli (>= 3.6.1),
     dplyr,
-    usethis,
     hexbin (>= 1.28.3),
     KernSmooth (>= 2.23),
     Luminescence (>= 0.9.24),
