@@ -6,9 +6,12 @@ on:
   pull_request:
     branches: [main, master]
 
-name: test-coverage.yaml
+name: test-coverage
 
-permissions: read-all
+# The job needs write permissions to upload the coverage status
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   test-coverage:
@@ -30,6 +33,8 @@ jobs:
 
       - name: Test coverage
         run: |
+          # The covr::to_cobertura() function creates a 'cobertura.xml' file in the
+          # root of the working directory. This file is what Codecov needs.
           cov <- covr::package_coverage(
             quiet = FALSE,
             clean = FALSE,
@@ -38,21 +43,29 @@ jobs:
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
-      - uses: codecov/codecov-action@v4
+      # This is the corrected and consolidated Codecov upload step.
+      # It uses the v4 version, which you previously had, and includes the
+      # token and file path.
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: ${{ github.event_name != 'pull_request' && true || false }}
           file: ./cobertura.xml
+          # The 'noop' plugin is the default and is fine, but you can remove this line for brevity.
           plugin: noop
+          # Disabling search is a good practice to ensure Codecov only looks for the specified file.
           disable_search: true
+          # The token is passed from your repository secrets. This is crucial for protected branches.
           token: ${{ secrets.CODECOV_TOKEN }}
 
+      # This step helps with debugging testthat output and is a good practice to keep.
       - name: Show testthat output
         if: always()
         run: |
-          ## --------------------------------------------------------------------
           find '${{ runner.temp }}/package' -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
 
+      # This step uploads the package directory if tests fail, which is useful for debugging.
       - name: Upload test results
         if: failure()
         uses: actions/upload-artifact@v4
