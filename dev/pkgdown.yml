@@ -1,0 +1,11 @@
+pandoc: 3.1.11
+pkgdown: 2.1.3
+pkgdown_sha: ~
+articles:
+  AgeFrameworks: AgeFrameworks.html
+  BayLum: BayLum.html
+  ConfigFile_Specification: ConfigFile_Specification.html
+last_built: 2025-08-11T10:16Z
+urls:
+  reference: https://crp2a.github.io/BayLum/reference
+  article: https://crp2a.github.io/BayLum/articles
