@@ -47,4 +47,4 @@ jobs:
         with:
           clean: true
           branch: gh-pages
-          folder: doc
+          folder: build
