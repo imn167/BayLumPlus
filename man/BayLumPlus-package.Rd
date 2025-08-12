@@ -45,9 +45,9 @@ Bayesian analysis of OSL ages: An introduction. \emph{Quaternary Geochronology}
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://CRAN.r-project.org/package=BayLum}
-  \item \url{https://crp2a.github.io/BayLum/}
-  \item Report bugs at \url{https://github.com/crp2a/BayLum/issues}
+  \item \url{https://imn167.github.io/BayLumPlus/}
+  \item \url{https://github.com/imn167/BayLumPlus}
+  \item Report bugs at \url{https://github.com/imn167/BayLumPlus/issues}
 }
 
 }
