@@ -151,6 +151,56 @@ D0Independant <- Compute_AgeS_D(list(D = D0Filtered$D, sD = D0Filtered$sD, ddot 
                                 PriorAge = rep(c(1, 1400), D0Filtered$Nb_sample),
                                 Iter = 2000, burnin = 50000, t = 10)
 
+D0Nicholls = Compute_AgeS_D(list(D = D0Filtered$D, sD = D0Filtered$sD, ddot = D0Filtered$ddot),
+                            Nb_sample = D0Filtered$Nb_sample, SampleNames = D0Filtered$SampleNames,
+                            ThetaMatrix = D0Filtered$Theta, prior = "StrictNicholls",
+                            PriorAge = rep(c(1, 1400), D0Filtered$Nb_sample),
+                            Iter = 2000, burnin = 50000, t = 10)
+
+D0UO = Compute_AgeS_D(list(D = D0Filtered$D, sD = D0Filtered$sD, ddot = D0Filtered$ddot),
+                      Nb_sample = D0Filtered$Nb_sample, SampleNames = D0Filtered$SampleNames,
+                      ThetaMatrix = D0Filtered$Theta, prior = "StrictOrder",
+                      PriorAge = rep(c(1, 1400), D0Filtered$Nb_sample),
+                      Iter = 2000, burnin = 50000, t = 10)
+
+D0Isotonic = PlotIsotonicCurve(c(), D0Independant)
+
+AllQZ = extractElaine("All_Qz_Grains_BayLum_doses.xlsx")
+AllQZ
+
+AllQZIndependant <- Compute_AgeS_D(list(D = AllQZ$D, sD = AllQZ$sD, ddot = AllQZ$ddot),
+               Nb_sample = AllQZ$Nb_sample, SampleNames = AllQZ$SampleNames,
+               ThetaMatrix = AllQZ$Theta, prior = "Independance",
+               PriorAge = rep(c(1, 1400), AllQZ$Nb_sample),
+               Iter = 2000, burnin = 50000, t = 10)
+AllQZIsotonic = PlotIsotonicCurve(c(), AllQZIndependant)
+
+
+AllQZNicholls <- Compute_AgeS_D(list(D = AllQZ$D, sD = AllQZ$sD, ddot = AllQZ$ddot),
+                                Nb_sample = AllQZ$Nb_sample, SampleNames = AllQZ$SampleNames,
+                                ThetaMatrix = AllQZ$Theta, prior = "StrictNicholls",
+                                PriorAge = rep(c(1, 1400), AllQZ$Nb_sample),
+                                Iter = 2000, burnin = 50000, t = 10)
+
+AllQZUO <- Compute_AgeS_D(list(D = AllQZ$D, sD = AllQZ$sD, ddot = AllQZ$ddot),
+                          Nb_sample = AllQZ$Nb_sample, SampleNames = AllQZ$SampleNames,
+                          ThetaMatrix = AllQZ$Theta, prior = "StrictOrder",
+                          PriorAge = rep(c(1, 1400), AllQZ$Nb_sample),
+                          Iter = 2000, burnin = 50000, t = 10)
+
+
+plotHpd(list(D0Isotonic, AllQZIsotonic), c("Filtered", "All Grains"))
+plotHpd((list(AllQZIsotonic, AllQZNicholls, AllQZUO)), c("Isotonic", "Nicholls", "UO"))
+plotHpd((list(D0Isotonic, D0Nicholls, D0UO)), c("Isotonic", "Nicholls", "UO"))
+
+all = list(D0Isotonic, D0Nicholls, D0UO, AllQZIsotonic, AllQZNicholls, AllQZUO)
+
+allname =c(sapply(c("Filtered", "AllGrains"),
+                function(l, method) paste0(l, method), method = c("Isotonic", "Nicholls", "UO"))
+)
+for (j in seq_along(all)) {
+  write.csv2(x = all[[j]]$Ages, file = paste0("../../Testing_Priors/Elaine/", allname[j], ".csv"))
+}
 
 #### Simulated Data ####
 SampleNames = c("OSL-001", "OSL-002", "OSL-003", "OSL-004", "OSL-005")
