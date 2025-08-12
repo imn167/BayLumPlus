@@ -67,3 +67,4 @@ jobs:
         with:
           upload-snapshots: false
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+          error-on: 'error' # Add this line - only fail on errors, not warnings

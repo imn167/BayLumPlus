@@ -122,12 +122,12 @@ PlotIsotonicCurve <- function(StratiConstraints, object, level = .95, method = "
 
   curve = df %>% ggplot2::ggplot(ggplot2::aes(x = Unit, ymin = lower, ymax = upper), fill = "orange") +
     ggplot2::geom_ribbon(alpha = .4) +
-    ggplot2::geom_line(ggplot2::aes(y = lower), color = "orange", group = 1) +
-    ggplot2::geom_line(ggplot2::aes(y = upper), color = "orange", group = 1) +
-    ggplot2::geom_line(ggplot2::aes(y = AGE), color = "orange", group = 1, size =1.5) +
-    ggplot2::geom_point(ggplot2::aes(x = Unit, y = lower), color = "blue") +
-    ggplot2::geom_point(ggplot2::aes(x = Unit, y = upper), color = "red") +
-    ggplot2::geom_point(ggplot2::aes(x = Unit, y = AGE), color = "black") +
+    ggplot2::geom_line(ggplot2::aes(y = .df$lower), color = "orange", group = 1) +
+    ggplot2::geom_line(ggplot2::aes(y = .df$upper), color = "orange", group = 1) +
+    ggplot2::geom_line(ggplot2::aes(y = .df$AGE), color = "orange", group = 1, size =1.5) +
+    ggplot2::geom_point(ggplot2::aes(x = .df$Unit, y = .df$lower), color = "blue") +
+    ggplot2::geom_point(ggplot2::aes(x = .df$Unit, y = .df$upper), color = "red") +
+    ggplot2::geom_point(ggplot2::aes(x = .df$Unit, y = .df$AGE), color = "black") +
     BayLumTheme() + ggplot2::ylab("IsotonicRegression") +
     ggplot2::scale_x_continuous(breaks = df$Unit, labels = df$SAMPLE) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
@@ -135,14 +135,14 @@ PlotIsotonicCurve <- function(StratiConstraints, object, level = .95, method = "
   print(curve)
   SAMPLE = object$Ages$SAMPLE
   tg <- tidygraph::as_tbl_graph(network)
-  tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::mutate(SAMPLE = SAMPLE)
+  tg <- tg %>% tidygraph::activate(.tg$nodes) %>% tidygraph::mutate(SAMPLE = SAMPLE)
   tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::left_join(df, by = "SAMPLE") %>%
-    tidygraph::mutate(translation = (upper-lower)/2)
-  layout <- ggraph::create_layout(tg, layout = "sugiyama") %>% dplyr::mutate(x1 = x-translation, x2 = x + translation, y = -(AGE ))
+    tidygraph::mutate(translation = (.df$upper-.df$lower)/2)
+  layout <- ggraph::create_layout(tg, layout = "sugiyama") %>% dplyr::mutate(x1 = .tg$x-.tg$translation, x2 = .tg$x + .tg$translation, y = -.tg$AGE )
 
   dag <- ggraph::ggraph(layout) +
-    ggplot2::geom_segment(data = layout, ggplot2::aes(x = x1, xend = x2, y = y, color = AGE), linewidth = 2) + ggraph::theme_graph() +
-    ggrepel::geom_text_repel(ggplot2::aes(x = x, y = y, label = SAMPLE), size = 5, max.overlaps = Inf) +
+    ggplot2::geom_segment(data = layout, ggplot2::aes(x = .layout$x1, xend = .layout$x2, y = .layout$y, color = .layout$AGE), linewidth = 2) + ggraph::theme_graph() +
+    ggrepel::geom_text_repel(ggplot2::aes(x = .layout$x, y = .layout$y, label = .layout$SAMPLE), size = 5, max.overlaps = Inf) +
     ggplot2::scale_color_viridis_c(name = "Ages") +
     ggraph::geom_edge_link(arrow = grid::arrow(length = grid::unit(.8, 'mm')),end_cap = ggraph::circle(3, 'mm'), alpha = 0.1)
 

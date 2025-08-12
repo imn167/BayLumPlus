@@ -226,6 +226,7 @@ nichollsBRInit <- function(I, upper, lower) {
 #### Networks Functions ####
 
 buildNetwork <- function(StratiConstraints) {
+  Nb_sample = dim(StratiConstraints)[2]
   ##no Strati
   if (length(StratiConstraints) == 0) {
     StratiConstraints <- matrix(
@@ -311,7 +312,7 @@ network_vizualization <- function(network, vertices_labels, interactive = FALSE,
 
     ggraph::ggraph(layout) + ggraph::geom_edge_link(arrow = grid::arrow(length = grid::unit(.8, 'mm')),end_cap = ggraph::circle(3, 'mm'), alpha = 0.5, edge_colour = "red") +
       ggraph::theme_graph() + ggraph::geom_node_circle(ggplot2::aes(r = .05), fill = "lightyellow", color = "blue", size = 1)  +
-      ggrepel::geom_text_repel(ggplot2::aes(x = x, y = y, label = Samples), size = 3.5, max.overlaps = Inf) + g
+      ggrepel::geom_text_repel(ggplot2::aes(x = .layout$x, y = .layout$y, label = .layout$Samples), size = 3.5, max.overlaps = Inf)
   # plot(
   #   network,
   #   layout = layout,

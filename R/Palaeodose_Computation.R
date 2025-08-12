@@ -123,9 +123,9 @@
 #' of the age estimates if the chains have converged.
 #'
 #' @seealso
-#' \code{\link{Generate_DataFile}}, \code{\link{Generate_DataFile_MG}}, \code{\link{combine_DataFiles}},
-#' [rjags::rjags-package], [plot_MCMC],
-#' \code{\link{Age_Computation}}, \code{\link{AgeS_Computation}}
+#' \link{Generate_DataFile}, \link{Generate_DataFile_MG}, \link{combine_DataFiles},
+#' \link[rjags]{rjags-package}, \link{plot_MCMC},
+#' \link{Age_Computation}, \link{AgeS_Computation}
 #'
 #' @examples
 #' ## Load data

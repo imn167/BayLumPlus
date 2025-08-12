@@ -34,7 +34,7 @@ findbounds <- function(network) {
 }
 
 #=================================================================================@
-#'@export
+#'
 GibbsDensity <- function(DataMeasures, A, Ai, index, a, b, ...) {
     ## Using the function create_MeasuresDataFrame
   Measures <- DataMeasures$Measures
@@ -93,7 +93,7 @@ GibbsDensity <- function(DataMeasures, A, Ai, index, a, b, ...) {
 }
 
 #=================================================================================@
-#'@export
+#'
 proposal_sd <- function(DataMeasures, lowerPeriod, upperPeriod, indexbounds, lambda) {
   ##
   Measures = DataMeasures$Measures
@@ -114,7 +114,7 @@ proposal_sd <- function(DataMeasures, lowerPeriod, upperPeriod, indexbounds, lam
 
 }
 #=================================================================================@
-#'@export
+#'
 sigmoidT <- function(u, bounds, lambda) {
   lowerbound = bounds[1]
   upperbound = bounds[2]
@@ -123,7 +123,7 @@ sigmoidT <- function(u, bounds, lambda) {
   )
 }
 
-#'@export
+#'
 logitT <- function(u, bounds, lambda) {
   lowerbound = bounds[1]
   upperbound = bounds[2]
@@ -132,7 +132,7 @@ logitT <- function(u, bounds, lambda) {
   )
 }
 
-#'@export
+#'
 logitJacobien <- function(u, bounds, lambda) {
   lowerbound = bounds[1]
   upperbound = bounds[2]
@@ -144,7 +144,7 @@ logitJacobien <- function(u, bounds, lambda) {
 
 
 #=================================================================================@
-#' @export
+#'
 arctanT <- function(u, bounds) {
   lowerbound = bounds[1]
   upperbound = bounds[2]
@@ -165,7 +165,7 @@ arctanT <- function(u, bounds) {
 #'
 #' The most efficient approach would be to considered the approximation Ahat = Dhat / ddot and then make it respect the constraints
 #'
-#'@export
+#'
 initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, type, plotGraph = F, ...) {
   Sc = Sc[-1, ] #del first line
   n = nrow(Sc)
@@ -259,7 +259,7 @@ initialize_SC <- function(Sc, LowerPeriod, UpperPeriod, type, plotGraph = F, ...
 
 
 #=================================================================================@
-#'@export
+#'
 GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
                       LowerPeriod, UpperPeriod, Transformation = "arctan",
                       lag = 10, plotGraph = T, plotChain = T, plotACF = T,
@@ -564,7 +564,7 @@ GibbsSampler <- function(DataMeasures, nchain,niter, burnin, Sc,
 
 
 ######@
-#'@export
+#'
 GibbsSamplerTrunc <- function(DataMeasures, nchain,niter, burnin, Sc,
                               LowerPeriod, UpperPeriod,
                               lag = 10, plotGraph = T, plotChain = T, plotACF = T,

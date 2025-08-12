@@ -20,7 +20,7 @@
 #'   * Estimated palaeodose values (`D`)
 #'   * Estimated palaeodose uncertainties (`sD`)
 #' @seealso \code{\link{Computation_AgeS_D}}, \code{\link{Palaeodose_Computation}}, \code{\link{Generate_DataFile}}, \code{\link{Generate_DataFile_MG}}
-#' @export
+#'
 #'
 
 
@@ -39,7 +39,7 @@ create_MeasuresDataFrame <- function(
                          sD = Obs[(DATA$Nb_sample+1): (2*DATA$Nb_sample)],
                    sddot_shared = contamination_degree, symetric_error = symetric_error)
   Theta = diag(Measures$sddot) + (contamination_degree %*% t(contamination_degree)) * symetric_error
-  CovD = diag(Measures$sD**2)
+  covD = diag(Measures$sD**2)
 
   return(list(Theta = Theta, Measures = Measures, covD = covD))
 }
@@ -51,7 +51,7 @@ sepSC <- NULL
 #' using a Bayesian model. Its behavior is similar to other functions like [AgeS_Computation()],
 #' with the primary difference being the first parameter.
 #'
-#' @param DATAMeasures **(required)** [list]
+#' @param DATA **(required)** [list]
 #' The output of the function [create_MeasuresDataFrame()], containing the necessary input data for computation.
 #'
 #' @return See the documentation for [AgeS_Computation()] for details on the returned output.

@@ -37,6 +37,11 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
+      - name: List docs folder contents
+        run: |
+        echo "Contents of docs folder"
+        find docs -type f -name "*.html" | head -10
+
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
@@ -47,4 +52,4 @@ jobs:
         with:
           clean: true
           branch: gh-pages
-          folder: docs
+          folder: docs/dev # Point to the dev subfolder

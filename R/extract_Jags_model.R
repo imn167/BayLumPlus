@@ -54,7 +54,7 @@ extract_Jags_model <- function() {
 
     type <- readline(prompt = "Enter the model type : ")
 
-    if (class(model[[type]]) == "list") {
+    if (is.list(model[[type]])) {
 
       cli::cat_rule(paste(" Available distributions for the", con, type ) )
       for (name in names(model[[type]])) {
