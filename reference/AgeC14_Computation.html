@@ -3,7 +3,7 @@
 The user can choose one of the following radiocarbon calibration curve:
 Northern or Southern Hemisphere or marine atmospheric. It must be the same curve for all samples."><meta property="og:description" content="This function calibrates the C-14 age of samples to get an age (in ka).
 The user can choose one of the following radiocarbon calibration curve:
-Northern or Southern Hemisphere or marine atmospheric. It must be the same curve for all samples."><meta name="robots" content="noindex"></head><body>
+Northern or Southern Hemisphere or marine atmospheric. It must be the same curve for all samples."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -11,7 +11,7 @@ Northern or Southern Hemisphere or marine atmospheric. It must be the same curve
 
     <a class="navbar-brand me-2" href="../index.html">BayLumPlus</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.3.3.9000-13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,7 +25,7 @@ Northern or Southern Hemisphere or marine atmospheric. It must be the same curve
 <li class="nav-item"><a class="nav-link" href="../articles/AgeFrameworks.html"><span class="play"></span> Age Frameworks</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">References</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-newspaper-o"></span> News</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/R-Lum/BayLum"><span class="fa fa-github"></span> GitHub</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/imn167/BayLumPlus"><span class="fa fa-github"></span> GitHub</a></li>
       </ul></div>
 
 
@@ -35,7 +35,7 @@ Northern or Southern Hemisphere or marine atmospheric. It must be the same curve
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Bayesian analysis for C-14 age estimations of various samples</h1>
-      <small class="dont-index">Source: <a href="https://github.com/crp2a/BayLum/blob/main/R/AgeC14_Computation.R" class="external-link"><code>R/AgeC14_Computation.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/imn167/BayLumPlus/blob/main/R/AgeC14_Computation.R" class="external-link"><code>R/AgeC14_Computation.R</code></a></small>
       <div class="d-none name"><code>AgeC14_Computation.Rd</code></div>
     </div>
 
@@ -282,10 +282,10 @@ IntCal13 ans Marine13 radiocarbon age calibration curves 0-50000 years cal BP. R
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; MCMC Convergence of Age parameters &lt;&lt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample name   Bayes estimate   Uppers credible interval</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26510 	 0.999 		 1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26506 	 1.017 		 1.043 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26507 	 1.002 		 1.014 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26508 	 1.015 		 1.017 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26510 	 1.006 		 1.027 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26506 	 1.005 		 1.021 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26507 	 1.007 		 1.012 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26508 	 0.996 		 0.997 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------------------------</span>
@@ -297,28 +297,28 @@ IntCal13 ans Marine13 radiocarbon age calibration curves 0-50000 years cal BP. R
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Bayes estimates of Age for each sample and credible interval &lt;&lt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample name 	 Bayes estimate  Credible interval: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26510 	 41.9752720370545 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26510 	 41.9526340672884 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 						 lower bound 	 upper bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 41.431 		 42.37 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 41.86 		 42.245 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 41.491 		 42.38 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 41.818 		 42.248 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample name 	 Bayes estimate  Credible interval: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26506 	 45.7286702203315 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26506 	 45.7223736219406 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 						 lower bound 	 upper bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 45.077 		 46.208 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 45.501 		 46.034 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 45.059 		 46.264 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 45.524 		 46.07 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample name 	 Bayes estimate  Credible interval: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26507 	 44.810180413555 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26507 	 44.857599553888 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 						 lower bound 	 upper bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 43.503 		 45.78 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 44.388 		 45.301 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 43.491 		 45.869 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 44.443 		 45.354 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample name 	 Bayes estimate  Credible interval: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26508 	 45.0672083802203 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26508 	 45.0621318464108 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 						 lower bound 	 upper bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 44.189 		 46.131 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 44.444 		 45.393 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 44.018 		 46.16 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 44.564 		 45.528 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------</span>
 <span class="r-plt img"><img src="AgeC14_Computation-5.png" alt="" width="700" height="433"></span>
