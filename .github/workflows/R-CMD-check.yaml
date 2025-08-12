@@ -67,4 +67,16 @@ jobs:
         with:
           upload-snapshots: false
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
-          error-on: 'error' # Add this line - only fail on errors, not warnings
+          error-on: 'error' # accept warnings
+
+      - name: Show testthat output
+        if: runner.os == 'macOS' || runner.os == 'Linux'
+        run: rcmdcheck::check_test_dir('.')
+        shell: Rscript {0}
+
+      - name: Upload check results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+          path: _R_check_dir/*

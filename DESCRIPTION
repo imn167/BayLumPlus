@@ -2,7 +2,7 @@ Type: Package
 Package: BayLumPlus
 Title: Chronological Bayesian Models Integrating Optically Stimulated
     Luminescence and Radiocarbon Age Dating
-Version: 0.3.3.9000-13
+Version: 1.0.0
 Date: 2024-07-12
 Authors@R: c(
     person("Claire", "Christophe", role = "aut"),
@@ -32,16 +32,13 @@ Author: Claire Christophe [aut], Anne Philippe [aut, cre]
     Montaigne [cph, fnd] CNRS [fnd] LabEx Sciences archéologiques de
     Bordeaux [fnd]
 Maintainer: Anne Philippe <anne.philippe@univ-nantes.fr>
-Description: Bayesian analysis of luminescence data and C-14 age
-    estimates. Bayesian models are based on the following publications:
-    Combes, B. & Philippe, A. (2017) <doi:10.1016/j.quageo.2017.02.003>
-    and Combes et al. (2015) <doi:10.1016/j.quageo.2015.04.001>. This
-    includes, amongst others, data import, export, application of age
-    models and palaeodose model.
+Description: A refined fork of the original BayLum R package. This update
+    introduces several new capabilities, particularly for Age processing,
+    where we aim to test different prior assumptions without incurring
+    the computational cost associated with the Palaeodose Model.
 License: GPL-3
-URL: https://CRAN.r-project.org/package=BayLum,
-    https://crp2a.github.io/BayLum/
-BugReports: https://github.com/crp2a/BayLum/issues
+URL: https://imn167.github.io/BayLumPlus/, https://github.com/imn167/BayLumPlus
+BugReports: https://github.com/imn167/BayLumPlus/issues
 Depends: 
     coda (>= 0.19),
     R (>= 4.3),

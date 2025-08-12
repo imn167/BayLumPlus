@@ -17,7 +17,7 @@ authors:
     html: <img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png" />
 
 navbar:
-  title: BayLum
+  title: BayLumPlus
   left:
   - icon: fa-home
     text: Home
@@ -40,7 +40,7 @@ navbar:
     href: news/index.html
   - icon: fa-github
     text: GitHub
-    href: https://github.com/R-Lum/BayLum
+    href: https://github.com/imn167/BayLumPlus
 
 template:
   bootstrap: 5
