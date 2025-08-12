@@ -7,7 +7,7 @@
 #'@author Imène Bouafia (LMJL)
 #'@md
 #'@export
-
+#' @importFrom rlang .data
 plotHpd <- function(
     list_object,
     ModelNames,
@@ -39,9 +39,9 @@ plotHpd <- function(
 
   ##
 
-   DtHpd <- DtHpd %>% dplyr::mutate(Samples = factor(.DtHpd$Samples, levels = sampleNames))
+   DtHpd <- DtHpd %>% dplyr::mutate(Samples = factor(.data$Samples, levels = sampleNames))
   #
-  plotting <- DtHpd %>% ggplot2::ggplot(ggplot2::aes(x = .DtHpd$Samples, ymin= .DtHpd$inf, ymax = .DtHpd$sup, colour = .DtHpd$Models)) +
+  plotting <- DtHpd %>% ggplot2::ggplot(ggplot2::aes(x = .data$Samples, ymin= .data$inf, ymax = .data$sup, colour = .data$Models)) +
     ggplot2::geom_linerange(position = ggplot2::position_dodge(.5) ) + ICAgeTheme(rotation_x = T)
 
   return(plotting)

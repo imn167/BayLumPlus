@@ -174,9 +174,9 @@ A Bayesian central equivalent dose model for optically stimulated luminescence d
 Quaternary Geochronology 28, 62-70. doi:10.1016/j.quageo.2015.04.001
 }
 \seealso{
-\code{\link{Generate_DataFile}}, \code{\link{Generate_DataFile_MG}}, \code{\link{combine_DataFiles}},
-\link[rjags:rjags-package]{rjags::rjags-package}, \link{plot_MCMC},
-\code{\link{Age_Computation}}, \code{\link{AgeS_Computation}}
+\link{Generate_DataFile}, \link{Generate_DataFile_MG}, \link{combine_DataFiles},
+\link[rjags]{rjags-package}, \link{plot_MCMC},
+\link{Age_Computation}, \link{AgeS_Computation}
 }
 \author{
 Claire Christophe, Sebastian Kreutzer, Anne Philippe, Guillaume Guérin

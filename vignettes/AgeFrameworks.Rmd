@@ -31,7 +31,7 @@ The only difference lies in the `DATA` parameter, which refers to a list of data
 
 - Equivalent Doses: $D$
 - Dose rate: $\dot{d}$
-- Standard Error for $D$: $s_D$
+- Standard Error for $D$: $\sigma_D$
 
 Note that several prior distributions can be tested:
 

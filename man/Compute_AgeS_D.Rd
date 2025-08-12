@@ -33,7 +33,7 @@ Compute_AgeS_D(
 )
 }
 \arguments{
-\item{DATAMeasures}{\strong{(required)} \link{list}
+\item{DATA}{\strong{(required)} \link{list}
 The output of the function \code{\link[=create_MeasuresDataFrame]{create_MeasuresDataFrame()}}, containing the necessary input data for computation.}
 }
 \value{
