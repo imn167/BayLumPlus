@@ -47,4 +47,4 @@ jobs:
         with:
           clean: true
           branch: gh-pages
-          folder: docs/dev # Point to the dev subfolder
+          folder: docs # Point to the dev subfolder
