@@ -1,6 +1,6 @@
 # BayLumPlus 1.0.0
 
-**BayLumPlus** is a a refined fork of the original *BayLum* R package. This update introduces several 
+**BayLumPlus** is a refined fork of the original *BayLum* R package. This update introduces several 
 new capabilities, particularly for the Age processing, where we aim to test different 
 prior assumptions without incurring the computational cost associated with the Palaeodose Model.
 
