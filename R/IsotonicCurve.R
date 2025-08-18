@@ -1,8 +1,12 @@
 #' Compute Isotonic Regression for different stratigraphic constraints
 #' @description This function compute the isotonic distorsion of a posterior distrubution obtained by `Compute_AgeS_D()`
+#'
 #' @param StratiConstraints : The stratigraphic matrix, it can be stored in a file or given directly. If there is none, then the model suppose that it is a strict order
 #' @param object : the returned object of the age model function `Compute_AgeS_D()`
 #' @param level = 0.95 by default for the level of High Posterior Densities regions
+#' @param method
+#' @param graphPath
+#' @param interactive
 #'
 #'@export
 IsotonicCurve <- function(StratiConstraints, object, level = .95, method = "SBM", graphPath = file.path(tempdir(), "graph.html"), interactive) {
@@ -107,8 +111,16 @@ IsotonicCurve <- function(StratiConstraints, object, level = .95, method = "SBM"
 
 }
 
+#' @param StratiConstraints
+#'
+#' @param object
+#' @param level
+#' @param method
+#' @param ...
+#'
 #'@export
 #' @importFrom rlang .data
+#'
 PlotIsotonicCurve <- function(StratiConstraints, object, level = .95, method = "SBM", ...) {
   arg = list(...)
   if (!is.null(arg$interactive)) {

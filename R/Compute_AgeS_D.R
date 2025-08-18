@@ -53,6 +53,30 @@ sepSC <- NULL
 #'
 #' @param DATA **(required)** [list]
 #' The output of the function [create_MeasuresDataFrame()], containing the necessary input data for computation.
+#' @param Nb_sample
+#' @param SampleNames
+#' @param ThetaMatrix
+#' @param PalaeodoseObject
+#' @param StratiConstraints
+#' @param model
+#' @param Iter
+#' @param burnin
+#' @param adapt
+#' @param t
+#' @param n.chains
+#' @param prior
+#' @param PriorAge
+#' @param jags_method
+#' @param autorun
+#' @param quiet
+#' @param roundingOfValue
+#' @param SavePdf
+#' @param OutputFileName
+#' @param OutputFilePath
+#' @param SaveEstimates
+#' @param OutputTableName
+#' @param OutputTablePath
+#' @param ...
 #'
 #' @return See the documentation for [AgeS_Computation()] for details on the returned output.
 #'

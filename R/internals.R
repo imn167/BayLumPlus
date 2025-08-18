@@ -251,6 +251,14 @@ buildNetwork <- function(StratiConstraints) {
 
 }
 
+#' Title
+#'
+#' @param G
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 remove_transitive_edges <- function(G) {
   reduced_G = rlang::duplicate(G)
   vertices = igraph::V(G)
