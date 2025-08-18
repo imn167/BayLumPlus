@@ -45,12 +45,11 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install jags
 
-      - name: SET JAGS_HOME homebrew
+      - name: Symlink JAGS for compatibility
         if: runner.os == 'macOS'
         run: |
-          options(width = 100)
-          Sys.setenv(JAGS_HOME="/usr/local/Cellar/jags/4.3.2")
-        shell: Rscript {0}
+          sudo mkdir -p /usr/local/lib
+          sudo ln -s /opt/homebrew/lib/libjags* /usr/local/lib/
 
       - name: Install JAGS on Windows (R release)
         if: (runner.os == 'windows') && (matrix.config.r != 'oldrel')
