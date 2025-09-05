@@ -22,7 +22,7 @@ OSLJingbian <- list(D = Jingbian$D, sD = Jingbian$Sigma_D, ddot = Jingbian$d,
                       ThetaMatrix = Jingb_Theta, Nb_Sample = Jingb_Nb_sample,
                       SampleNames = Jingb_SampleNames, Output = JingbianUnconstrained)
 
-JingbIso = PlotIsotonicCurve(StratiConstraints = c(), object = JingbianUnconstrained, level = .68)
+JingbIso = PlotIsotonicCurve(StratiConstraints = c(), object = OSLJingbian$Output, level = .95)
 
 JingbianUO = Compute_AgeS_D(list(D = Jingbian$D, sD = Jingbian$Sigma_D, ddot = Jingbian$d,
                                  sddot = Jingbian$Sigma_d),
@@ -63,9 +63,10 @@ ChezPinaud_Independant <- Compute_AgeS_D(list(D = ChezPinaud$estimate,
                               PriorAge = rep(c(1, 1400), ChezPinaud_Nb_sample),
                               Iter = 2000, burnin = 50000, t = 10)
 
-IsoChezPinaud = PlotIsotonicCurve(c(), ChezPinaud_Independant )
+IsoChezPinaud = PlotIsotonicCurve(c(), ChezPinaud_Independant, level = .68 )
 
-IsoChezPinaud
+write.csv2(x = IsoChezPinaudCSV, file = "../../Testing_Priors/GuillaumePaper/AbstractEcosse/IsotonicAges.csv")
+
 ChezPinaud_UO <- Compute_AgeS_D(list(D = ChezPinaud$estimate,
                                      sD = (ChezPinaud$upper95-ChezPinaud$lower95) /(2*1.96),
                                      ddot = ChezPinaud$ddot),
@@ -84,8 +85,8 @@ ChezPinaud_Nicholls <- Compute_AgeS_D(list(D = ChezPinaud$estimate,
 
 
 
-plotHpd(list(ChezPinaud_UO, IsoChezPinaud, ChezPinaud_Nicholls), c("UO", "Iso", "Nicholls"))
-
+plotHpd(list(ChezPinaud_UO, IsoChezPinaud$Iso, ChezPinaud_Nicholls), c("Uniform Order", "IsotonicReg", "Nicholls")) +
+  ggplot2::coord_flip()
 ##======================================================================================#
 #### Bloc Datasets ####
 datasets2 <- readxl::read_excel("R/DataManipulation/dataOSL_3sites.xlsx")

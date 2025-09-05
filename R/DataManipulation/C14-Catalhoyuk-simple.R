@@ -28,9 +28,9 @@ C14ages = c(8033,7955,7940,7955,8092,7920,8027,7935,7980,7965,7990,7985,8090,809
 C14agesEr = c(39,40,30,25,98,25,37,50,55,25,25,50,55,50,38,25,25,30,37,25,25,50,40,25,35,50,30,36,30,55,36,
               30,50,50,30,55,36,50,90,80)
 
-AC14_WithStratiWithout109995= AgeC14_Computation(Data_C14Cal=C14ages, Data_SigmaC14Cal=C14agesEr,
-                                                SampleNames=C14_SampleNames, Nb_sample = C14_Nb_sample,
-                                                PriorAge = rep(c(7, 13), C14_Nb_sample), SavePdf
+AC14_WithStratiWithout109995= AgeC14_Computation(Data_C14Cal=Catalhoyuk$C14ages, Data_SigmaC14Cal=Catalhoyuk$C14agesEr,
+                                                SampleNames=Catalhoyuk$C14_SampleNames, Nb_sample = Catalhoyuk$C14_Nb_sample,
+                                                PriorAge = rep(c(7, 13), Catalhoyuk$C14_Nb_sample), SavePdf
                                                 = TRUE,
                                                 monitors = c("Age"),
                                                 OutputFileName = c("MCMCplot",
@@ -38,17 +38,17 @@ AC14_WithStratiWithout109995= AgeC14_Computation(Data_C14Cal=C14ages, Data_Sigma
                                                 OutputFilePath = Path, SaveEstimates = TRUE,
                                                 OutputTableName = c("AllC14"), OutputTablePath
                                                 = c(""),
-                                                StratiConstraints = c(), sepSC = c(","), Model       #contraintes stratigraphiques
+                                                StratiConstraints = Catalhoyuk$StratiConstraints, sepSC = c(","), Model       #contraintes stratigraphiques
                                                 = c("full"),
                                                 CalibrationCurve = c("IntCal20"), Iter = 50000,
-                                                t = 5,
+                                                t = 10,
                                                 n.chains = 3, quiet = FALSE)
 AgeC14_Computation
 
 reduced_network <- remove_transitive_edges(buildNetwork(Catalhoyuk$StratiConstraints))
 
 startSBM = Sys.time()
-IsoC14SBM = PlotIsotonicCurve(Catalhoyuk$StratiConstraints, object = AC14_WithStratiWithout109995, interactive = T)
+IsoC14SBM = PlotIsotonicCurve(Catalhoyuk$StratiConstraints, object = Catalhoyuk$Output, interactive = T)
 endSBM = Sys.time()
 SBMtime = endSBM-startSBM
 

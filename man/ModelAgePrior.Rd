@@ -14,6 +14,12 @@ Nicholls' Age Model applied on ages directly
 Jeffrey's Age Model with conditional setting
 
 Independance Age Model
+
+Approached Jeffrey Model for simulated data
+
+Order Model for simulated data
+
+Nicholls Model for simulated data
 }
 \usage{
 ModelAgePrior

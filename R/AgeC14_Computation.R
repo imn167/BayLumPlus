@@ -45,8 +45,8 @@
 #'
 #' @param CalibrationCurve [character] (with default): calibration curve chosen. Allowed inputs are
 #' \itemize{
-#'   \item \bold{"Intcal13"} or \bold{"Intcal13"} for Northern Hemisphere atmospheric radiocarbon calibration curve,
-#'   \item \bold{"Marine13"} or \bold{"Marine13"} for Marine radiocarbon calibration curve,
+#'   \item \bold{"Intcal13"} or \bold{"Intcal20"} for Northern Hemisphere atmospheric radiocarbon calibration curve,
+#'   \item \bold{"Marine13"} or \bold{"Marine20"} for Marine radiocarbon calibration curve,
 #'   \item \bold{"SHCal13"} or \bold{"SHCal20"} for Southern Hemisphere atmospheric radiocarbon calibration curve
 #'   \item \bold{a csv file, with tree columns, the first column is dedicated to `"Cal.BP"`, the second to `"XC-14.age"`, the third to `"Error"`.
 #'   The decimal of this file must be a dot, and the separator must be a comma. }

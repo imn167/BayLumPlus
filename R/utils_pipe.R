@@ -9,3 +9,8 @@
 #' @importFrom magrittr %>%
 #' @usage lhs \%>\% rhs
 NULL
+
+#' @importFrom rlang .data
+#' @usage .data$nameVar
+#' @keywords internal
+NULL

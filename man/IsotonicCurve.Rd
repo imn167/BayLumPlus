@@ -7,19 +7,36 @@
 IsotonicCurve(
   StratiConstraints,
   object,
-  level = 0.95,
-  method = "SBM",
-  graphPath = file.path(tempdir(), "graph.html"),
+  levels = c(0.65, 0.95),
+  path = tempdir(),
   interactive
 )
 }
 \arguments{
-\item{StratiConstraints}{: The stratigraphic matrix, it can be stored in a file or given directly. If there is none, then the model suppose that it is a strict order}
+\item{StratiConstraints}{\link{numeric matrix} or \link{character} : The stratigraphic relation between samples.}
 
-\item{object}{: the returned object of the age model function \code{Compute_AgeS_D()}}
+\item{object}{\link{BayLum.list}: output of the function \code{\link[=Compute_AgeS_D]{Compute_AgeS_D()}} when using the prior \strong{no_strat}. If the \code{StratiConstraints} input is a null matrix then the model suppose a strict order}
 
-\item{level}{= 0.95 by default for the level of High Posterior Densities regions}
+\item{interactive}{\link{logical} (Default) Indicating wether we want an interactive html file or an plot image for the DAG structure}
+
+\item{level}{\link{numeric} c(0.95, 0.68) by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
+at the level indicated.}
+
+\item{graphPath}{\link{character} (Default) path for saving the \code{StratiConstraits}'s DAG}
+}
+\value{
+** NUMERICAL OUTPUT : A list of type \code{BayLum.list} containing the following objects**
+\enumerate{
+\item \bold{Sampling} : Samples from the posterior distribution after distorsion by the isotonic regression;
+\item \bold{network} : The DAG constructed from the \code{StratiConstraints} matrix
+\item \bold{Ages} : data frame containing the Credible interval at 95\% and 68\%, the bayes mean estimator, the bayes standard deviation estimator, the MAP and sample names.
+}
 }
 \description{
-This function compute the isotonic distorsion of a posterior distrubution obtained by \code{Compute_AgeS_D()}
+This function compute the isotonic distorsion of a posterior distrubution obtained by \code{Compute_AgeS_D()}.\cr
+The efficient algorithm considered for the Isotnic Regression (IR) is the ** Sequetial Block Merging (SBM)**. \cr
+If the \code{StratiConstraints} input is a null matrix then the model suppose a strict order
+}
+\seealso{
+\code{\link[=Compute_AgeS_D(), PlotIsotonicCurve]{Compute_AgeS_D(), PlotIsotonicCurve()}}
 }

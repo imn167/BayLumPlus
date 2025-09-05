@@ -208,6 +208,82 @@
 # }"
 
 
+#'@format Approached Jeffrey Model for simulated data
+
+# Classical <-  "model {
+#   #### Likelyhood #####
+#   for (i in 1:I) {
+#     M[i] ~ dnorm(A[i], precision[i])
+#     precision[i] = 1 /(sigma[i]*sigma[i])
+#   }
+#
+#   T1 = xbound[1]
+#   T2 = xbound[2]
+#   ### Prior ####
+#
+#   for(i in 1:I) {
+#     u[i] ~ dunif(0,1)
+#     A[i] = u[i] * (T2-T1) + T1
+#   }
+#
+# }"
+
+#'@format Order Model for simulated data
+#
+# ClassicalOrder <-  "model {
+#   #### Likelyhood #####
+#   for (i in 1:I) {
+#     M[i] ~ dnorm(A[i], precision[i])
+#     precision[i] = 1 / (sigma[i]*sigma[i])
+#   }
+#
+#   T1 = xbound[1]
+#   T2 = xbound[2]
+#   ### Prior ####
+#   for (i in 1:(I+1)) {
+#   e[i] ~dexp(1)
+#   }
+#
+#   for(i in 1:I) {
+#     u[i] = sum(e[1:i] / sum(e[1:(I+1)]))
+#     A[i] = (T2-T1) * u[i] + T1
+#   }
+#
+# }"
+
+#' @format Nicholls Model for simulated data
+# ClassicalNicholls <-  "model {
+#   #### Likelyhood #####
+#   for (i in 1:I) {
+#     M[i] ~ dnorm(A[i], precision[i])
+#     precision[i] = 1 / (sigma[i]*sigma[i])
+#   }
+#
+#   #bounds
+#   alpha = xbound[1]
+#   beta = xbound[2]
+# ###### Prior #####
+#   for (i in 1: (I-1)) {
+#   e[i] ~ dexp(1)
+#   }
+#
+#   s ~ dunif(0, 1)
+#   first ~ dunif(0, (1-s))
+#   u[1]= first
+#   u[I]= s + first
+#
+#   for (i in 2:(I-1)) {
+#     u[i] = (sum(e[1:(i-1)]) / sum(e[1:(I-1)])) *s + first
+#   }
+#   for (i in 1:I) {
+#     A[i] = u[i] * (beta - alpha) + alpha
+#
+#   }
+#
+# }"
+
+
+
 "ModelAgePrior"
 
 #
@@ -215,5 +291,10 @@
 # ModelAgePrior$StrictNicholls <- Strict_nicholls
 # ModelAgePrior$nichollsBR <- nichollsBR
 # ModelAgePrior$Independance <- Independance
-# usethis::use_data(ModelAgePrior, overwrite = T)
 # ModelAgePrior$Conditional <- Conditional
+
+# ModelAgePrior$classical <- Classical
+# ModelAgePrior$classicalorder <- ClassicalOrder
+# ModelAgePrior$classicalnicholls <- ClassicalNicholls
+
+# usethis::use_data(ModelAgePrior, overwrite = T)
