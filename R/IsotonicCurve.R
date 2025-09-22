@@ -8,13 +8,13 @@
 #' @param level [numeric] c(0.95, 0.68) by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
 #'  at the level indicated.
 #' @param graphPath [character] (Default) path for saving the `StratiConstraits`'s DAG
-#' @param interactive [logical] (Default) Indicating wether we want an interactive html file or an plot image for the DAG structure
+#' @param interactive [logical] (Default) Indicating wether we want an interactive html file or a plot image for the DAG structure
 #'
 #'@return ** NUMERICAL OUTPUT : A list of type `BayLum.list` containing the following objects**
 #'\enumerate{
 #'  \item \bold{Sampling} : Samples from the posterior distribution after distorsion by the isotonic regression;
 #'  \item \bold{network} : The DAG constructed from the `StratiConstraints` matrix
-#'  \item \bold{Ages} : data frame containing the Credible interval at 95% and 68%, the bayes mean estimator, the bayes standard deviation estimator, the MAP and sample names.
+#'  \item \bold{Ages} : data frame containing the Credible interval at 95% and 68% , the bayes mean estimator, the bayes standard deviation estimator, the MAP and sample names.
 #'}
 
 #' @seealso [Compute_AgeS_D(), PlotIsotonicCurve()]
@@ -75,7 +75,7 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.65,.95), path =
     }
 
     ## init dataframe for HPD regions
-    HPD_frame <- data.frame()
+    HPD_frame <- data.frame(SAMPLE = SampleNames)
     ## Isotonic Regression
     edges = igraph::as_edgelist(network, names = F)
     IsoSamples = as.matrix(pbapply::pbapply(sample, 1, function(Ahat, edges, weights) {
@@ -85,25 +85,27 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.65,.95), path =
     IsoSamples = t(IsoSamples)
 
     for (elt in levels) {
-      HPD = apply(IsoSamples, 2, arkhe::interval_hdr, level = level)
+      HPD = apply(IsoSamples, 2, arkhe::interval_hdr, level = elt)
       if (is.list(HPD)) {
         message(paste("\t  \t Multiples HPD Regions -- Using", elt*100, " Credible Interval Instead \t \t "))
         HPD = apply(IsoSamples, 2, CredibleInterval, level = level, roundingOfValue = 3)
-        HPD = HPD[-1, ]
       }
+      HPD = HPD[-3, ]
 
       #create column names
-      min_col <- paste0("HPD.", elt, "MIN")
-      max_col <- paste0("HPD", elt, "MAX")
+      min_col <- paste0("HPD", elt*100, ".MIN")
+      max_col <- paste0("HPD", elt*100, ".MAX")
 
       if (is.matrix(HPD) && nrow(HPD) == 2) {
+
         HPD_frame[[min_col]] <- HPD[1,]
         HPD_frame[[max_col]] <- HPD[2,]}
     }
+
     colnames(IsoSamples) <-  SampleNames
     IsoSummary = data.frame( AGE = apply(IsoSamples, 2, mean), SD = apply(IsoSamples, 2, sd), MAP = apply(IsoSamples, 2, get_map),
                              SAMPLE = factor(SampleNames, levels = SampleNames), Unit = 1:n )
-    IsoSummary = cbind(IsoSummary, HPD_frame)
+    IsoSummary = dplyr::left_join(IsoSummary, HPD_frame) #cbind(IsoSummary, HPD_frame)
 
     return(.list_BayLum(Sampling = coda::as.mcmc.list(coda::as.mcmc(IsoSamples)), Ages = IsoSummary, network= network))
 
@@ -111,37 +113,42 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.65,.95), path =
 
 
 
-#' Plot graphs build to vizualise istonic distorsion of the function [IsotonicCurve()]
+#' Plot graphs designed to visualize isotonic distortion from the [IsotonicCurve()] function. Note that only one HPD region/Credible Interval level can be displayed at a time.
 #' @param StratiConstraints [numeric matrix] or [character] : The stratigraphic relation between samples.
 #'
-#' @param object [BayLum.list]: output of the function [Compute_AgeS_D()] when using the prior **no_strat**. If the `StratiConstraints` input is a null matrix then the model suppose a strict order
-#' @param level [numeric] c(0.95, 0.68) by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
-#'  at the level indicated.
+#' @param object [BayLum.list]: output of the function [IsotonicCurve()] when using the prior **no_strat**.
+#' @param level [numeric] 0.95 by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
+#'  at the level indicated. Notice that only one level can be considered
 #' @param ...
 #'
 #'@return ** NUMERICAL OUTPUT : A list of type `BayLum.list` containing the following objects**
 #'\enumerate{
 #'  \item \bold{ribbon} : Ribbon of the Credible Interval and solid orange line representing the Bayes mean estimator;
 #'  \item \bold{dag} : The DAG constructed from the `StratiConstraints` matrix with segments length represent IC(level) and gradient color the value of ages for each samples
-#'  \item \bold{Iso} : returned value of the function [IsotonicCurve()]
+#'  \item \bold{Iso} : Data frame used for generating curve and DAG plots. This data frame is extracted from the **Ages** element of the list object returned by [IsotonicCurve()]
 #'}
 #'
 #' @importFrom rlang .data
 #'@export
 #'
-PlotIsotonicCurve <- function(StratiConstraints, object, level = .95,  ...) {
+PlotIsotonicCurve <- function( object, level = .95,  ...) {
   arg = list(...)
-  if (!is.null(arg$interactive)) {
-    Iso <- IsotonicCurve(StratiConstraints, object, level, method, interactive = arg$interactive)
+  # if (!is.null(arg$interactive)) {
+  #   Iso <- IsotonicCurve(StratiConstraints, object, level, interactive = arg$interactive)
+  # }
+  # else {
+  # Iso <- IsotonicCurve(StratiConstraints, object, level, interactive = T)
+  # }
+  #
+  if (length(level)>1) {
+    stop("This function accepts only a single HPD level. Please provide one credible interval level instead of multiple.", call. = FALSE)
   }
-  else {
-  Iso <- IsotonicCurve(StratiConstraints, object, level, method, interactive = T)
-  }
-  df <- Iso[[2]]
-  network <- Iso[[3]]
+
+  df <- object[[2]] %>% dplyr::select(.data$Unit, .data$SAMPLE, .data$AGE,dplyr::starts_with(paste0("HPD", level*100))) %>% dplyr::rename_with(~c("lower", "upper"), dplyr::starts_with("HPD"))
+  network <- object[[3]]
   n = dim(df)[1]
 
-  curve = df %>% ggplot2::ggplot(ggplot2::aes(x = .data$Unit, ymin = .data$lower, ymax = .data$upper), fill = "orange") +
+  curve = df  %>% ggplot2::ggplot(ggplot2::aes(x = .data$Unit, ymin = .data$lower, ymax = .data$upper), fill = "orange") +
     ggplot2::geom_ribbon(alpha = .4) +
     ggplot2::geom_line(ggplot2::aes(y = .data$lower), color = "orange", group = 1) +
     ggplot2::geom_line(ggplot2::aes(y = .data$upper), color = "orange", group = 1) +
@@ -149,11 +156,12 @@ PlotIsotonicCurve <- function(StratiConstraints, object, level = .95,  ...) {
     ggplot2::geom_point(ggplot2::aes(x = .data$Unit, y = .data$lower), color = "blue") +
     ggplot2::geom_point(ggplot2::aes(x = .data$Unit, y = .data$upper), color = "red") +
     ggplot2::geom_point(ggplot2::aes(x = .data$Unit, y = .data$AGE), color = "black") +
-    BayLumTheme() + ggplot2::ylab("IsotonicRegression") + ggplot2::xlab("Samples")
+    BayLumTheme() + ggplot2::ylab("IsotonicRegression") + ggplot2::xlab("Samples") +
     ggplot2::scale_x_continuous(breaks = df$Unit, labels = df$SAMPLE)  +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::coord_flip()
 
   print(curve)
+
   SAMPLE = object$Ages$SAMPLE
   tg <- tidygraph::as_tbl_graph(network)
   tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::mutate(SAMPLE = SAMPLE)
@@ -168,7 +176,7 @@ PlotIsotonicCurve <- function(StratiConstraints, object, level = .95,  ...) {
     ggraph::geom_edge_link(arrow = grid::arrow(length = grid::unit(.8, 'mm')),end_cap = ggraph::circle(3, 'mm'), alpha = 0.1)
 
   print(dag)
-  return(.list_BayLum(Iso = Iso, DAG = dag, ribbon = curve))
+  return(.list_BayLum(Iso = df, DAG = dag, ribbon = curve))
 }
 
 

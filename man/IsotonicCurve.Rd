@@ -17,7 +17,7 @@ IsotonicCurve(
 
 \item{object}{\link{BayLum.list}: output of the function \code{\link[=Compute_AgeS_D]{Compute_AgeS_D()}} when using the prior \strong{no_strat}. If the \code{StratiConstraints} input is a null matrix then the model suppose a strict order}
 
-\item{interactive}{\link{logical} (Default) Indicating wether we want an interactive html file or an plot image for the DAG structure}
+\item{interactive}{\link{logical} (Default) Indicating wether we want an interactive html file or a plot image for the DAG structure}
 
 \item{level}{\link{numeric} c(0.95, 0.68) by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
 at the level indicated.}
@@ -29,7 +29,7 @@ at the level indicated.}
 \enumerate{
 \item \bold{Sampling} : Samples from the posterior distribution after distorsion by the isotonic regression;
 \item \bold{network} : The DAG constructed from the \code{StratiConstraints} matrix
-\item \bold{Ages} : data frame containing the Credible interval at 95\% and 68\%, the bayes mean estimator, the bayes standard deviation estimator, the MAP and sample names.
+\item \bold{Ages} : data frame containing the Credible interval at 95\% and 68\% , the bayes mean estimator, the bayes standard deviation estimator, the MAP and sample names.
 }
 }
 \description{

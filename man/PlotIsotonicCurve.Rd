@@ -2,28 +2,28 @@
 % Please edit documentation in R/IsotonicCurve.R
 \name{PlotIsotonicCurve}
 \alias{PlotIsotonicCurve}
-\title{Plot graphs build to vizualise istonic distorsion of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}}}
+\title{Plot graphs designed to visualize isotonic distortion from the \code{\link[=IsotonicCurve]{IsotonicCurve()}} function. Note that only one HPD region/Credible Interval level can be displayed at a time.}
 \usage{
-PlotIsotonicCurve(StratiConstraints, object, level = 0.95, ...)
+PlotIsotonicCurve(object, level = 0.95, ...)
 }
 \arguments{
-\item{StratiConstraints}{\link{numeric matrix} or \link{character} : The stratigraphic relation between samples.}
+\item{object}{\link{BayLum.list}: output of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}} when using the prior \strong{no_strat}.}
 
-\item{object}{\link{BayLum.list}: output of the function \code{\link[=Compute_AgeS_D]{Compute_AgeS_D()}} when using the prior \strong{no_strat}. If the \code{StratiConstraints} input is a null matrix then the model suppose a strict order}
-
-\item{level}{\link{numeric} c(0.95, 0.68) by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
-at the level indicated.}
+\item{level}{\link{numeric} 0.95 by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
+at the level indicated. Notice that only one level can be considered}
 
 \item{...}{}
+
+\item{StratiConstraints}{\link{numeric matrix} or \link{character} : The stratigraphic relation between samples.}
 }
 \value{
 ** NUMERICAL OUTPUT : A list of type \code{BayLum.list} containing the following objects**
 \enumerate{
 \item \bold{ribbon} : Ribbon of the Credible Interval and solid orange line representing the Bayes mean estimator;
 \item \bold{dag} : The DAG constructed from the \code{StratiConstraints} matrix with segments length represent IC(level) and gradient color the value of ages for each samples
-\item \bold{Iso} : returned value of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}}
+\item \bold{Iso} : Data frame used for generating curve and DAG plots. This data frame is extracted from the \strong{Ages} element of the list object returned by \code{\link[=IsotonicCurve]{IsotonicCurve()}}
 }
 }
 \description{
-Plot graphs build to vizualise istonic distorsion of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}}
+Plot graphs designed to visualize isotonic distortion from the \code{\link[=IsotonicCurve]{IsotonicCurve()}} function. Note that only one HPD region/Credible Interval level can be displayed at a time.
 }
