@@ -47,7 +47,7 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.65,.95), path =
     }
   ## Stratigraph in a csv file
   if (is(StratiConstraints)[1] == "character") {
-    SCMatrix <- read.csv(StratiConstraints, sep = NULL)
+    SCMatrix <- read.csv(StratiConstraints, sep = ",")
     StratiConstraints <- as.matrix(SCMatrix)
   }
 
@@ -74,6 +74,12 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.65,.95), path =
       print(visplot)
     }
 
+
+    # Input validation
+    if (any(levels <= 0) || any(levels >= 1)) {
+      stop("All levels must be between 0 and 1 (exclusive)", call. = FALSE)
+    }
+
     ## init dataframe for HPD regions
     HPD_frame <- data.frame(SAMPLE = SampleNames)
     ## Isotonic Regression
@@ -88,7 +94,7 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.65,.95), path =
       HPD = apply(IsoSamples, 2, arkhe::interval_hdr, level = elt)
       if (is.list(HPD)) {
         message(paste("\t  \t Multiples HPD Regions -- Using", elt*100, " Credible Interval Instead \t \t "))
-        HPD = apply(IsoSamples, 2, CredibleInterval, level = level, roundingOfValue = 3)
+        HPD = apply(IsoSamples, 2, CredibleInterval, level = elt, roundingOfValue = 3)
       }
       HPD = HPD[-3, ]
 
@@ -113,7 +119,7 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.65,.95), path =
 
 
 
-#' Plot graphs designed to visualize isotonic distortion from the [IsotonicCurve()] function. Note that only one HPD region/Credible Interval level can be displayed at a time.
+#' Plot graphs build to vizualise istonic distorsion of the function [IsotonicCurve()]. The user needs to note that only one HPD regions / Credible Interval level can be allowed and vizualized.
 #' @param StratiConstraints [numeric matrix] or [character] : The stratigraphic relation between samples.
 #'
 #' @param object [BayLum.list]: output of the function [IsotonicCurve()] when using the prior **no_strat**.
