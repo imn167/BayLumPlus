@@ -2,15 +2,14 @@
 % Please edit documentation in R/IsotonicCurve.R
 \name{PlotIsotonicCurve}
 \alias{PlotIsotonicCurve}
-\title{Plot graphs designed to visualize isotonic distortion from the \code{\link[=IsotonicCurve]{IsotonicCurve()}} function. Note that only one HPD region/Credible Interval level can be displayed at a time.}
+\title{Plot graphs build to vizualise istonic distorsion of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}}. The user needs to note that only one HPD regions / Credible Interval level can be allowed and vizualized.}
 \usage{
 PlotIsotonicCurve(object, level = 0.95, ...)
 }
 \arguments{
 \item{object}{\link{BayLum.list}: output of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}} when using the prior \strong{no_strat}.}
 
-\item{level}{\link{numeric} 0.95 by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
-at the level indicated. Notice that only one level can be considered}
+\item{level}{\link{numeric} 0.95 by default. One of the computed level given in \code{\link[=IsotonicCurve]{IsotonicCurve()}}  Notice that only one level can be considered.}
 
 \item{...}{}
 
@@ -25,5 +24,5 @@ at the level indicated. Notice that only one level can be considered}
 }
 }
 \description{
-Plot graphs designed to visualize isotonic distortion from the \code{\link[=IsotonicCurve]{IsotonicCurve()}} function. Note that only one HPD region/Credible Interval level can be displayed at a time.
+Plot graphs build to vizualise istonic distorsion of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}}. The user needs to note that only one HPD regions / Credible Interval level can be allowed and vizualized.
 }

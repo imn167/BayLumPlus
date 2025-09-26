@@ -1,5 +1,5 @@
 ---
-title: "BayLumPlus: Specification of the YAML config file"
+title: "BayLum: Specification of the YAML config file"
 author: "Sebastian Kreutzer"
 date: 'Updated for BayLumPlus package version >= `r packageVersion("BayLumPlus")` (`r Sys.Date()`)'
 output:
@@ -21,15 +21,15 @@ library(BayLumPlus)
 
 # Background and scope
 
-In earlier versions of `'BayLumPlus'` measurement data and settings had to be prepared using a multiple folder 
+In earlier versions of `'BayLum'` measurement data and settings had to be prepared using a multiple folder 
 structure comprising various CVS and BIN/BINX files in a very particular way. This concept 
 proved error-prone and left a lot of frustrated `'BayLumPlus'` users behind, who sometimes spent
-hours trying to understand unclear error messages and then realising that there was a typo in one of the CSV files, or the folder structure was not precisely how `'BayLumPlus'` expected it to be found. By switching to a single-configuration
+hours trying to understand unclear error messages and then realising that there was a typo in one of the CSV files, or the folder structure was not precisely how `'BayLum'` expected it to be found. By switching to a single-configuration
 file users have more options while the settings are cleaner and less scatters over different files in numerous subfolders. The parameter naming follows the naming convention used in the "old" `'BayLumPlus'` CSV-files.
 
 The purpose of this document is the specification and description of the [YAML](https://en.wikipedia.org/wiki/YAML)
 (file ending `*.yml`) configuration file used by the function `create_DataFile()` to provide data input and settings
-to the `'BayLumPlus'` modelling. The YAML file is an alternative and a future replacement of the previous folder structure with various CSV files required by the functions `Generate_DataFile()` and `Generate_DateFile_MG()`.
+to the `'BayLum'` modelling. The YAML file is an alternative and a future replacement of the previous folder structure with various CSV files required by the functions `Generate_DataFile()` and `Generate_DateFile_MG()`.
 
 # Key concepts
 

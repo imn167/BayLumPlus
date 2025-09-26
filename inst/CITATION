@@ -1,4 +1,5 @@
-citHeader("To cite the R package 'BayLum' please cite the R package itself and the following article:")
+citHeader("To cite the R package 'BayLumPlus' please cite the R package itself and the following article:")
+
 citation(auto = meta)
 
 	 bibentry(bibtype = "Article",

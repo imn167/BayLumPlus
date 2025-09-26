@@ -1,14 +1,24 @@
+if (capabilities("cairo")) {
+  options(bitmapType = "cairo")
+}
+
+# For headless testing
+if (!interactive()) {
+  options(device = "pdf")
+}
 
 #Mock data creations helpers
 create_mock_object <-  function(n_samples=5) {
-  mock_samples <- matrix(rnorm(n_samples*100), ncol = n_samples)
+  mock_samples <- matrix(abs(rnorm(n_samples*100)), ncol = n_samples)
   sample_names <- paste0("Sample", 1:n_samples)
   colnames(mock_samples) <- sample_names
 
   #returned
   .list_BayLum(
     "Sampling" = coda::as.mcmc.list(coda::as.mcmc(mock_samples)),
-    "Ages" = data.frame(SAMPLE = sample_names, stringsAsFactors = F),
+    "Ages" = data.frame(SAMPLE = sample_names, stringsAsFactors = F, HPD95.MIN = rep(10, n_samples), HPD95.MAX = rep(20, n_samples),
+                        HPD68.MIN = rep(12, n_samples), HPD68.MAX = rep(18, n_samples),
+                        AGE = rep(15, n_samples), Unit = 1:n_samples),
     "Summary" = replicate(8, rep(1, n_samples))
   )
 }
@@ -19,6 +29,11 @@ create_mock_constraints <- function(n = 5) {
          nrow = 6, byrow = TRUE)
 }
 
+create_mock_isoObject <- function(n_samples = 5) {
+  List <- create_mock_object(n_samples)
+  List[[3]] <-  buildNetwork(create_mock_constraints(n_samples))
+  return(List)
+}
 
 
 test_that("IsotonicCurve runs with valid inputs", {
@@ -65,10 +80,29 @@ test_that("function handles different levels correctly", {
   )
 
   # Invalid levels (outside 0-1 range)
-  expect_error(
-    IsotonicCurve(mock_constraints, mock_obj, levels = 1.5, interactive = FALSE), class = "error"
-  )
+  expect_warning(expect_error(
+    IsotonicCurve(mock_constraints, mock_obj, levels = 1.5, interactive = FALSE)
+  ))
 
+
+})
+
+
+### PlotIsotonicCurve tests
+
+test_that("Restriction to one HPD region / Credible Interval level only", {
+  mock_object <- create_mock_isoObject()
+
+  # Test with a calculated level
+    expect_no_error(PlotIsotonicCurve(mock_object, .95))
+
+  # Test with an uncalculated level
+
+    expect_error(PlotIsotonicCurve(mock_object, .62))
+
+    # Test with several levels
+
+    expect_error(PlotIsotonicCurve(mock_object, c(.95, .68)))
 
 })
 

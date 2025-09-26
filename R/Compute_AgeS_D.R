@@ -73,7 +73,7 @@ sepSC <- NULL
 #' @param prior [character] : Character string specifying the name of one of the models
 #'   available in the `ModelAgePrior` dataset. Use [extract_Jags_model()] to see all available options
 #' @param PriorAge vector (with default): lower and upper bounds for age parameter of each sample (in ka).
-#' @param jags_method (with default): select which method to use in order to call JAGS. jags_methods `"rjags"` (the default) and `"rjparallel"` have been tested. (for more information about these possibilities and others, see [runjags::run.jags])
+#' @param jags_method (with default): select which method to use in order to call JAGS. jags_methods `"rjparallel"`  (the default) and `"rjags"` have been tested. (for more information about these possibilities and others, see [runjags::run.jags])
 #' @param autorun [logical] (with default): choose to automate JAGS processing. JAGS model will be automatically extended until convergence is reached (for more information see [runjags::autorun.jags]).
 #' @param quiet  [logical] (with default): enables/disables `rjags` messages
 #' @param roundingOfValue [integer] (with default):  Integer indicating the number of decimal places to be used, default = 3.
@@ -120,6 +120,17 @@ sepSC <- NULL
 #'  \item \bold{no_strat} : The approached Jeffrey (see Combes & Philippe 2017) without stratigraphic constraints;
 #'
 #'}
+#'@examples
+#'DATA <- list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot)
+#'\dontrun{
+#' ### run standard
+#'  Output <- Compute_AgeS_D(DATA = DATA, Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
+#'  ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "Independance",
+#'  PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
+#'  Iter = 2000, burnin = 50000, t = 10)
+#'
+#'
+#'}
 #'
 #' @seealso [AgeS_Computation()]
 #' @md
@@ -141,7 +152,7 @@ Compute_AgeS_D <- function(
     n.chains = 3,
     prior = "Jeffreys",
     PriorAge = rep(c(0.01, 100), Nb_sample),
-    jags_method = "rjags",
+    jags_method = "rjparallel",
     autorun = F,
     quiet = F,
     roundingOfValue = 3,

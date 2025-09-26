@@ -56,12 +56,12 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Imene Bouafia
   \item Claire Christophe
   \item Sebastian Kreutzer (\href{https://orcid.org/0000-0002-0734-2199}{ORCID})
   \item Guillaume Guérin (\href{https://orcid.org/0000-0001-6298-5579}{ORCID})
   \item Frederik Harly Baumgarten (\href{https://orcid.org/0000-0002-4374-5948}{ORCID})
   \item Nicolas Frerebeau (\href{https://orcid.org/0000-0001-5759-4944}{ORCID})
-  \item Imene Bouafia
 }
 
 Other contributors:

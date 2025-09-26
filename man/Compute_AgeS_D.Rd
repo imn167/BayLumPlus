@@ -19,7 +19,7 @@ Compute_AgeS_D(
   n.chains = 3,
   prior = "Jeffreys",
   PriorAge = rep(c(0.01, 100), Nb_sample),
-  jags_method = "rjags",
+  jags_method = "rjparallel",
   autorun = F,
   quiet = F,
   roundingOfValue = 3,
@@ -69,7 +69,7 @@ available in the \code{ModelAgePrior} dataset. Use \code{\link[=extract_Jags_mod
 
 \item{PriorAge}{vector (with default): lower and upper bounds for age parameter of each sample (in ka).}
 
-\item{jags_method}{(with default): select which method to use in order to call JAGS. jags_methods \code{"rjags"} (the default) and \code{"rjparallel"} have been tested. (for more information about these possibilities and others, see \link[runjags:run.jags]{runjags::run.jags})}
+\item{jags_method}{(with default): select which method to use in order to call JAGS. jags_methods \code{"rjparallel"}  (the default) and \code{"rjags"} have been tested. (for more information about these possibilities and others, see \link[runjags:run.jags]{runjags::run.jags})}
 
 \item{autorun}{\link{logical} (with default): choose to automate JAGS processing. JAGS model will be automatically extended until convergence is reached (for more information see \link[runjags:autorun.jags]{runjags::autorun.jags}).}
 
@@ -133,6 +133,19 @@ If there is a strict order as a stratigraphic constraints, the user would be abl
 \item \bold{no_strat} : The approached Jeffrey (see Combes & Philippe 2017) without stratigraphic constraints;
 
 }
+}
+\examples{
+DATA <- list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot)
+\dontrun{
+### run standard
+ Output <- Compute_AgeS_D(DATA = DATA, Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
+ ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "Independance",
+ PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
+ Iter = 2000, burnin = 50000, t = 10)
+
+
+}
+
 }
 \seealso{
 \code{\link[=AgeS_Computation]{AgeS_Computation()}}

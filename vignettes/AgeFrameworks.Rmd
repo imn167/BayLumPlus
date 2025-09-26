@@ -1,12 +1,15 @@
 ---
-title: "AgeFrameworks"
+title: "Age Frameworks"
+author: "Bouafia Imène"
+date: 
+bibliography: references.bib 
 output:
   rmarkdown::html_vignette:
     toc: yes
     toc_depth: 4
     number_sections: yes
 vignette: >
-  %\VignetteIndexEntry{AgeFrameworks}
+  %\VignetteIndexEntry{Age Frameworks}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,138 +21,229 @@ knitr::opts_chunk$set(
 )
 ```
 
-This Vignette introduces the tools in **BayLumPlus** that extend the original framework for age modelling. 
+This Vignette introduces the tools in **BayLumPlus** that extend the original framework for age modelling.
 
 ```{r setup}
 library(BayLumPlus)
 ```
+## Age Models Function
 
-## Age Model Function
+In this section we present the splitting of the OSL Model presented in @combes2017bayesian. We summarize our approach in the following hierarchical model:
 
-`Compute_AgeS_D` computes only the model age and follows the same configuration as `AgeS_Computation`.  
-The only difference lies in the `DATA` parameter, which refers to a list of data inputs:
+![](figures/DAG.png)
 
-- Equivalent Doses: $D$
-- Dose rate: $\dot{d}$
-- Standard Error for $D$: $\sigma_D$
+The model incorporates three primary data vectors:
+
+- $\mathbf{A} = (A_1, \ldots, A_n)$: the unknown ages to be estimated.
+- $\mathbf{D} = (D_1, \ldots, D_n)$: the equivalent doses obtained from luminescence measurements.
+- $\boldsymbol{\sigma} = (\sigma_{1}, \ldots, \sigma_{n})$: the measurement uncertainties for equivalent doses.
+
+The environmental context is characterized by known parameters:
+
+- $\boldsymbol{d} = (d_1, \ldots, d_n)$: mean annual dose rates for each sample.
+- $\boldsymbol{\sigma}_{d} = (\sigma_{d_1}, \ldots, \sigma_{d_n})$: individual dose rate uncertainties.
+- $\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_n)$: contamination factors relating to systematic uncertainty.
+
+However, this approach does not allow us to account for the complex modeling of common errors. Therefore, instead of considering one common error and a contamination factor, we set the $\Theta$ matrix which 
+represents the covariance matrix that summarizes the several common errors we can consider (see documentation of `create_ThetaMatrix()`). 
+
+The considered model can be summarized by the likelihood:
+
+$$ D \sim \mathcal{N}\left( \text{diag}(A) \boldsymbol{d}; \    \text{diag}(A) \Theta \text{diag}(A) + \text{diag}(\boldsymbol{\sigma}) \right)$$ 
+
+![](figures/DAGBayLumPlus.png)
+
+The function allowing to compute such configuration is `Compute_AgeS_D()`.
+
+In the following sections, we demonstrate how to use this function with practical examples.
+
+### Measurements quantities
+
+The function needs parameters (see `?Compute_AgeS_D()` ) such as a list of `DATA` composed of\
+- Equivalent Doses: $D$\
+- Dose rate: $d$\
+- Standard Error for $D$: $\boldsymbol{\sigma}$
+
+An example of what it might look like
+
+```{r DATA Input,, eval=FALSE, include=TRUE}
+DATA = list( D = Doses, 
+             ddot = dose_rate, 
+             sD = standard_error_D)
+```
+
+### Stratigraphics prior knowledge
+
+The function can also require a matrix that summarizes the stratigraphic constraints called `StratiConstraints`. Multiple choice are accepted :\
+- A numeric matrix such as in `create_ThetaMatrix()` (meaning with a row of ones)\
+- A path to a csv file
 
 Note that several prior distributions can be tested:
 
-- **Under strict order:**
-  - Nicholls
-  - Approached Jeffreys:
-    - *Conditional* (using successive conditional processing)
-    - *StrictOrder* (using Uniform Order, UO)
-  - BayLum (the current BayLum implementation on CRAN)
+-   **Under strict order:** $A_1 \leq \cdots, \leq A_n$
+    -   Nicholls & Jones applied directly to ages (see section 4 in @nicholls2001 )
+    -   Approached Jeffreys:
+        -   *Conditional* (using successive conditional processing)
+        -   *StrictOrder* (using Uniform Order, UO)
+    -   BayLum (the current BayLum implementation on CRAN)
+-   **Without constraints:**
+    -   Independence
 
-- **Without order:**
-  - Independence
+It is important to note that only BayLum prior accepts partial order constraints. For others priors there is no need to specify the parameter `StratiConstraints` as it is supposed to be the **strict order** or no constraints at all. 
 
 You can use the `extract_Jags_model()` function to check the list of all available models and data structures in **BayLumPlus**.
 
-To illustrate usage, the following code snippet uses the OSL dataset from Jingbian, China  
+
+To illustrate usage, the following code snippet uses the OSL dataset from Jingbian, China\
 (see the package documentation for more details).
-```{r}
-data("OSLJingbian")
 
-names(OSLJingbian)
+```{r OSLJingbian China}
+data("OSLJingbian") 
+?OSLJingbian
 ```
 
-To avoid redundancy, we have already computed the equivalent dose model for these samples,  
-as our main objective here is to illustrate the age modeling framework.
+We can use the **Independance** prior for our first bayesian computation. The following code snippet produces this scenario:
 
-
-We can directly use the output of our unconstrained model, stored in `Output`, with the following line:
-
-```{r eval=FALSE, include=FALSE}
-JingbianUnconstrained = Compute_AgeS_D(list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$sd),
-                                       Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
-                                       ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "Independance",
-                                       PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
-                                       Iter = 2000, burnin = 50000, t = 10
-                                       )
+```{r Independance, eval=FALSE, include=TRUE}
+Output = Compute_AgeS_D(
+  
+  DATA = list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot),
+  Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
+  ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "Independance", 
+  jags_method = "rjags",
+  PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
+  Iter = 2000, burnin = 50000, t = 10
+) 
 ```
 
-We use the *Independence* prior since we require an unconstrained Bayesian model.
+Note that the data `OSLJingbian` already have the object *Output*, which is the return object of the code above.
+
+Then the following code snippet shows when we use the *approached Jeffrey* prior for the second bayesian model
+
+```{r  logUniformPrior, results='hide',  fig.show='hide'}
+JingbianUO = Compute_AgeS_D(
+  
+  DATA = list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot),
+  Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
+  ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "Conditional", 
+  jags_method = "rjags",
+  PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
+  Iter = 2000, burnin = 50000, t = 10
+)
+```
+
+Finally, the snippet code when using the *Nicholls & Jones* prior
+
+```{r Nicholls&JonesPrior, results='hide',  fig.show='hide'}
+JingbianNicholls = Compute_AgeS_D(
+  
+  DATA = list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot),
+  Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
+  ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "StrictNicholls", 
+  jags_method = "rjags",
+  PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
+  Iter = 2000, burnin = 50000, t = 10
+)
+```
 
 To visualize the posterior marginals, we use the `plot_Ages()` function with the `"density"` mode:
 
-```{r  fig.height=6, fig.width=7}
-DoseDataset = plot_Ages(OSLJingbian$Output, plot_mode = "density")
+```{r fig.height=6, fig.width=7, include=TRUE}
+AgeWith_NoConstraints = plot_Ages(OSLJingbian$Output, plot_mode = "density")
+```
+
+```{r, fig.width= 7, fig.height=6}
+AgeWith_LogUniformOrder = plot_Ages(JingbianUO, plot_mode = "density")
+```
+
+```{r, fig.width= 7, fig.height=6}
+AgeWith_NJ = plot_Ages(JingbianNicholls, plot_mode = "density")
+```
+
+### Graph Network and Stratigraphic Visualization
+
+One can visualize the order links set up by the StratiConstraints matrix in a directed acyclic graph. The following code snippet provides the scheme on how to do that:
+
+```{r mock constraints }
+  # Create simple stratigraphic constraint matrix
+create_mock_constraints <- function(n = 5) {
+  
+  matrix(c(rep(1, n), ## first row of ones
+           c(0, 1, 1, 1, 1), rep(0, 5), 
+           c(0,0, 0, 1, 1), c(rep(0, 4),1 ),
+           rep(0, 5)),
+         nrow = 6, byrow = TRUE)
+}
+
+reduced_network = remove_transitive_edges(create_mock_constraints()) 
+# network visualization thanks to VisNetwork 
+network_vizualization(reduced_network, interactive = T, vertices_labels = paste0("A", 1:5))
 ```
 
 ## Isotonic Regression Computation
 
-The functions `CurveIsotonic()` and `PlotIsotonicCurve()` compute the isotonic distortion of a posterior distribution 
-obtained from the `Compute_AgeS_D()` function.
+In this section, we introduce the function `IsotonicCurve()`, which computes the isotonic distortion of a posterior distribution obtained from the `Compute_AgeS_D()` function.
 
-The currently supported prior for this isotonic correction is the *Independence* prior.
+**The currently supported prior for this isotonic correction is the *Independence* prior.**
 
-These functions require the following arguments:
+This function requires the following arguments:
 
-- `StratiConstraints`: The stratigraphic constraint matrix. This can either be provided directly or loaded from a file.  
-  If no matrix is supplied, the model assumes a strict chronological order.
-  
+- `StratiConstraints`: The stratigraphic constraint matrix. This can either be provided directly or loaded from a file. If no matrix is supplied, the model assumes a strict chronological order.
 - `Object`: The output object returned by the age model function `Compute_AgeS_D()`.
-
-- `level`: Confidence level for High Posterior Density (HPD) regions. The default is `0.95`.
-
-- `interactive`: An optional argument. If not provided, the program will decide whether to display an interactive  
-  Directed Acyclic Graph (DAG) visualization in a web browser.
+- `level`: Confidence levels for High Posterior Density (HPD) regions. The default values are `0.95` and `0.68`.
+- `path`: An optional path for saving the constraints DAG.
+- `interactive`: An optional argument. If not provided, the program will decide whether to display an interactive Directed Acyclic Graph (DAG) visualization in a web browser.
 
 
-```{r Isotonic Distorsion, fig.height=7, fig.width=8, message=FALSE, warning=FALSE}
-JingbIso = PlotIsotonicCurve(StratiConstraints = c(), object = OSLJingbian$Output, level = .68)
+
+```{r Isotonic Distorsion, fig.height=7, fig.width=8, message=FALSE, warning=FALSE, results='hide',  fig.show='hide'}
+IsotonicDistorsion = IsotonicCurve(c(), OSLJingbian$Output,interactive = FALSE)
 ```
 
-The return value is a data frame containing information about the distorted posterior distribution, including:
+The function return a `BayLum.list` of three objects including the data.frame `Ages`:
 
-- High Posterior Density (HPD) regions  
-- Mean Bayesian estimates  
-- Standard deviation estimates  
+```{r Ages dataframe Isotonic, out.width='70%'}
+knitr::kable(IsotonicDistorsion$Ages )
+```
 
-In addition to the data frame, the function also generates a visualization that displays:
+Similary to the `compute_AgeS_D()` function, the posterior marginals can be visualized with `plot_Ages()``
 
-- The stratigraphic constraints as a Directed Acyclic Graph (DAG)  
-- A ribbon plot showing the HPD regions of the distorted posterior distribution  
+```{r PlotIR, fig.width= 7, fig.height=6}
+AgeWith_IR <-  plot_Ages(object = IsotonicDistorsion, plot_mode = "density")
+```
 
-Several optimization approaches are available, depending on the structure of the constraints:
+Note that the isotonic regression is computed following the **Sequential Merging Block (SBM)** algorithm presented in @wang2022efficient.
 
-- **PAVA** (Pool Adjacent Violators Algorithm) for strict chronological order  
-- **Sequential Block Merging (SBM)** algorithm  
-- **Global convex optimization** using the `CVXR` package  
+To visualize the resulting posterior densities from the Isotonic Distorsion, we can use the function `PlotIsotonicCurve()` :
 
+```{r Plotting Isotonic}
+JingbianPlots = PlotIsotonicCurve(object = IsotonicDistorsion, level = .68)
+```
+
+The DAG constructed from the StratiConstraints matrix shows segments whose length represents the confidence interval (at the specified level) and gradient colors represent the age values for each sample. The y-axis has the same scale as the Bayesian mean estimators.
+
+```{r DAGPlotIso,  fig.height=6, fig.width=8}
+JingbianPlots$DAG
+```
+
+A ribbon plot showing the HPD regions of the distorted posterior distribution
+
+```{r ribbon plot, fig.height=6, fig.width=8}
+JingbianPlots$ribbon
+```
+
+It is important to choose a level of HPD region / Credible interval already computed by `IsotonicDistorsion()` otherwise, the function return an error message.
 
 ## HPD Regions Plotting
 
 We can compare multiple priors using the `plotHpd()` function. This function requires two main arguments:
 
-- `listObject`: A list of output objects returned by `Compute_AgeS_D()` using different prior settings.  
-- `Names`: A character vector specifying the names for each age computation method, used to distinguish them in the plot.
-
-
-```{r include=FALSE}
-JingbianUO = Compute_AgeS_D(list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot),
-                                       Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
-                                       ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "Conditional",
-                            PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
-                            Iter = 2000, burnin = 50000, t = 10
-)
-```
-
-
-```{r include=FALSE}
-JingbianNicholls = Compute_AgeS_D(list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot),
-                                       Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
-                                       ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "StrictNicholls",
-                            PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
-                            Iter = 2000, burnin = 50000, t = 10
-)
-```
+-   `listObject`: A list of output objects returned by `Compute_AgeS_D()` using different prior settings.\
+-   `Names`: A character vector specifying the names for each age computation method, used to distinguish them in the plot.
 
 ```{r fig.height=7, fig.width=8}
-plotHpd(list(JingbianUO, JingbIso, JingbianNicholls), c("UO", "Isotonic", "Nicholls"))
+plotHpd(list(JingbianUO, IsotonicDistorsion, JingbianNicholls), c("UO", "Isotonic", "Nicholls"))
 
 ```
 
-
+# References

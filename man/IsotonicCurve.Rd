@@ -7,7 +7,7 @@
 IsotonicCurve(
   StratiConstraints,
   object,
-  levels = c(0.65, 0.95),
+  levels = c(0.68, 0.95),
   path = tempdir(),
   interactive
 )

@@ -21,7 +21,7 @@
 #'@export
 
 
-IsotonicCurve <- function(StratiConstraints, object, levels = c(.65,.95), path = tempdir(), interactive) {
+IsotonicCurve <- function(StratiConstraints, object, levels = c(.68,.95), path = tempdir(), interactive) {
 
   ##### VARIABLES #######@
   #get all mcmc samples
@@ -59,7 +59,7 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.65,.95), path =
 
     ## Network vizualisation before
 
-    network = remove_transitive_edges(buildNetwork(StratiConstraints))
+    network = remove_transitive_edges(StratiConstraints)
     visplot = network_vizualization(network, SampleNames, interactive)
 
     if (interactive) {
@@ -72,12 +72,6 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.65,.95), path =
     else{
 
       print(visplot)
-    }
-
-
-    # Input validation
-    if (any(levels <= 0) || any(levels >= 1)) {
-      stop("All levels must be between 0 and 1 (exclusive)", call. = FALSE)
     }
 
     ## init dataframe for HPD regions
@@ -123,8 +117,7 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.65,.95), path =
 #' @param StratiConstraints [numeric matrix] or [character] : The stratigraphic relation between samples.
 #'
 #' @param object [BayLum.list]: output of the function [IsotonicCurve()] when using the prior **no_strat**.
-#' @param level [numeric] 0.95 by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
-#'  at the level indicated. Notice that only one level can be considered
+#' @param level [numeric] 0.95 by default. One of the computed level given in [IsotonicCurve()]  Notice that only one level can be considered.
 #' @param ...
 #'
 #'@return ** NUMERICAL OUTPUT : A list of type `BayLum.list` containing the following objects**
@@ -146,11 +139,21 @@ PlotIsotonicCurve <- function( object, level = .95,  ...) {
   # Iso <- IsotonicCurve(StratiConstraints, object, level, interactive = T)
   # }
   #
+
   if (length(level)>1) {
     stop("This function accepts only a single HPD level. Please provide one credible interval level instead of multiple.", call. = FALSE)
   }
 
-  df <- object[[2]] %>% dplyr::select(.data$Unit, .data$SAMPLE, .data$AGE,dplyr::starts_with(paste0("HPD", level*100))) %>% dplyr::rename_with(~c("lower", "upper"), dplyr::starts_with("HPD"))
+  #check if the HPD columns exist
+  hpd_pattern <-  paste0("HPD", level*100)
+  has_hpd <- any(grepl(hpd_pattern, colnames(object$Ages)))
+
+  if (!has_hpd) {
+    stop(paste0("No HPD regions / Credible Interval found with the level", level *100, "%"))
+  }
+
+  df <- object[[2]] %>% dplyr::select(Unit, SAMPLE, AGE,dplyr::starts_with(paste0("HPD", level*100))) %>%
+    dplyr::rename_with(~c("lower", "upper"), dplyr::starts_with("HPD"))
   network <- object[[3]]
   n = dim(df)[1]
 
@@ -158,7 +161,7 @@ PlotIsotonicCurve <- function( object, level = .95,  ...) {
     ggplot2::geom_ribbon(alpha = .4) +
     ggplot2::geom_line(ggplot2::aes(y = .data$lower), color = "orange", group = 1) +
     ggplot2::geom_line(ggplot2::aes(y = .data$upper), color = "orange", group = 1) +
-    ggplot2::geom_line(ggplot2::aes(y = .data$AGE), color = "orange", group = 1, size =1.5) +
+    ggplot2::geom_line(ggplot2::aes(y = .data$AGE), color = "orange", group = 1, linewidth =1.5) +
     ggplot2::geom_point(ggplot2::aes(x = .data$Unit, y = .data$lower), color = "blue") +
     ggplot2::geom_point(ggplot2::aes(x = .data$Unit, y = .data$upper), color = "red") +
     ggplot2::geom_point(ggplot2::aes(x = .data$Unit, y = .data$AGE), color = "black") +
@@ -166,11 +169,11 @@ PlotIsotonicCurve <- function( object, level = .95,  ...) {
     ggplot2::scale_x_continuous(breaks = df$Unit, labels = df$SAMPLE)  +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::coord_flip()
 
-  print(curve)
+  # print(curve)
 
-  SAMPLE = object$Ages$SAMPLE
+  # SAMPLE = object$Ages$SAMPLE
   tg <- tidygraph::as_tbl_graph(network)
-  tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::mutate(SAMPLE = SAMPLE)
+  tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::mutate(SAMPLE = df$SAMPLE)
   tg <- tg %>% tidygraph::activate(nodes) %>% tidygraph::left_join(df, by = "SAMPLE") %>%
     tidygraph::mutate(translation = (.data$upper-.data$lower)/2)
   layout <- ggraph::create_layout(tg, layout = "sugiyama") %>% dplyr::mutate(x1 = .data$x-.data$translation, x2 = .data$x + .data$translation, y = -.data$AGE )
@@ -181,7 +184,13 @@ PlotIsotonicCurve <- function( object, level = .95,  ...) {
     ggplot2::scale_color_viridis_c(name = "Ages") +
     ggraph::geom_edge_link(arrow = grid::arrow(length = grid::unit(.8, 'mm')),end_cap = ggraph::circle(3, 'mm'), alpha = 0.1)
 
-  print(dag)
+  # print(dag)
+
+  if (interactive()) {
+    curve
+    dag
+  }
+
   return(.list_BayLum(Iso = df, DAG = dag, ribbon = curve))
 }
 

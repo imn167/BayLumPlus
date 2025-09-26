@@ -1,17 +1,18 @@
-url: https://crp2a.github.io/BayLum/
+url: https://github.com/imn167/BayLumPlus
 development:
   mode: auto
 
 authors:
+  CNRS:
+    href: https://www.cnrs.fr
+    html: <img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg" />
+
   Archéosciences Bordeaux:
     href: https://www.archeosciences-bordeaux.fr.fr
     html: <img src="https://crp2a.github.io/BayLum/reference/figures/logo_archeosciences.jpg" />
   Université Bordeaux Montaigne:
     href: https://www.u-bordeaux-montaigne.fr
     html: <img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg" />
-  CNRS:
-    href: https://www.cnrs.fr
-    html: <img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg" />
   LabEx Sciences archéologiques de Bordeaux:
     href: https://lascarbx.labex.u-bordeaux.fr
     html: <img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png" />
@@ -24,13 +25,13 @@ navbar:
     href: index.html
   - icon: play
     text: Get Started
-    href: articles/BayLum.html
+    href: articles/AgeFrameworks.html
   - icon: play
     text: YAML configuration
     href: articles/ConfigFile_Specification.html
   - icon: play
-    text: Age Frameworks
-    href: articles/AgeFrameworks.html
+    text: BayLum
+    href: articles/BayLum.html
   - text: References
     href: reference/index.html
 
