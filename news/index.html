@@ -16,10 +16,13 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span> Home</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/BayLum.html"><span class="play"></span> Get Started</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/ConfigFile_Specification.html"><span class="play"></span> YAML configuration</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/AgeFrameworks.html"><span class="play"></span> Age Frameworks</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">References</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/AgeFrameworks.html"><span class="fa fa-rocket"></span> Get Started</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book"></span> Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/BayLum.html">BayLum Foundations</a></li>
+    <li><a class="dropdown-item" href="../articles/ConfigFile_Specification.html">YAML Configuration</a></li>
+  </ul></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span> Reference</a></li>
       </ul><ul class="navbar-nav"><li class="active nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-newspaper-o"></span> News</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/imn167/BayLumPlus"><span class="fa fa-github"></span> GitHub</a></li>
       </ul></div>
@@ -36,7 +39,7 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="baylumplus-100">BayLumPlus 1.0.0<a class="anchor" aria-label="anchor" href="#baylumplus-100"></a></h2>
-<p><strong>BayLumPlus</strong> is a a refined fork of the original <em>BayLum</em> R package. This update introduces several new capabilities, particularly for the Age processing, where we aim to test different prior assumptions without incurring the computational cost associated with the Palaeodose Model.</p>
+<p><strong>BayLumPlus</strong> is a refined fork of the original <em>BayLum</em> R package. This update introduces several new capabilities, particularly for the Age processing, where we aim to test different prior assumptions without incurring the computational cost associated with the Palaeodose Model.</p>
 <div class="section level3">
 <h3 id="major-new-features-1-0-0">Major New Features<a class="anchor" aria-label="anchor" href="#major-new-features-1-0-0"></a></h3>
 <ul><li><p>Graph-based Stratigraphic Tools: New functions to build, visualize, and simplify stratigraphic relationships using graph theory.</p></li>
@@ -47,11 +50,11 @@
 <div class="section level3">
 <h3 id="new-functions-1-0-0">New Functions<a class="anchor" aria-label="anchor" href="#new-functions-1-0-0"></a></h3>
 <p><code>buildNetwork()</code>: Builds a network from stratigraphic input.</p>
-<p><code>network_vizualization()</code>: Visualizes stratigraphic constraints as a graph.</p>
-<p><code>remove_transitive_edges()</code>: Removes redundant edges implied by transitivity.</p>
+<p><code><a href="../reference/network_vizualization.html">network_vizualization()</a></code>: Visualizes stratigraphic constraints as a graph.</p>
+<p><code><a href="../reference/remove_transitive_edges.html">remove_transitive_edges()</a></code>: Removes redundant edges implied by transitivity.</p>
 <p><code><a href="../reference/Compute_AgeS_D.html">Compute_AgeS_D()</a></code>: A new Bayesian age modeling function that supports StrictOrder, StrictNicholls, and Independence priors.</p>
 <p><code><a href="../reference/IsotonicCurve.html">IsotonicCurve()</a></code>: Fits the isotonic distortion model.</p>
-<p><code>PlotIsotonicCurve()</code>: Visualizes the results of the isotonic distortion model.</p>
+<p><code><a href="../reference/PlotIsotonicCurve.html">PlotIsotonicCurve()</a></code>: Visualizes the results of the isotonic distortion model.</p>
 <p><code><a href="../reference/plotHpd.html">plotHpd()</a></code>: Compares Highest Posterior Density intervals for different model settings.</p>
 </div>
 <div class="section level3">
@@ -72,7 +75,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, Imene Bouafia, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
+  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

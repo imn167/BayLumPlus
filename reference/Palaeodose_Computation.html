@@ -24,10 +24,13 @@ Single-grain or Multi-grain OSL measurements can be analysed simultaneouly."></h
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span> Home</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/BayLum.html"><span class="play"></span> Get Started</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/ConfigFile_Specification.html"><span class="play"></span> YAML configuration</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/AgeFrameworks.html"><span class="play"></span> Age Frameworks</a></li>
-<li class="active nav-item"><a class="nav-link" href="../reference/index.html">References</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/AgeFrameworks.html"><span class="fa fa-rocket"></span> Get Started</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book"></span> Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/BayLum.html">BayLum Foundations</a></li>
+    <li><a class="dropdown-item" href="../articles/ConfigFile_Specification.html">YAML Configuration</a></li>
+  </ul></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span> Reference</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-newspaper-o"></span> News</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/imn167/BayLumPlus"><span class="fa fa-github"></span> GitHub</a></li>
       </ul></div>
@@ -93,10 +96,7 @@ provided by <code><a href="Generate_DataFile-deprecated.html">Generate_DataFile<
 
 
 <dt id="arg-binpersample">BinPerSample<a class="anchor" aria-label="anchor" href="#arg-binpersample"></a></dt>
-<dd><p>integer vector (with default): vector with the number of BIN files per sample.
-The length of this vector is equal to <code>Nb_sample</code>.
-<code>BinPerSample</code>i corresponds to the number of BIN files for the sample whose number ID is equal to <code>i</code>.
-For more information to fill this vector, we refer to details in <code><a href="Generate_DataFile-deprecated.html">Generate_DataFile</a></code> or <code><a href="Generate_DataFile_MG-deprecated.html">Generate_DataFile_MG</a></code>.</p></dd>
+<dd><p>integer vector (with default): vector with the number of BIN files per sample.</p></dd>
 
 
 <dt id="arg-savepdf">SavePdf<a class="anchor" aria-label="anchor" href="#arg-savepdf"></a></dt>
@@ -152,6 +152,13 @@ Allowed inputs are <b>"cauchy"</b>, <b>"gaussian"</b>, <b>"lognormal_A"</b> and 
 
 <dt id="arg-n-chains">n.chains<a class="anchor" aria-label="anchor" href="#arg-n-chains"></a></dt>
 <dd><p>integer (with default): number of independent chains for the model (for more information see <a href="https://rdrr.io/pkg/rjags/man/jags.model.html" class="external-link">rjags::jags.model</a>).</p></dd>
+
+
+<dt id="arg-monitors">monitors<a class="anchor" aria-label="anchor" href="#arg-monitors"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a> (with default): charcter vector of desired parameters in the MCMC output.
+The length of this vector is equal to <code>Nb_sample</code>.
+<code>BinPerSample</code>i corresponds to the number of BIN files for the sample whose number ID is equal to <code>i</code>.
+For more information to fill this vector, we refer to details in <code><a href="Generate_DataFile-deprecated.html">Generate_DataFile</a></code> or <code><a href="Generate_DataFile_MG-deprecated.html">Generate_DataFile_MG</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -254,8 +261,8 @@ Quaternary Geochronology 28, 62-70. doi:10.1016/j.quageo.2015.04.001</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Sample name:  GDB5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 		 Point estimate Uppers confidence interval</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> D_GDB5 	 1.08 		 1.3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sD_GDB5 	 1.14 		 1.48 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> D_GDB5 	 8.57 		 19.75 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sD_GDB5 	 1.26 		 1.79 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------------------------</span>
@@ -269,16 +276,16 @@ Quaternary Geochronology 28, 62-70. doi:10.1016/j.quageo.2015.04.001</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Sample name:  GDB5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameter 	 Bayes estimate 	  Credible interval </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> D_GDB5 	 104.589 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> D_GDB5 	 142.273 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 						 lower bound 	 upper bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 97 		 110 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 103 		 108 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 98 		 182 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 103 		 170 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameter 	 Bayes estimate 	  Credible interval </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sD_GDB5 	 14.958 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sD_GDB5 	 16.694 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 						 lower bound 	 upper bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 11 		 20 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 11 		 16 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 11 		 23 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 13 		 20 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------</span>
 <span class="r-in"><span></span></span>
@@ -289,7 +296,7 @@ Quaternary Geochronology 28, 62-70. doi:10.1016/j.quageo.2015.04.001</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, Imene Bouafia, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
+  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -20,10 +20,13 @@ with the primary difference being the first parameter."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span> Home</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/BayLum.html"><span class="play"></span> Get Started</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/ConfigFile_Specification.html"><span class="play"></span> YAML configuration</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/AgeFrameworks.html"><span class="play"></span> Age Frameworks</a></li>
-<li class="active nav-item"><a class="nav-link" href="../reference/index.html">References</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/AgeFrameworks.html"><span class="fa fa-rocket"></span> Get Started</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book"></span> Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/BayLum.html">BayLum Foundations</a></li>
+    <li><a class="dropdown-item" href="../articles/ConfigFile_Specification.html">YAML Configuration</a></li>
+  </ul></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span> Reference</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-newspaper-o"></span> News</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/imn167/BayLumPlus"><span class="fa fa-github"></span> GitHub</a></li>
       </ul></div>
@@ -62,7 +65,7 @@ with the primary difference being the first parameter.</p>
 <span>  n.chains <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  prior <span class="op">=</span> <span class="st">"Jeffreys"</span>,</span>
 <span>  PriorAge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">100</span><span class="op">)</span>, <span class="va">Nb_sample</span><span class="op">)</span>,</span>
-<span>  jags_method <span class="op">=</span> <span class="st">"rjags"</span>,</span>
+<span>  jags_method <span class="op">=</span> <span class="st">"rjparallel"</span>,</span>
 <span>  autorun <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  roundingOfValue <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -81,25 +84,155 @@ with the primary difference being the first parameter.</p>
 
 
 <dl><dt id="arg-data">DATA<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p><strong>(required)</strong> <a href="https://rdrr.io/r/base/list.html" class="external-link">list</a>
-The output of the function <code><a href="create_MeasuresDataFrame.html">create_MeasuresDataFrame()</a></code>, containing the necessary input data for computation.</p></dd>
+<dd><p><strong>(required)</strong> <a href="https://rdrr.io/r/base/list.html" class="external-link">list</a> of objects :</p><ul><li><p>Equivalent doses <code>D</code></p></li>
+<li><p>dose rates : <code>ddot</code></p></li>
+<li><p>standard error for D : <code>sD</code>
+The output of the function <code><a href="create_MeasuresDataFrame.html">create_MeasuresDataFrame()</a></code>, containing the necessary input data for computation.</p></li>
+</ul></dd>
+
+
+<dt id="arg-nb-sample">Nb_sample<a class="anchor" aria-label="anchor" href="#arg-nb-sample"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a> number of samples</p></dd>
+
+
+<dt id="arg-samplenames">SampleNames<a class="anchor" aria-label="anchor" href="#arg-samplenames"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a> character vector with sample names</p></dd>
+
+
+<dt id="arg-thetamatrix">ThetaMatrix<a class="anchor" aria-label="anchor" href="#arg-thetamatrix"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a> or <a href="https://rdrr.io/r/base/character.html" class="external-link">character</a> input of systematic and individual errors.</p></dd>
+
+
+<dt id="arg-palaeodoseobject">PalaeodoseObject<a class="anchor" aria-label="anchor" href="#arg-palaeodoseobject"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a> (with default NULL) Output of the <code><a href="Palaeodose_Computation.html">Palaeodose_Computation()</a></code></p></dd>
+
+
+<dt id="arg-straticonstraints">StratiConstraints<a class="anchor" aria-label="anchor" href="#arg-straticonstraints"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a> or <a href="https://rdrr.io/r/base/character.html" class="external-link">character</a> The stratigraphic relation between samples</p></dd>
+
+
+<dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a> (optional) custom Jags model</p></dd>
+
+
+<dt id="arg-iter">Iter<a class="anchor" aria-label="anchor" href="#arg-iter"></a></dt>
+<dd><p>(with default): the number of iterations to run which will be used to assess convergence and ages (see <a href="https://rdrr.io/pkg/runjags/man/run.jags.html" class="external-link">runjags::run.jags</a>).</p></dd>
+
+
+<dt id="arg-burnin">burnin<a class="anchor" aria-label="anchor" href="#arg-burnin"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a> (with default): the number of iterations used to "home in" on the stationary posterior distribution. These are not used for assessing convergence (see <a href="https://rdrr.io/pkg/runjags/man/run.jags.html" class="external-link">runjags::run.jags</a>).</p></dd>
+
+
+<dt id="arg-adapt">adapt<a class="anchor" aria-label="anchor" href="#arg-adapt"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a> (with default): the number of iterations used in the adaptive phase of the simulation (see <a href="https://rdrr.io/pkg/runjags/man/run.jags.html" class="external-link">runjags::run.jags</a>).</p></dd>
+
+
+<dt id="arg-t">t<a class="anchor" aria-label="anchor" href="#arg-t"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a> (with default): 1 every <code>t</code> iterations of the MCMC is considered for sampling the posterior distribution.
+(for more information see <a href="https://rdrr.io/pkg/runjags/man/run.jags.html" class="external-link">runjags::run.jags</a>).</p></dd>
+
+
+<dt id="arg-n-chains">n.chains<a class="anchor" aria-label="anchor" href="#arg-n-chains"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a> (with default): number of independent chains for the model (for more information see <a href="https://rdrr.io/pkg/runjags/man/run.jags.html" class="external-link">runjags::run.jags</a>).</p></dd>
+
+
+<dt id="arg-prior">prior<a class="anchor" aria-label="anchor" href="#arg-prior"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a> : Character string specifying the name of one of the models
+available in the <code>ModelAgePrior</code> dataset. Use <code><a href="extract_Jags_model.html">extract_Jags_model()</a></code> to see all available options</p></dd>
+
+
+<dt id="arg-priorage">PriorAge<a class="anchor" aria-label="anchor" href="#arg-priorage"></a></dt>
+<dd><p>vector (with default): lower and upper bounds for age parameter of each sample (in ka).</p></dd>
+
+
+<dt id="arg-jags-method">jags_method<a class="anchor" aria-label="anchor" href="#arg-jags-method"></a></dt>
+<dd><p>(with default): select which method to use in order to call JAGS. jags_methods <code>"rjparallel"</code>  (the default) and <code>"rjags"</code> have been tested. (for more information about these possibilities and others, see <a href="https://rdrr.io/pkg/runjags/man/run.jags.html" class="external-link">runjags::run.jags</a>)</p></dd>
+
+
+<dt id="arg-autorun">autorun<a class="anchor" aria-label="anchor" href="#arg-autorun"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a> (with default): choose to automate JAGS processing. JAGS model will be automatically extended until convergence is reached (for more information see <a href="https://rdrr.io/pkg/runjags/man/autorun.jags.html" class="external-link">runjags::autorun.jags</a>).</p></dd>
+
+
+<dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a> (with default): enables/disables <code>rjags</code> messages</p></dd>
+
+
+<dt id="arg-roundingofvalue">roundingOfValue<a class="anchor" aria-label="anchor" href="#arg-roundingofvalue"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a> (with default):  Integer indicating the number of decimal places to be used, default = 3.</p></dd>
+
+
+<dt id="arg-savepdf">SavePdf<a class="anchor" aria-label="anchor" href="#arg-savepdf"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a> (with default): if TRUE save graphs in pdf file named <code>OutputFileName</code> in folder <code>OutputFilePath</code>.</p></dd>
+
+
+<dt id="arg-outputfilename">OutputFileName<a class="anchor" aria-label="anchor" href="#arg-outputfilename"></a></dt>
+<dd><p>OutputFileName <a href="https://rdrr.io/r/base/character.html" class="external-link">character</a> (with default): name of the pdf file that will be generated by the function if <code>SavePdf = TRUE</code>;
+<code>length(OutputFileName)=2</code>, see <b>PLOT OUTPUT</b> in <b>Value</b> section for more informations.</p></dd>
+
+
+<dt id="arg-outputfilepath">OutputFilePath<a class="anchor" aria-label="anchor" href="#arg-outputfilepath"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a> (with default): path to the pdf file that will be generated by the function if <code>SavePdf</code>=TRUE.
+If it is not equal to "", it must be terminated by "/".</p></dd>
+
+
+<dt id="arg-saveestimates">SaveEstimates<a class="anchor" aria-label="anchor" href="#arg-saveestimates"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a> (with default): if TRUE save Bayes' estimates, credible interval at level 68% and 95%,
+the result of the Gelman en Rubin test of convergence and the Time Series SE, in a csv table named <code>OutputFileName</code> in folder <code>OutputFilePath</code>.</p></dd>
+
+
+<dt id="arg-outputtablename">OutputTableName<a class="anchor" aria-label="anchor" href="#arg-outputtablename"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a> (with default): name of the table that will be generated by the function if <code>SaveEstimates = TRUE</code>.</p></dd>
+
+
+<dt id="arg-outputtablepath">OutputTablePath<a class="anchor" aria-label="anchor" href="#arg-outputtablepath"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a> (with default): path to the table that will be generated by the function if <code>SaveEstimates = TRUE</code>.
+If it is not equal to "", it must be terminated by "/".</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>See the documentation for <code><a href="AgeS_Computation.html">AgeS_Computation()</a></code> for details on the returned output.</p>
-    </div>
+    <p><strong>NUMERICAL OUTPUT</strong></p>
+<p><strong>A list of type <code>BayLum.list</code> containing the following objects:</strong></p><ul><li><p><b>Ages</b> : dataframe containing the Credible interval at 95% and 68%, the bayes mean estimator, the bayes standard deviation estimator and sample names.</p></li>
+<li><p><b>Sampling</b>: that corresponds to a sample of the posterior distributions
+of the age (in ka);</p></li>
+<li><p><b>PriorAge</b>: stating the priors used for the age parameter (in ka);</p></li>
+<li><p><b>StratiConstraints</b>: stating the stratigraphic relations between samples considered in the model;</p></li>
+<li><p><b>CovarianceMatrix</b>: stating the covariance matrix of error used in the model, highlighting common errors between samples or not;</p></li>
+<li><p><b>model</b>: returns the model that was used for the Bayesian modelling as a <a href="https://rdrr.io/r/base/character.html" class="external-link">character</a>;</p></li>
+<li><p><b>JAGS model output</b>: returns the JAGS model with class "runjags";</p></li>
+</ul><p><strong>PLOT OUTPUT</strong></p>
+<ol><li><p><b>MCMC trajectories</b>: A graph with the MCMC trajectories and posterior distributions of the age.
+On each line, the plot on the left represents the MCMC trajectories, and the one on the right the posterior distribution of the parameter.</p></li>
+<li><p><b>Summary of sample age estimates</b>: plot credible intervals and Bayes estimate of each sample age on a same graph. <br>
+A default <code>plot_mode</code> parameter can gives either IC segment or density distribution if <em>plot_mode = "density"</em>, see <code><a href="plot_Ages.html">plot_Ages()</a></code></p></li>
+</ol></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>** Which prior to use regarding the Stratigraphic constraints **
+If there is a strict order as a stratigraphic constraints, the user would be able to use the following priors :</p><ol><li><p><b>LogUniformOrder</b> : uniform order over the period of study;</p></li>
+<li><p><b>flawed_jeffrey</b> : old BayLum model : false configuration of the approximated Jeffrey;</p></li>
+<li><p><b>nicholls_jones_age</b> : The Nicholls &amp; Jones uniform order applied on ages;</p></li>
+<li><p><b>no_strat</b> : The approached Jeffrey (see Combes &amp; Philippe 2017) without stratigraphic constraints;</p></li>
+</ol></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="AgeS_Computation.html">AgeS_Computation()</a></code>, <code><a href="create_MeasuresDataFrame.html">create_MeasuresDataFrame()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="AgeS_Computation.html">AgeS_Computation()</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, Imene Bouafia, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
+  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
