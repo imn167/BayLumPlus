@@ -8,7 +8,7 @@ output:
     toc_depth: 4
     number_sections: yes
 vignette: >
-  %\VignetteIndexEntry{BayLumPlus: Specification of the YAML config file}
+  %\VignetteIndexEntry{BayLum: Specification of the YAML config file}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

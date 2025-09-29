@@ -1,4 +1,4 @@
-url: https://github.com/imn167/BayLumPlus
+url: https://imn167.github.io/BayLumPlus
 development:
   mode: auto
 
@@ -6,9 +6,11 @@ authors:
   CNRS:
     href: https://www.cnrs.fr
     html: <img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg" />
-
+  QuinaWorld:
+    href: https://quinaworld.univ-rennes.fr
+    html: <img src= "man/figures/LogoQuinaW.svg" />
   Archéosciences Bordeaux:
-    href: https://www.archeosciences-bordeaux.fr.fr
+    href: https://www.archeosciences-bordeaux.fr #double .fr.fr
     html: <img src="https://crp2a.github.io/BayLum/reference/figures/logo_archeosciences.jpg" />
   Université Bordeaux Montaigne:
     href: https://www.u-bordeaux-montaigne.fr
@@ -23,18 +25,19 @@ navbar:
   - icon: fa-home
     text: Home
     href: index.html
-  - icon: play
-    text: Get Started
+  - text: Get Started
+    icon: fa-rocket
     href: articles/AgeFrameworks.html
-  - icon: play
-    text: YAML configuration
-    href: articles/ConfigFile_Specification.html
-  - icon: play
-    text: BayLum
-    href: articles/BayLum.html
-  - text: References
+  - text: Articles
+    icon: fa-book
+    menu:
+    - text: BayLum Foundations
+      href: articles/BayLum.html
+    - text: YAML Configuration
+      href: articles/ConfigFile_Specification.html
+  - text: Reference
+    icon: fa-file-code-o
     href: reference/index.html
-
   right:
   - icon: fa-newspaper-o
     text: News
@@ -46,3 +49,5 @@ navbar:
 template:
   bootstrap: 5
   bootswatch: flatly
+  bslib:
+    primary: "#1C7CD6"
