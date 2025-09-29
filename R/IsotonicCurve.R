@@ -1,13 +1,13 @@
 #' Compute Isotonic Regression for different stratigraphic constraints
-#' @description This function compute the isotonic distorsion of a posterior distrubution obtained by `Compute_AgeS_D()`.\cr
+#' @description This function compute the isotonic distorsion of a posterior distrubution obtained by [Compute_AgeS_D()].\cr
 #'The efficient algorithm considered for the Isotnic Regression (IR) is the ** Sequetial Block Merging (SBM)**. \cr
 #'If the `StratiConstraints` input is a null matrix then the model suppose a strict order
 #'
-#' @param StratiConstraints [numeric matrix] or [character] : The stratigraphic relation between samples.
-#' @param object [BayLum.list]: output of the function [Compute_AgeS_D()] when using the prior **no_strat**. If the `StratiConstraints` input is a null matrix then the model suppose a strict order
-#' @param level [numeric] c(0.95, 0.68) by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
+#' @param StratiConstraints [matrix] or [character] : The stratigraphic relation between samples.
+#' @param object [list]: output of the function [Compute_AgeS_D()] when using the prior **no_strat**. If the `StratiConstraints` input is a null matrix then the model suppose a strict order
+#' @param levels [numeric] c(0.95, 0.68) by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
 #'  at the level indicated.
-#' @param graphPath [character] (Default) path for saving the `StratiConstraits`'s DAG
+#' @param path [character] (Default) path for saving the `StratiConstraints`'s DAG
 #' @param interactive [logical] (Default) Indicating wether we want an interactive html file or a plot image for the DAG structure
 #'
 #'@return ** NUMERICAL OUTPUT : A list of type `BayLum.list` containing the following objects**
@@ -17,7 +17,7 @@
 #'  \item \bold{Ages} : data frame containing the Credible interval at 95% and 68% , the bayes mean estimator, the bayes standard deviation estimator, the MAP and sample names.
 #'}
 
-#' @seealso [Compute_AgeS_D(), PlotIsotonicCurve()]
+#' @seealso [Compute_AgeS_D()] [PlotIsotonicCurve()]
 #'@export
 
 
@@ -113,12 +113,10 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.68,.95), path =
 
 
 
-#' Plot graphs build to vizualise istonic distorsion of the function [IsotonicCurve()]. The user needs to note that only one HPD regions / Credible Interval level can be allowed and vizualized.
-#' @param StratiConstraints [numeric matrix] or [character] : The stratigraphic relation between samples.
-#'
-#' @param object [BayLum.list]: output of the function [IsotonicCurve()] when using the prior **no_strat**.
+#' Plot graphs build to vizualise isotonic distorsion of the function [IsotonicCurve()].
+#' The user needs to note that only one HPD regions / Credible Interval level can be allowed and vizualized.
+#' @param object [list]: output of the function [IsotonicCurve()] when using the prior **no_strat**.
 #' @param level [numeric] 0.95 by default. One of the computed level given in [IsotonicCurve()]  Notice that only one level can be considered.
-#' @param ...
 #'
 #'@return ** NUMERICAL OUTPUT : A list of type `BayLum.list` containing the following objects**
 #'\enumerate{
@@ -130,8 +128,8 @@ IsotonicCurve <- function(StratiConstraints, object, levels = c(.68,.95), path =
 #' @importFrom rlang .data
 #'@export
 #'
-PlotIsotonicCurve <- function( object, level = .95,  ...) {
-  arg = list(...)
+PlotIsotonicCurve <- function( object, level = .95) {
+  # arg = list(...)
   # if (!is.null(arg$interactive)) {
   #   Iso <- IsotonicCurve(StratiConstraints, object, level, interactive = arg$interactive)
   # }

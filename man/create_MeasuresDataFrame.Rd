@@ -37,7 +37,7 @@ A list containing:
 }
 }
 \description{
-This function prepares the necessary data frame entries for the function \link{Computation_AgeS_D}.
+This function prepares the necessary data frame entries for the function \code{\link[=Compute_AgeS_D]{Compute_AgeS_D()}}.
 It takes structured input data (as defined in \code{\link[=Generate_DataFile]{Generate_DataFile()}} and \code{\link[=Generate_DataFile_MG]{Generate_DataFile_MG()}})
 and computes relevant parameters for age estimation.
 }

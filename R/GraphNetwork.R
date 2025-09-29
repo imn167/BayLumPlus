@@ -1,7 +1,7 @@
 
 #' The Edge Pruner Algorithm (EPA). This algorithm handles the redundancy of the constraints matrix (see [create_ThetaMatrix()]) by deleting all unecessary edges.
 #'The result is
-#' @param Sc  [numeric matrix] or [character] : The stratigraphic relation between samples.
+#' @param Sc  [matrix] or [character] : The stratigraphic relation between samples.
 #' @param n_samples [numeric] NaN by default. Optional size of samples to create a strict order DAG without constructing `Sc`
 #'
 #' @returns [igraph]  a non transitive DAG that can also be referred to as a Hasse Diagram.
@@ -43,9 +43,9 @@ remove_transitive_edges <- function(Sc, n_samples = NaN) {
 
 #' Plot a Graph Network according to sugiyama layout
 #'
-#' @param network [igraph network] An igraph object
+#' @param network [igraph] An igraph object
 #' @param vertices_labels [character] Samples Names for each node
-#' @param interactive [bool] TRUE by default, An optional parameter whether to use the interactive visualization with VisNetwork
+#' @param interactive [logical] TRUE by default, An optional parameter whether to use the interactive visualization with VisNetwork
 #'
 #' @returns \enumerate{
 #' \item If *interactive = TRUE* : `visNetwork` plot

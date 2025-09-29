@@ -2,18 +2,15 @@
 % Please edit documentation in R/IsotonicCurve.R
 \name{PlotIsotonicCurve}
 \alias{PlotIsotonicCurve}
-\title{Plot graphs build to vizualise istonic distorsion of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}}. The user needs to note that only one HPD regions / Credible Interval level can be allowed and vizualized.}
+\title{Plot graphs build to vizualise isotonic distorsion of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}}.
+The user needs to note that only one HPD regions / Credible Interval level can be allowed and vizualized.}
 \usage{
-PlotIsotonicCurve(object, level = 0.95, ...)
+PlotIsotonicCurve(object, level = 0.95)
 }
 \arguments{
-\item{object}{\link{BayLum.list}: output of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}} when using the prior \strong{no_strat}.}
+\item{object}{\link{list}: output of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}} when using the prior \strong{no_strat}.}
 
 \item{level}{\link{numeric} 0.95 by default. One of the computed level given in \code{\link[=IsotonicCurve]{IsotonicCurve()}}  Notice that only one level can be considered.}
-
-\item{...}{}
-
-\item{StratiConstraints}{\link{numeric matrix} or \link{character} : The stratigraphic relation between samples.}
 }
 \value{
 ** NUMERICAL OUTPUT : A list of type \code{BayLum.list} containing the following objects**
@@ -24,5 +21,6 @@ PlotIsotonicCurve(object, level = 0.95, ...)
 }
 }
 \description{
-Plot graphs build to vizualise istonic distorsion of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}}. The user needs to note that only one HPD regions / Credible Interval level can be allowed and vizualized.
+Plot graphs build to vizualise isotonic distorsion of the function \code{\link[=IsotonicCurve]{IsotonicCurve()}}.
+The user needs to note that only one HPD regions / Credible Interval level can be allowed and vizualized.
 }

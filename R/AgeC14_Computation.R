@@ -12,6 +12,8 @@
 #'
 #' @param Nb_sample [integer]: number of samples.
 #'
+#' @param monitors [character]: Parameter to monitors in MCMC outputs
+#'
 #' @param PriorAge [numeric] (with default): lower and upper bounds for age parameter of each sample in years (not in ka).
 #' Note that, `length(PriorAge) == 2 * Nb_sample`
 #' and `PriorAge[2i-1,2i]` corresponds to the lower and upper bounds of sample whose number ID is equal to `i`.

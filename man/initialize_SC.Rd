@@ -11,7 +11,7 @@ In this function we try different way of initializing our Gibbs Sampler.
 Several limitation can be encoutered :
 \itemize{
 \item The constraints need to be respected
-\item The ages need to belongs to a certain period of study \link{T1, T2} that will be fixed arbitrarily
+\item The ages need to belongs to a certain period of study (T1, T2) that will be fixed arbitrarily
 \item Initialisation are not only constrained by the Matrix of constraint but also to avoid numerical zeros the interval of initialisation
 need to be reasonable according to the density of Gibbs Sampler.
 }

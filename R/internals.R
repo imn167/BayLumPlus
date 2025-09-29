@@ -225,7 +225,14 @@ nichollsBRInit <- function(I, upper, lower) {
 
 #=================================================================================@
 #### Networks Functions ####
-#'Build the network fixed by the matrix of constraints
+#Build the network fixed by the matrix of constraints
+# Title
+# @param StratiConstraints [numeric matrix] or [character] : The stratigraphic relation between samples.
+# @param n_samples [numeric] number of samples if a strict order constraints
+#
+# @returns [igraph] an igraph network that summarize the constraints
+#
+
 buildNetwork <- function(StratiConstraints, n_samples = NaN) {
   ##no Strati
   if (length(StratiConstraints) == 0) {

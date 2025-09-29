@@ -7,11 +7,11 @@
 network_vizualization(network, vertices_labels, interactive = TRUE)
 }
 \arguments{
-\item{network}{\link{igraph network} An igraph object}
+\item{network}{\link{igraph} An igraph object}
 
 \item{vertices_labels}{\link{character} Samples Names for each node}
 
-\item{interactive}{\link{bool} TRUE by default, An optional parameter whether to use the interactive visualization with VisNetwork}
+\item{interactive}{\link{logical} TRUE by default, An optional parameter whether to use the interactive visualization with VisNetwork}
 }
 \value{
 \enumerate{

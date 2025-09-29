@@ -1,7 +1,7 @@
 #' @title Create Input for Age Computation
 #'@md
 #' @description
-#' This function prepares the necessary data frame entries for the function [Computation_AgeS_D].
+#' This function prepares the necessary data frame entries for the function [Compute_AgeS_D()].
 #' It takes structured input data (as defined in [Generate_DataFile()] and [Generate_DataFile_MG()])
 #' and computes relevant parameters for age estimation.
 #'
@@ -60,9 +60,9 @@ sepSC <- NULL
 #' The output of the function [create_MeasuresDataFrame()], containing the necessary input data for computation.
 #' @param Nb_sample [integer] number of samples
 #' @param SampleNames [character] character vector with sample names
-#' @param ThetaMatrix [numeric matrix] or [character] input of systematic and individual errors.
-#' @param PalaeodoseObject [BayLum.List] (with default NULL) Output of the [Palaeodose_Computation]
-#' @param StratiConstraints [numeric matrix ] or [character] The stratigraphic relation between samples
+#' @param ThetaMatrix [matrix] or [character] input of systematic and individual errors.
+#' @param PalaeodoseObject [list] (with default NULL) Output of the [Palaeodose_Computation()]
+#' @param StratiConstraints [matrix] or [character] The stratigraphic relation between samples
 #' @param model [character] (optional) custom Jags model
 #' @param Iter (with default): the number of iterations to run which will be used to assess convergence and ages (see [runjags::run.jags]).
 #' @param burnin  [integer] (with default): the number of iterations used to "home in" on the stationary posterior distribution. These are not used for assessing convergence (see [runjags::run.jags]).
@@ -124,8 +124,11 @@ sepSC <- NULL
 #'DATA <- list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot)
 #'\dontrun{
 #' ### run standard
-#'  Output <- Compute_AgeS_D(DATA = DATA, Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
-#'  ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "Independance",
+#'  Output <- Compute_AgeS_D(DATA = DATA,
+#'  Nb_sample = OSLJingbian$Nb_Sample,
+#'  SampleNames = OSLJingbian$SampleNames,
+#'  ThetaMatrix = OSLJingbian$ThetaMatrix,
+#'  ‡prior = "Independance",
 #'  PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
 #'  Iter = 2000, burnin = 50000, t = 10)
 #'

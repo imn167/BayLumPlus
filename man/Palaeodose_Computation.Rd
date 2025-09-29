@@ -33,10 +33,7 @@ provided by \code{\link{Generate_DataFile}} or \code{\link{Generate_DataFile_MG}
 
 \item{Nb_sample}{integer: number of samples.}
 
-\item{BinPerSample}{integer vector (with default): vector with the number of BIN files per sample.
-The length of this vector is equal to \code{Nb_sample}.
-\code{BinPerSample}\link{i} corresponds to the number of BIN files for the sample whose number ID is equal to \code{i}.
-For more information to fill this vector, we refer to details in \code{\link{Generate_DataFile}} or \code{\link{Generate_DataFile_MG}}.}
+\item{BinPerSample}{integer vector (with default): vector with the number of BIN files per sample.}
 
 \item{SavePdf}{boolean (with default): if TRUE save graph in pdf file named \code{OutputFileName} in folder \code{OutputFilePath}.}
 
@@ -68,6 +65,11 @@ Allowed inputs are \bold{"cauchy"}, \bold{"gaussian"}, \bold{"lognormal_A"} and 
 (for more information see \link[rjags:jags.model]{rjags::jags.model}).}
 
 \item{n.chains}{integer (with default): number of independent chains for the model (for more information see \link[rjags:jags.model]{rjags::jags.model}).}
+
+\item{monitors}{\link{character} (with default): charcter vector of desired parameters in the MCMC output.
+The length of this vector is equal to \code{Nb_sample}.
+\code{BinPerSample}\link{i} corresponds to the number of BIN files for the sample whose number ID is equal to \code{i}.
+For more information to fill this vector, we refer to details in \code{\link{Generate_DataFile}} or \code{\link{Generate_DataFile_MG}}.}
 }
 \value{
 \bold{NUMERICAL OUTPUT}\cr

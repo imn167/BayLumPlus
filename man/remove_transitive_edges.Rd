@@ -8,7 +8,7 @@ The result is}
 remove_transitive_edges(Sc, n_samples = NaN)
 }
 \arguments{
-\item{Sc}{\link{numeric matrix} or \link{character} : The stratigraphic relation between samples.}
+\item{Sc}{\link{matrix} or \link{character} : The stratigraphic relation between samples.}
 
 \item{n_samples}{\link{numeric} NaN by default. Optional size of samples to create a strict order DAG without constructing \code{Sc}}
 }

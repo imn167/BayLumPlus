@@ -12,6 +12,7 @@
 #' @param SampleNames character vector: names of sample. The length of this vector is equal to \code{Nb_sample}.
 #' @param Nb_sample integer: number of samples.
 #' @param BinPerSample integer vector (with default): vector with the number of BIN files per sample.
+#' @param monitors [character] (with default): charcter vector of desired parameters in the MCMC output.
 #' The length of this vector is equal to \code{Nb_sample}.
 #' \code{BinPerSample}[i] corresponds to the number of BIN files for the sample whose number ID is equal to \code{i}.
 #' For more information to fill this vector, we refer to details in \code{\link{Generate_DataFile}} or \code{\link{Generate_DataFile_MG}}.

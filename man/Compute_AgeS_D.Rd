@@ -45,11 +45,11 @@ The output of the function \code{\link[=create_MeasuresDataFrame]{create_Measure
 
 \item{SampleNames}{\link{character} character vector with sample names}
 
-\item{ThetaMatrix}{\link{numeric matrix} or \link{character} input of systematic and individual errors.}
+\item{ThetaMatrix}{\link{matrix} or \link{character} input of systematic and individual errors.}
 
-\item{PalaeodoseObject}{\link{BayLum.List} (with default NULL) Output of the \link{Palaeodose_Computation}}
+\item{PalaeodoseObject}{\link{list} (with default NULL) Output of the \code{\link[=Palaeodose_Computation]{Palaeodose_Computation()}}}
 
-\item{StratiConstraints}{\link{numeric matrix } or \link{character} The stratigraphic relation between samples}
+\item{StratiConstraints}{\link{matrix} or \link{character} The stratigraphic relation between samples}
 
 \item{model}{\link{character} (optional) custom Jags model}
 
@@ -138,8 +138,11 @@ If there is a strict order as a stratigraphic constraints, the user would be abl
 DATA <- list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot)
 \dontrun{
 ### run standard
- Output <- Compute_AgeS_D(DATA = DATA, Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
- ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "Independance",
+ Output <- Compute_AgeS_D(DATA = DATA,
+ Nb_sample = OSLJingbian$Nb_Sample,
+ SampleNames = OSLJingbian$SampleNames,
+ ThetaMatrix = OSLJingbian$ThetaMatrix,
+ ‡prior = "Independance",
  PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
  Iter = 2000, burnin = 50000, t = 10)
 
