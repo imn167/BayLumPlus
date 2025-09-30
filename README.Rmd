@@ -61,7 +61,7 @@ We introduce a new modeling function: `Compute_AgeS_D()`, focused on Bayesian ag
 - `StrictOrder`: Uniform order on the log-scale (chain-like constraints)  
 - `StrictNicholls`: Based on the Uniform Order prior, from the original `BayLum`  
 - `Independence`: For unstructured or weakly constrained stratigraphy  
----
+
 
 ### Isotonic Distortion Framework
 
