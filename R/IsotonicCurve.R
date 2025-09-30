@@ -155,8 +155,8 @@ PlotIsotonicCurve <- function( object, level = .95) {
   network <- object[[3]]
   n = dim(df)[1]
 
-  curve = df  %>% ggplot2::ggplot(ggplot2::aes(x = .data$Unit, ymin = .data$lower, ymax = .data$upper), fill = "orange") +
-    ggplot2::geom_ribbon(alpha = .4) +
+  curve = df  %>% ggplot2::ggplot(ggplot2::aes(x = .data$Unit, ymin = .data$lower, ymax = .data$upper)) +
+    ggplot2::geom_ribbon(alpha = .4, fill = "orange") +
     ggplot2::geom_line(ggplot2::aes(y = .data$lower), color = "orange", group = 1) +
     ggplot2::geom_line(ggplot2::aes(y = .data$upper), color = "orange", group = 1) +
     ggplot2::geom_line(ggplot2::aes(y = .data$AGE), color = "orange", group = 1, linewidth =1.5) +

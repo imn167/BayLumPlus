@@ -70,7 +70,7 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
         with:
-          upload-snapshots: false
+          upload-snapshots: false #no snaps
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
           error-on: '"error"' # CMD check accepts warnings
 

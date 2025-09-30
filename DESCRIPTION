@@ -86,6 +86,6 @@ SystemRequirements: JAGS >= 4.3.2 (https://mcmc-jags.sourceforge.io/)
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
-Config/testthat/start-first: watcher, parallel*
+
 Remotes: 
     IsotoneOptimization=github::Xiwen1997/IsotoneRpkg
