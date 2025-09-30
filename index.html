@@ -92,7 +92,7 @@
 <code><a href="reference/network_vizualization.html">network_vizualization()</a></code> – visualizes stratigraphic constraints as a graph<br>
 </li>
 <li>
-<code><a href="reference/remove_transitive_edges.html">remove_transitive_edges()</a></code> – removes redundant edges implied by transitivity</li>
+<code><a href="reference/remove_transitive_edges.html">remove_transitive_edges()</a></code> – called Edge Pruner Algorithm (EPA), it removes redundant edges implied by transitivity</li>
 </ul>
 <p>These tools help simplify and explore complex stratigraphic relationships more intuitively.</p>
 <hr>
@@ -104,10 +104,14 @@
 <p>We introduce a new modeling function: <code><a href="reference/Compute_AgeS_D.html">Compute_AgeS_D()</a></code>, focused on Bayesian age estimation under various prior structures.</p>
 <p><strong>Supported priors include:</strong></p>
 <ul>
-<li><p><code>StrictOrder</code>: Uniform order on the log-scale (chain-like constraints)</p></li>
-<li><p><code>StrictNicholls</code>: Based on the Uniform Order prior, from the original <code>BayLum</code></p></li>
-<li><h2 id="independence-for-unstructured-or-weakly-constrained-stratigraphy">
-<code>Independence</code>: For unstructured or weakly constrained stratigraphy</h2></li>
+<li>
+<code>StrictOrder</code>: Uniform order on the log-scale (chain-like constraints)<br>
+</li>
+<li>
+<code>StrictNicholls</code>: Based on the Uniform Order prior, from the original <code>BayLum</code><br>
+</li>
+<li>
+<code>Independence</code>: For unstructured or weakly constrained stratigraphy</li>
 </ul>
 </div>
 <div class="section level3">
@@ -186,9 +190,11 @@
 <li>Frederik Harly Baumgarten <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-4374-5948" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Nicolas Frerebeau <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-5759-4944" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>
-<a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a> <br><small class="roles"> Copyright holder, funder </small>   </li>
-<li>
 <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a> <br><small class="roles"> Funder </small>   </li>
+<li>
+<a href="https://quinaworld.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_Quina.png"></a> <br><small class="roles"> Funder </small>   </li>
+<li>
+<a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a> <br><small class="roles"> Copyright holder, funder </small>   </li>
 <li>
 <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a> <br><small class="roles"> Funder </small>   </li>
 <li><a href="authors.html">More about authors...</a></li>
@@ -202,7 +208,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
+  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://quinaworld.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_Quina.png"></a>, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
