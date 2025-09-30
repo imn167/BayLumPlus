@@ -46,7 +46,7 @@ Please note that development versions may change day by day.
 To support the modeling of stratigraphic relationships, we introduce graph-based functions:
 
 - `network_vizualization()` – visualizes stratigraphic constraints as a graph  
-- `remove_transitive_edges()` – removes redundant edges implied by transitivity  
+- `remove_transitive_edges()` – called Edge Pruner Algorithm (EPA), it removes redundant edges implied by transitivity  
 
 These tools help simplify and explore complex stratigraphic relationships more intuitively.
 
@@ -61,7 +61,6 @@ We introduce a new modeling function: `Compute_AgeS_D()`, focused on Bayesian ag
 - `StrictOrder`: Uniform order on the log-scale (chain-like constraints)  
 - `StrictNicholls`: Based on the Uniform Order prior, from the original `BayLum`  
 - `Independence`: For unstructured or weakly constrained stratigraphy  
-
 
 ### Isotonic Distortion Framework
 
