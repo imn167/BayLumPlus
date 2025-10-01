@@ -76,9 +76,16 @@ jobs:
           no-vignettes: ${{ runner.os == 'macOS' && 'true' || 'false' }}
 
       - name: System diagnostics
-        run: |
+      if: runner.os = 'macOS'
+      run: |
+          echo "=== Hardware Overview ==="
           system_profiler SPHardwareDataType
+          echo "=== CPU Cores ==="
           sysctl hw.ncpu
+          echo "=== Memory ==="
           sysctl hw.memsize
+          echo "=== Current Load ==="
+          top -l 1 | head -10
+
 
 
