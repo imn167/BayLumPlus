@@ -76,7 +76,7 @@ jobs:
           no-vignettes: ${{ runner.os == 'macOS' && 'true' || 'false' }}
 
       - name: System diagnostics
-      if: runner.os = 'macOS'
+      if: runner.os == 'macOS'
       run: |
           echo "=== Hardware Overview ==="
           system_profiler SPHardwareDataType
