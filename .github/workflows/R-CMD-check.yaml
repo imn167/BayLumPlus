@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-14,   r: 'release'}
+          - {os: macos-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
@@ -44,6 +44,16 @@ jobs:
       - name: Install JAGS on macOS
         if: runner.os == 'macOS'
         run: brew install jags
+
+      - name: System diagnostics
+      if: runner.os == 'macOS'
+      run: |
+          echo "=== CPU Cores ==="
+          sysctl hw.ncpu
+          echo "=== Memory ==="
+          sysctl hw.memsize
+          echo "=== Current Load ==="
+          top -l 1 | head -10
 
       - name: Symlink JAGS for compatibility
         if: runner.os == 'macOS'
@@ -75,17 +85,7 @@ jobs:
           error-on: '"error"' # CMD check accepts warnings
           no-vignettes: ${{ runner.os == 'macOS' && 'true' || 'false' }}
 
-      - name: System diagnostics
-      if: runner.os == 'macOS'
-      run: |
-          echo "=== Hardware Overview ==="
-          system_profiler SPHardwareDataType
-          echo "=== CPU Cores ==="
-          sysctl hw.ncpu
-          echo "=== Memory ==="
-          sysctl hw.memsize
-          echo "=== Current Load ==="
-          top -l 1 | head -10
+
 
 
 
