@@ -45,15 +45,7 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install jags
 
-      - name: System diagnostics
-      if: runner.os == 'macOS'
-      run: |
-          echo "=== CPU Cores ==="
-          sysctl hw.ncpu
-          echo "=== Memory ==="
-          sysctl hw.memsize
-          echo "=== Current Load ==="
-          top -l 1 | head -10
+
 
       - name: Symlink JAGS for compatibility
         if: runner.os == 'macOS'
