@@ -66,8 +66,9 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item Université Bordeaux Montaigne (Institutional contributor) [copyright holder, funder]
   \item CNRS (Institutional contributor) [funder]
+  \item QuinaWorld (Institutional contributor) [funder]
+  \item Université Bordeaux Montaigne (Institutional contributor) [copyright holder, funder]
   \item LabEx Sciences archéologiques de Bordeaux (Institutional contributor) [funder]
 }
 

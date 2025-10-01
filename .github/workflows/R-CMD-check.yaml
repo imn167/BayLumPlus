@@ -73,5 +73,12 @@ jobs:
           upload-snapshots: false #no snaps
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
           error-on: '"error"' # CMD check accepts warnings
+          args: ${{ runner.os == 'macOS' && '--no-vignettes --no-build-vignettes' || '' }}
+
+      - name: System diagnostics
+        run: |
+          system_profiler SPHardwareDataType
+          sysctl hw.ncpu
+          sysctl hw.memsize
 
 
