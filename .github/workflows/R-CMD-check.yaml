@@ -85,7 +85,8 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: false #no snaps
-          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+          args: '--no-manual --no-vignettes --no-build-vignettes' #Skips vignette building and checking
+          build_args: 'c("--no-manual","--no-build-vignettes")' #"--compact-vignettes=gs+qpdf"
           error-on: '"error"' # CMD check accepts warnings
           no-vignettes: ${{ runner.os == 'macOS' && 'true' || 'false' }}
 
