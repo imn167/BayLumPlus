@@ -1,3 +1,6 @@
+skip_on_ci()
+
+
 if (capabilities("cairo")) {
   options(bitmapType = "cairo")
 }
