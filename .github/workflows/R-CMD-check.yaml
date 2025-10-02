@@ -21,10 +21,10 @@ jobs:
       matrix:
         config:
           - {os: macos-14,   r: 'release'}
-          # - {os: windows-latest, r: 'release'}
-          # - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
-          # - {os: ubuntu-latest,   r: 'release'}
-          # - {os: ubuntu-latest,   r: 'oldrel-1'}
+          - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'oldrel-1'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -85,8 +85,8 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: false #no snaps
-          args: 'c("--no-manual", "--no-vignettes")'
-          build_args: 'c("--no-build-vignettes")'   #'c("--no-manual","--compact-vignettes=gs+qpdf")'
+          #args: 'c("--no-manual", "--no-vignettes")'
+          build_args:  'c("--no-manual","--compact-vignettes=gs+qpdf")' # 'c("--no-build-vignettes")'
           error-on: '"error"' # CMD check accepts warnings
 
 
