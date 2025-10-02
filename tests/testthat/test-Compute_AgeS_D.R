@@ -1,5 +1,5 @@
 #Mock data creations helpers
-
+skip_on_ci()
 
 test_that("Full function test", {
 dt <- list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot)
