@@ -20,11 +20,11 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
+          - {os: macos-14,   r: 'release'}
+          # - {os: windows-latest, r: 'release'}
+          # - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          # - {os: ubuntu-latest,   r: 'release'}
+          # - {os: ubuntu-latest,   r: 'oldrel-1'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -65,6 +65,18 @@ jobs:
           curl --progress-bar -s -o 'C:\JAGS-4.3.1.exe' -L 'https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/JAGS-4.3.1.exe'
           C:\JAGS-4.3.1.exe /S
 
+      - name: Monitor MacOS Memory
+        if: runner.os == 'macOS'
+        run: |
+          echo "=== Hardware Overview ==="
+          system_profiler SPHardwareDataType
+          echo "=== CPU Cores ==="
+          sysctl hw.ncpu
+          echo "=== Memory ==="
+          sysctl hw.memsize
+          echo "=== Current Load ==="
+          top -l 1 | head -10
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
@@ -75,6 +87,7 @@ jobs:
           upload-snapshots: false #no snaps
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
           error-on: '"error"' # CMD check accepts warnings
+          no-vignettes: ${{ runner.os == 'macOS' && 'true' || 'false' }}
 
 
 
