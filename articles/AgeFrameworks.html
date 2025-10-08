@@ -147,41 +147,36 @@ with a row of ones)<br>
 <p>Note that several prior distributions can be tested:</p>
 <ul>
 <li>
+<strong>Without stratigraphic constraints:</strong>
+<ul>
+<li><em>unconstrained_Jeffrey</em></li>
+</ul>
+</li>
+<li>
 <strong>Under strict order:</strong>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>A</mi><mn>1</mn></msub><mo>≤</mo><mi>⋯</mi><mo>,</mo><mo>≤</mo><msub><mi>A</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">A_1 \leq \cdots, \leq A_n</annotation></semantics></math><ul>
-<li>Nicholls &amp; Jones applied directly to ages (see section 4 in
-<span class="citation">Nicholls and Jones (2001)</span> )</li>
-<li>Approached Jeffreys:
-<ul>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>A</mi><mn>1</mn></msub><mo>≤</mo><mi>⋯</mi><mo>,</mo><mo>≤</mo><msub><mi>A</mi><mi>n</mi></msub><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\lbrace A_1 \leq \cdots, \leq A_n \rbrace</annotation></semantics></math><ul>
 <li>
-<em>Conditional</em> (using successive conditional processing)</li>
+<em>StrictNicholls&amp;Jones</em> : Nicholls &amp; Jones applied
+directly to ages (see section 4 in <span class="citation">Nicholls and
+Jones (2001)</span> )</li>
 <li>
-<em>StrictOrder</em> (using Uniform Order, UO)</li>
-</ul>
-</li>
-<li>BayLum (the current BayLum implementation on CRAN)</li>
-</ul>
-</li>
-<li>
-<strong>Without constraints:</strong>
-<ul>
-<li>Independence</li>
+<em>constrained_Jeffrey</em> : Approached Jeffreys form</li>
 </ul>
 </li>
 </ul>
-<p>It is important to note that only BayLum prior accepts partial order
-constraints. For others priors there is no need to specify the parameter
+<p>For more information use <code><a href="../reference/ModelAgePrior.html">help(ModelAgePrior)</a></code>.</p>
+<p>For these priors there is no need to specify the parameter
 <code>StratiConstraints</code> as it is supposed to be the
 <strong>strict order</strong> or no constraints at all.</p>
 <p>You can use the <code><a href="../reference/extract_Jags_model.html">extract_Jags_model()</a></code> function to check
-the list of all available models and data structures in
+all available models and data structures in
 <strong>BayLumPlus</strong>.</p>
 <p>To illustrate usage, the following code snippet uses the OSL dataset
 from Jingbian, China<br>
 (see the package documentation for more details).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"OSLJingbian"</span><span class="op">)</span> </span>
-<span><span class="op">?</span><span class="va">OSLJingbian</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/help.html" class="external-link">help</a></span><span class="op">(</span><span class="va">OSLJingbian</span><span class="op">)</span></span></code></pre></div>
 <p>We can use the <strong>Independance</strong> prior for our first
 bayesian computation. The following code snippet produces this
 scenario:</p>
@@ -190,25 +185,26 @@ scenario:</p>
 <span>  </span>
 <span>  DATA <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>D <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">D</span>, sD <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">sD</span>, ddot <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">ddot</span><span class="op">)</span>,</span>
 <span>  Nb_sample <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">Nb_Sample</span>, SampleNames <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">SampleNames</span>,</span>
-<span>  ThetaMatrix <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">ThetaMatrix</span>, prior <span class="op">=</span> <span class="st">"Independance"</span>, </span>
+<span>  ThetaMatrix <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">ThetaMatrix</span>, prior <span class="op">=</span> <span class="st">"unconstrained_Jeffrey"</span>, </span>
 <span>  jags_method <span class="op">=</span> <span class="st">"rjags"</span>,</span>
 <span>  PriorAge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1400</span><span class="op">)</span>, <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">Nb_Sample</span><span class="op">)</span>,</span>
 <span>  Iter <span class="op">=</span> <span class="fl">2000</span>, burnin <span class="op">=</span> <span class="fl">50000</span>, t <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span> </span></code></pre></div>
 <p>Note that the data <code>OSLJingbian</code> already have the object
 <em>Output</em>, which is the return object of the code above.</p>
-<p>Then the following code snippet shows when we use the <em>approached
+<p>Then the following code snippet shows when we use the <em>constrained
 Jeffrey</em> prior for the second bayesian model</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">JingbianUO</span> <span class="op">=</span> <span class="fu"><a href="../reference/Compute_AgeS_D.html">Compute_AgeS_D</a></span><span class="op">(</span></span>
 <span>  </span>
 <span>  DATA <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>D <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">D</span>, sD <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">sD</span>, ddot <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">ddot</span><span class="op">)</span>,</span>
 <span>  Nb_sample <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">Nb_Sample</span>, SampleNames <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">SampleNames</span>,</span>
-<span>  ThetaMatrix <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">ThetaMatrix</span>, prior <span class="op">=</span> <span class="st">"Conditional"</span>, </span>
+<span>  ThetaMatrix <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">ThetaMatrix</span>, prior <span class="op">=</span> <span class="st">"constrained_Jeffrey"</span>, </span>
 <span>  jags_method <span class="op">=</span> <span class="st">"rjags"</span>,</span>
 <span>  PriorAge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1400</span><span class="op">)</span>, <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">Nb_Sample</span><span class="op">)</span>,</span>
 <span>  Iter <span class="op">=</span> <span class="fl">2000</span>, burnin <span class="op">=</span> <span class="fl">50000</span>, t <span class="op">=</span> <span class="fl">10</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required namespace: rjags</span></span></code></pre></div>
 <p>Finally, the snippet code when using the <em>Nicholls &amp;
 Jones</em> prior</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -216,7 +212,7 @@ Jones</em> prior</p>
 <span>  </span>
 <span>  DATA <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>D <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">D</span>, sD <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">sD</span>, ddot <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">ddot</span><span class="op">)</span>,</span>
 <span>  Nb_sample <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">Nb_Sample</span>, SampleNames <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">SampleNames</span>,</span>
-<span>  ThetaMatrix <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">ThetaMatrix</span>, prior <span class="op">=</span> <span class="st">"StrictNicholls"</span>, </span>
+<span>  ThetaMatrix <span class="op">=</span> <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">ThetaMatrix</span>, prior <span class="op">=</span> <span class="st">"StrictNicholls&amp;Jones"</span>, </span>
 <span>  jags_method <span class="op">=</span> <span class="st">"rjags"</span>,</span>
 <span>  PriorAge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1400</span><span class="op">)</span>, <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">Nb_Sample</span><span class="op">)</span>,</span>
 <span>  Iter <span class="op">=</span> <span class="fl">2000</span>, burnin <span class="op">=</span> <span class="fl">50000</span>, t <span class="op">=</span> <span class="fl">10</span></span>
@@ -319,114 +315,114 @@ including the data.frame <code>Ages</code>:</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">14.62844</td>
-<td align="right">0.6347027</td>
-<td align="right">14.14845</td>
+<td align="right">14.63564</td>
+<td align="right">0.6312375</td>
+<td align="right">13.80877</td>
 <td align="left">D3_81_33</td>
 <td align="right">1</td>
-<td align="right">13.99567</td>
-<td align="right">15.24116</td>
-<td align="right">13.35107</td>
-<td align="right">15.88576</td>
+<td align="right">13.99494</td>
+<td align="right">15.23440</td>
+<td align="right">13.40082</td>
+<td align="right">15.94120</td>
 </tr>
 <tr class="even">
-<td align="right">14.70381</td>
-<td align="right">0.6150626</td>
-<td align="right">14.03645</td>
+<td align="right">14.71020</td>
+<td align="right">0.6106724</td>
+<td align="right">15.10305</td>
 <td align="left">D3_81_34</td>
 <td align="right">2</td>
-<td align="right">14.06835</td>
-<td align="right">15.27868</td>
-<td align="right">13.48405</td>
-<td align="right">15.93601</td>
+<td align="right">14.07069</td>
+<td align="right">15.27121</td>
+<td align="right">13.52500</td>
+<td align="right">15.96573</td>
 </tr>
 <tr class="odd">
-<td align="right">14.73232</td>
-<td align="right">0.6116058</td>
-<td align="right">15.27280</td>
+<td align="right">14.73769</td>
+<td align="right">0.6055334</td>
+<td align="right">14.45041</td>
 <td align="left">D3_81_35</td>
 <td align="right">3</td>
-<td align="right">14.09015</td>
-<td align="right">15.28876</td>
-<td align="right">13.53775</td>
-<td align="right">15.96624</td>
+<td align="right">14.10488</td>
+<td align="right">15.29663</td>
+<td align="right">13.57097</td>
+<td align="right">15.99261</td>
 </tr>
 <tr class="even">
-<td align="right">14.77170</td>
-<td align="right">0.6033786</td>
-<td align="right">14.89183</td>
+<td align="right">14.77688</td>
+<td align="right">0.5995986</td>
+<td align="right">14.85089</td>
 <td align="left">D3_81_36</td>
 <td align="right">4</td>
-<td align="right">14.13348</td>
-<td align="right">15.31932</td>
-<td align="right">13.59258</td>
-<td align="right">15.98505</td>
+<td align="right">14.13684</td>
+<td align="right">15.32685</td>
+<td align="right">13.61621</td>
+<td align="right">16.00553</td>
 </tr>
 <tr class="odd">
-<td align="right">14.78426</td>
-<td align="right">0.6013973</td>
-<td align="right">15.13346</td>
+<td align="right">14.79002</td>
+<td align="right">0.5994387</td>
+<td align="right">14.40252</td>
 <td align="left">D3_81_37</td>
 <td align="right">5</td>
-<td align="right">14.14436</td>
-<td align="right">15.32950</td>
-<td align="right">13.60377</td>
-<td align="right">15.98445</td>
+<td align="right">14.15538</td>
+<td align="right">15.33617</td>
+<td align="right">13.62542</td>
+<td align="right">16.02419</td>
 </tr>
 <tr class="even">
-<td align="right">14.84831</td>
-<td align="right">0.6045395</td>
-<td align="right">14.96547</td>
+<td align="right">14.85316</td>
+<td align="right">0.6011624</td>
+<td align="right">14.40252</td>
 <td align="left">D3_81_38</td>
 <td align="right">6</td>
-<td align="right">14.18818</td>
-<td align="right">15.38472</td>
-<td align="right">13.64815</td>
-<td align="right">16.06241</td>
+<td align="right">14.21181</td>
+<td align="right">15.40505</td>
+<td align="right">13.69094</td>
+<td align="right">16.09637</td>
 </tr>
 <tr class="odd">
-<td align="right">14.86652</td>
-<td align="right">0.6069282</td>
-<td align="right">14.85696</td>
+<td align="right">14.87198</td>
+<td align="right">0.6037002</td>
+<td align="right">15.98767</td>
 <td align="left">D3_81_39</td>
 <td align="right">7</td>
-<td align="right">14.21938</td>
-<td align="right">15.41678</td>
-<td align="right">13.66837</td>
-<td align="right">16.08435</td>
+<td align="right">14.22434</td>
+<td align="right">15.41324</td>
+<td align="right">13.70238</td>
+<td align="right">16.11884</td>
 </tr>
 <tr class="even">
-<td align="right">14.86652</td>
-<td align="right">0.6069282</td>
-<td align="right">14.85696</td>
+<td align="right">14.87198</td>
+<td align="right">0.6037002</td>
+<td align="right">15.98767</td>
 <td align="left">D3_81_40</td>
 <td align="right">8</td>
-<td align="right">14.21938</td>
-<td align="right">15.41678</td>
-<td align="right">13.66837</td>
-<td align="right">16.08435</td>
+<td align="right">14.22434</td>
+<td align="right">15.41324</td>
+<td align="right">13.70238</td>
+<td align="right">16.11884</td>
 </tr>
 <tr class="odd">
-<td align="right">14.86675</td>
-<td align="right">0.6069006</td>
-<td align="right">14.85696</td>
+<td align="right">14.87227</td>
+<td align="right">0.6037580</td>
+<td align="right">15.98767</td>
 <td align="left">D3_81_41</td>
 <td align="right">9</td>
-<td align="right">14.21938</td>
-<td align="right">15.41678</td>
-<td align="right">13.66837</td>
-<td align="right">16.08435</td>
+<td align="right">14.22443</td>
+<td align="right">15.41320</td>
+<td align="right">13.70253</td>
+<td align="right">16.11873</td>
 </tr>
 <tr class="even">
-<td align="right">14.92776</td>
-<td align="right">0.6502774</td>
-<td align="right">16.22697</td>
+<td align="right">14.93136</td>
+<td align="right">0.6451963</td>
+<td align="right">14.11807</td>
 <td align="left">D3_81_42</td>
 <td align="right">10</td>
-<td align="right">14.22356</td>
-<td align="right">15.47908</td>
-<td align="right">13.64811</td>
-<td align="right">16.22454</td>
+<td align="right">14.22384</td>
+<td align="right">15.47776</td>
+<td align="right">13.71033</td>
+<td align="right">16.24206</td>
 </tr>
 </tbody>
 </table>
@@ -507,7 +503,7 @@ Artificial Intelligence</em>, 36:8575–83. 8.
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://quinaworld.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_Quina.png" width="100"></a>, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
+  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/LogoERC.png" width="100"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://quinaworld.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_Quina.png" width="100"></a>, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/logo-lmjl.png" width="100"></a>, <a href="https://www.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo-UnivRennes.png" width="100"></a>, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
