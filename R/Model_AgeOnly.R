@@ -3,16 +3,18 @@
 #' @description
 #' JAGS models used to estimate true OSL ages based on data obtained from the Bayesian OSL analysis performed
 #' by the function  \code{\link{Palaeodose_Computation}}.
+#' Note that \emph{unconstrained}, \emph{uniform_order}, \emph{Nicholls&Jones} are model base on the likelihood \eqn{M_i \sim \mathcal{N}(A_i, \sigma_i^2)} which is different from the
+#' \emph{OSL} model.
 #'
+#'@md
 #' @details
-#' These models take as input the estimated dose response ($D$) from  \code{\link{Palaeodose_Computation}}
+#' These models take as input the estimated dose response (D) from  \code{\link{Palaeodose_Computation}}
 #' along with the structured data matrix computed by  \code{\link{create_MeasuresDataFrame}}.
 #' The models are designed to refine age estimation by integrating these measurements into a Bayesian framework.
-#'@md
 #' @references
 #' To cite this package, please use: citation("BayLum")
 
-#'@format BayLum's Old Age Model (wrong vector law)
+#'@format oldBaylum : BayLum's Old Age Model (wrong vector law)
 
 # Jeffreys <- " model {
 #   ###### Likelyhood ####
@@ -52,7 +54,7 @@
 
 
 
-#'@format Jeffrey's Age Model with log-uniform order settings
+#'@format constrained_Jeffrey : Jeffrey's Age Model with log-uniform order settings
 # StrictOrder <- " model {
 #   ###### Likelyhood ####
 #   for (i in 1:I) {
@@ -80,7 +82,7 @@
 # }"
 
 
-#'@format Nicholls' Age Model applied on ages directly
+#'@format StrcitNicholls&Jones : Nicholls&Jones' Age Model applied on ages directly
 # Strict_nicholls <- "model {
 #   ###### Likelyhood ####
 #   for (i in 1:I) {
@@ -150,7 +152,7 @@
 #
 # }"
 
-#'@format Jeffrey's Age Model with conditional setting
+#@format Jeffrey's Age Model with conditional setting
 # Conditional <- " model {
 #   ###### Likelyhood ####
 #   for (i in 1:I) {
@@ -180,7 +182,7 @@
 #
 # }"
 
-#'@format Independance Age Model
+#'@format unconstrained_jeffrey : unconstrained Age Model (no stratigraphic constraints)
 
 # Independance <-  "model {
 #   #### Likelyhood #####
@@ -208,7 +210,7 @@
 # }"
 
 
-#'@format Approached Jeffrey Model for simulated data
+#'@format unconstrained : Age uniformly distributed over the period of study
 
 # Classical <-  "model {
 #   #### Likelyhood #####
@@ -228,7 +230,7 @@
 #
 # }"
 
-#'@format Order Model for simulated data
+#'@format uniform_order : Age uniformly ordered over the period of study
 #
 # ClassicalOrder <-  "model {
 #   #### Likelyhood #####
@@ -251,7 +253,7 @@
 #
 # }"
 
-#' @format Nicholls Model for simulated data
+#' @format Nicholls&Jones : Nicholls&Jones prior applied directly to Ages. The duration \eqn{A_n-A_1 \sim \mathcal{U}(0, T_2-T1)}
 # ClassicalNicholls <-  "model {
 #   #### Likelyhood #####
 #   for (i in 1:I) {
@@ -296,5 +298,7 @@
 # ModelAgePrior$classical <- Classical
 # ModelAgePrior$classicalorder <- ClassicalOrder
 # ModelAgePrior$classicalnicholls <- ClassicalNicholls
+
+# names(ModelAgePrior) #then change the names we want to change
 
 # usethis::use_data(ModelAgePrior, overwrite = T)

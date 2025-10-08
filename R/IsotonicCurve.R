@@ -24,6 +24,11 @@
 IsotonicCurve <- function(StratiConstraints, object, levels = c(.68,.95), path = tempdir(), interactive) {
 
   ##### VARIABLES #######@
+  ## Forbid user from using anything other than unconstrained_Jeffrey
+  if(!is.nan(object$prior)) {
+    if(object$prior != "unconstrained_Jeffrey") stop(paste("The Posterior should be computed with the prior unconstrained_Jeffrey not", object$prior))
+  }
+
   #get all mcmc samples
   sample = runjags::combine.mcmc(object$Sampling) ## mcmc sample
   SampleNames = object$Ages$SAMPLE

@@ -80,18 +80,17 @@ The function can also require a matrix that summarizes the stratigraphic constra
 
 Note that several prior distributions can be tested:
 
--   **Under strict order:** $A_1 \leq \cdots, \leq A_n$
-    -   Nicholls & Jones applied directly to ages (see section 4 in @nicholls2001 )
-    -   Approached Jeffreys:
-        -   *Conditional* (using successive conditional processing)
-        -   *StrictOrder* (using Uniform Order, UO)
-    -   BayLum (the current BayLum implementation on CRAN)
--   **Without constraints:**
-    -   Independence
+-   **Without stratigraphic constraints:**
+    -   *unconstrained_Jeffrey* 
+-   **Under strict order:** $\lbrace A_1 \leq \cdots, \leq A_n \rbrace$
+    -   *StrictNicholls&Jones* : Nicholls & Jones applied directly to ages (see section 4 in @nicholls2001 )
+    -   *constrained_Jeffrey* : Approached Jeffreys form
+        
+For more information use `help(ModelAgePrior)`.
 
-It is important to note that only BayLum prior accepts partial order constraints. For others priors there is no need to specify the parameter `StratiConstraints` as it is supposed to be the **strict order** or no constraints at all. 
+For these priors there is no need to specify the parameter `StratiConstraints` as it is supposed to be the **strict order** or no constraints at all. 
 
-You can use the `extract_Jags_model()` function to check the list of all available models and data structures in **BayLumPlus**.
+You can use the `extract_Jags_model()` function to check all available models and data structures in **BayLumPlus**.
 
 
 To illustrate usage, the following code snippet uses the OSL dataset from Jingbian, China\
@@ -99,7 +98,7 @@ To illustrate usage, the following code snippet uses the OSL dataset from Jingbi
 
 ```{r OSLJingbian China}
 data("OSLJingbian") 
-?OSLJingbian
+help(OSLJingbian)
 ```
 
 We can use the **Independance** prior for our first bayesian computation. The following code snippet produces this scenario:
@@ -109,7 +108,7 @@ Output = Compute_AgeS_D(
   
   DATA = list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot),
   Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
-  ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "Independance", 
+  ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "unconstrained_Jeffrey", 
   jags_method = "rjags",
   PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
   Iter = 2000, burnin = 50000, t = 10
@@ -118,14 +117,14 @@ Output = Compute_AgeS_D(
 
 Note that the data `OSLJingbian` already have the object *Output*, which is the return object of the code above.
 
-Then the following code snippet shows when we use the *approached Jeffrey* prior for the second bayesian model
+Then the following code snippet shows when we use the *constrained Jeffrey* prior for the second bayesian model
 
 ```{r  logUniformPrior, results='hide',  fig.show='hide'}
 JingbianUO = Compute_AgeS_D(
   
   DATA = list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot),
   Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
-  ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "Conditional", 
+  ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "constrained_Jeffrey", 
   jags_method = "rjags",
   PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
   Iter = 2000, burnin = 50000, t = 10
@@ -139,7 +138,7 @@ JingbianNicholls = Compute_AgeS_D(
   
   DATA = list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot),
   Nb_sample = OSLJingbian$Nb_Sample, SampleNames = OSLJingbian$SampleNames,
-  ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "StrictNicholls", 
+  ThetaMatrix = OSLJingbian$ThetaMatrix, prior = "StrictNicholls&Jones", 
   jags_method = "rjags",
   PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
   Iter = 2000, burnin = 50000, t = 10

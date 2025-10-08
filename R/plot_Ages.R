@@ -18,7 +18,8 @@
 #' @param plot_mode [character] (*with default*): allows to switch from displaying ages as points with lines (`"ages"`)
 #' for the credible intervals to densities (`"density"`)
 #'
-#'  @param model [character] "BayLum" by default. Name of the used Bayesian Age model (see `ModelAgePrior`).
+#' @param model [character] "BayLum" by default. Name of the used Bayesian Age model (see `ModelAgePrior`).
+#'
 #' @param ... further arguments to control the plot output,
 #' standard arguments are: `cex`, `xlim`, `main`, `xlab`, `col` further (non-standard) arguments
 #' are: `grid` (`TRUE`/`FALSE`), `legend` (`TRUE`/`FALSE`), `legend.text` ([character] input needed), `legend.pos` [graphics::legend], `legend.cex`. Additional arguments: `d_scale` (scales density plots), `show_ages` (add ages to density  plots)

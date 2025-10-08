@@ -5,21 +5,19 @@
 \alias{ModelAgePrior}
 \title{JAGS Models for OSL Age Estimation in \code{\link{Compute_AgeS_D}}}
 \format{
-BayLum's Old Age Model (wrong vector law)
+oldBaylum : BayLum's Old Age Model (wrong vector law)
 
-Jeffrey's Age Model with log-uniform order settings
+constrained_Jeffrey : Jeffrey's Age Model with log-uniform order settings
 
-Nicholls' Age Model applied on ages directly
+StrcitNicholls&Jones : Nicholls&Jones' Age Model applied on ages directly
 
-Jeffrey's Age Model with conditional setting
+unconstrained_jeffrey : unconstrained Age Model (no stratigraphic constraints)
 
-Independance Age Model
+unconstrained : Age uniformly distributed over the period of study
 
-Approached Jeffrey Model for simulated data
+uniform_order : Age uniformly ordered over the period of study
 
-Order Model for simulated data
-
-Nicholls Model for simulated data
+Nicholls&Jones : Nicholls&Jones prior applied directly to Ages. The duration \eqn{A_n-A_1 \sim \mathcal{U}(0, T_2-T1)}
 }
 \usage{
 ModelAgePrior
@@ -27,9 +25,11 @@ ModelAgePrior
 \description{
 JAGS models used to estimate true OSL ages based on data obtained from the Bayesian OSL analysis performed
 by the function  \code{\link{Palaeodose_Computation}}.
+Note that \emph{unconstrained}, \emph{uniform_order}, \emph{Nicholls&Jones} are model base on the likelihood \eqn{M_i \sim \mathcal{N}(A_i, \sigma_i^2)} which is different from the
+\emph{OSL} model.
 }
 \details{
-These models take as input the estimated dose response ($D$) from  \code{\link{Palaeodose_Computation}}
+These models take as input the estimated dose response (D) from  \code{\link{Palaeodose_Computation}}
 along with the structured data matrix computed by  \code{\link{create_MeasuresDataFrame}}.
 The models are designed to refine age estimation by integrating these measurements into a Bayesian framework.
 }

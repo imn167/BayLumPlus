@@ -12,7 +12,7 @@ Jingb_Theta = Theta = as.matrix(read.csv("R/DataManipulation/CovarianceMatrix_Ji
 JingbianUnconstrained = Compute_AgeS_D(list(D = Jingbian$D, sD = Jingbian$Sigma_D, ddot = Jingbian$d,
                                             sddot = Jingbian$Sigma_d),
                                        Nb_sample = Jingb_Nb_sample, SampleNames = Jingb_SampleNames,
-                                       ThetaMatrix = Jingb_Theta, prior = "Independance",
+                                       ThetaMatrix = Jingb_Theta, prior = "unconstrained_Jeffrey",
                                        PriorAge = rep(c(1, 1400), Jingb_Nb_sample),
                                        Iter = 2000, burnin = 50000, t = 10
                                        )

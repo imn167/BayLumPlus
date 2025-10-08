@@ -26,9 +26,9 @@ If the length of the provided \link{character} vector is shorter than the real n
 the last sample first.}
 
 \item{plot_mode}{\link{character} (\emph{with default}): allows to switch from displaying ages as points with lines (\code{"ages"})
-for the credible intervals to densities (\code{"density"})
+for the credible intervals to densities (\code{"density"})}
 
-@param model \link{character} "BayLum" by default. Name of the used Bayesian Age model (see \code{ModelAgePrior}).}
+\item{model}{\link{character} "BayLum" by default. Name of the used Bayesian Age model (see \code{ModelAgePrior}).}
 
 \item{...}{further arguments to control the plot output,
 standard arguments are: \code{cex}, \code{xlim}, \code{main}, \code{xlab}, \code{col} further (non-standard) arguments

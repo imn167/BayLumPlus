@@ -153,7 +153,7 @@ Compute_AgeS_D <- function(
     adapt = 1000,
     t = 5, #thin
     n.chains = 3,
-    prior = "Jeffreys",
+    prior = "unconstrained_jeffrey",
     PriorAge = rep(c(0.01, 100), Nb_sample),
     jags_method = "rjparallel",
     autorun = F,
@@ -175,7 +175,7 @@ Compute_AgeS_D <- function(
 
   ### JagsRun
   ## liste of data
-   if (prior == "StrictOrder" | prior == "StrictNicholls" | prior == "Independance" | prior =="Conditional"  ) {
+   if (prior == "constrained_Jeffrey" | prior == "StrictNicholls&Jones" | prior == "unconstrained_Jeffrey" | prior =="Conditional"  ) {
      dataList = list(
        "I" = Nb_sample,
        "Theta" = ThetaMatrix,
@@ -186,7 +186,7 @@ Compute_AgeS_D <- function(
      )
    }
 
-  else if (startsWith(prior, "classical")) {
+  else if (prior == "unconstrained" | prior == "uniform_order" | prior == "Nicholls&Jones") {
     dataList = list(
       "I" = Nb_sample,
       "M" = DATA$M,
@@ -233,6 +233,7 @@ Compute_AgeS_D <- function(
 
   ## select Model
   if (is.null(model)) {
+    entry_model = model
     model <- ModelAgePrior[[prior]]
   }
 
@@ -241,7 +242,7 @@ Compute_AgeS_D <- function(
     #write model in tempfile
     temp_file <- tempfile(fileext = ".txt")
     writeLines(model, con = temp_file)
-    if ( prior == "Jeffreys" | prior == "Conditional" | prior == "Independance"| prior == "classical") {
+    if ( prior == "oldBayLum"  | prior == "unconstrained_Jeffrey"| prior == "unconstrained") {
 
   inits = list(
     list(u = runif(Nb_sample)), #chain 1
@@ -250,7 +251,7 @@ Compute_AgeS_D <- function(
   )
     }
 
-  else if ( prior == "StrictOrder" | prior == "classicalorder") {
+  else if ( prior == "constrained_Jeffrey" | prior == "uniform_order") {
     temp_file <- tempfile(fileext = ".txt")
     writeLines(model, con = temp_file)
     inits = list(
@@ -260,7 +261,7 @@ Compute_AgeS_D <- function(
     )
   }
 
-    else if (prior == "StrictNicholls" | prior == "classicalnicholls") {    ######
+    else if (prior == "StrictNicholls&Jones" | prior == "Nicholls&Jones") {    ######
       temp_file <- tempfile(fileext = ".txt")
       writeLines(model, con = temp_file)
       inits = list(
@@ -501,6 +502,7 @@ Compute_AgeS_D <- function(
       stringsAsFactors = FALSE
     ),
     "Sampling" = echantillon,
+    "prior" = if(is.null(entry_model)) prior else NaN,
     "PriorAge" = results_runjags$args$PriorAge,
     "StratiConstraints" = results_runjags$args$StratiConstraints,
     "CovarianceMatrix" = results_runjags$args$CovarianceMatrix,

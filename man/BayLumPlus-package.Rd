@@ -68,6 +68,8 @@ Other contributors:
 \itemize{
   \item CNRS (Institutional contributor) [funder]
   \item QuinaWorld (Institutional contributor) [funder]
+  \item ERC (Institutional contributor) [copyright holder, funder]
+  \item LMJL (Institutional contributor) [copyright holder, funder]
   \item Université Bordeaux Montaigne (Institutional contributor) [copyright holder, funder]
   \item LabEx Sciences archéologiques de Bordeaux (Institutional contributor) [funder]
 }

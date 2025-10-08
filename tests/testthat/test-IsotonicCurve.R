@@ -21,7 +21,8 @@ create_mock_object <-  function(n_samples=5) {
     "Ages" = data.frame(SAMPLE = sample_names, stringsAsFactors = F, HPD95.MIN = rep(10, n_samples), HPD95.MAX = rep(20, n_samples),
                         HPD68.MIN = rep(12, n_samples), HPD68.MAX = rep(18, n_samples),
                         AGE = rep(15, n_samples), Unit = 1:n_samples),
-    "Summary" = replicate(8, rep(1, n_samples))
+    "Summary" = replicate(8, rep(1, n_samples)),
+    prior = "unconstrained_Jeffrey"
   )
 }
 
@@ -87,6 +88,19 @@ test_that("function handles different levels correctly", {
   ))
 
 
+})
+
+### Using other prior than unconstrained_jeffrey
+test_that("restriction to unconstrained priors", {
+  skip_if_not_installed("runjags")
+
+  mock_obj <- create_mock_object()
+  mock_constraints <- create_mock_constraints()
+
+  mock_obj$prior = "other_prior"
+  expect_error(
+    IsotonicCurve(mock_constraints, mock_obj, interactive = FALSE)
+  )
 })
 
 

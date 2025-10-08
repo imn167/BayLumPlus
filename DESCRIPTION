@@ -19,6 +19,8 @@ Authors@R: c(
            comment = c(ORCID = "0000-0001-5759-4944")), 
     person("CNRS", role = "fnd", comment = "Institutional contributor"),
     person("QuinaWorld", role = "fnd", comment = "Institutional contributor"), 
+    person("ERC", role = c("cph", "fnd"), comment = "Institutional contributor"),
+    person("LMJL", role = c("cph", "fnd"), comment = "Institutional contributor"), 
     person("Université Bordeaux Montaigne", role = c("cph", "fnd"), 
     comment = "Institutional contributor"),
     person("LabEx Sciences archéologiques de Bordeaux", role = "fnd", 

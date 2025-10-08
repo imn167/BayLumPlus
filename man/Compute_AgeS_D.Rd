@@ -17,7 +17,7 @@ Compute_AgeS_D(
   adapt = 1000,
   t = 5,
   n.chains = 3,
-  prior = "Jeffreys",
+  prior = "unconstrained_jeffrey",
   PriorAge = rep(c(0.01, 100), Nb_sample),
   jags_method = "rjparallel",
   autorun = F,

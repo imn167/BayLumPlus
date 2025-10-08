@@ -9,9 +9,19 @@ authors:
   QuinaWorld:
     href: https://quinaworld.univ-rennes.fr
     html: <img src= "https://imn167.github.io/BayLumPlus/reference/figures/Logo_Quina.png" width = "100" />
+  ERC:
+    href: https://erc.europa.eu/homepage
+    html: <img src= "https://imn167.github.io/BayLumPlus/reference/figures/LogoERC.png" width = "100" />
+  LMJL:
+    href: https://erc.europa.eu/homepage
+    html: <img src= "https://imn167.github.io/BayLumPlus/reference/figures/logo-lmjl.png" width = "100" />
+  Université de Rennes:
+    href:https://www.univ-rennes.fr
+    html: <img src= "https://imn167.github.io/BayLumPlus/reference/figures/Logo-UnivRennes.png" width = "100" />
   Archéosciences Bordeaux:
     href: https://www.archeosciences-bordeaux.fr #double .fr.fr
     html: <img src="https://crp2a.github.io/BayLum/reference/figures/logo_archeosciences.jpg" />
+
   Université Bordeaux Montaigne:
     href: https://www.u-bordeaux-montaigne.fr
     html: <img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg" />
