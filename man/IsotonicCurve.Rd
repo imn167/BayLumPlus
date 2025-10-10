@@ -7,9 +7,9 @@
 IsotonicCurve(
   StratiConstraints,
   object,
+  interactive,
   levels = c(0.68, 0.95),
-  path = tempdir(),
-  interactive
+  path = tempdir()
 )
 }
 \arguments{
@@ -17,15 +17,15 @@ IsotonicCurve(
 
 \item{object}{\link{list}: output of the function \code{\link[=Compute_AgeS_D]{Compute_AgeS_D()}} when using the prior \strong{no_strat}. If the \code{StratiConstraints} input is a null matrix then the model suppose a strict order}
 
+\item{interactive}{\link{logical} (Default) Indicating wether we want an interactive html file or a plot image for the DAG structure}
+
 \item{levels}{\link{numeric} c(0.95, 0.68) by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
 at the level indicated.}
 
 \item{path}{\link{character} (Default) path for saving the \code{StratiConstraints}'s DAG}
-
-\item{interactive}{\link{logical} (Default) Indicating wether we want an interactive html file or a plot image for the DAG structure}
 }
 \value{
-** NUMERICAL OUTPUT : A list of type \code{BayLum.list} containing the following objects**
+\strong{NUMERICAL OUTPUT : A list of type \code{BayLum.list} containing the following objects}
 \enumerate{
 \item \bold{Sampling} : Samples from the posterior distribution after distorsion by the isotonic regression;
 \item \bold{network} : The DAG constructed from the \code{StratiConstraints} matrix
@@ -34,7 +34,7 @@ at the level indicated.}
 }
 \description{
 This function compute the isotonic distorsion of a posterior distrubution obtained by \code{\link[=Compute_AgeS_D]{Compute_AgeS_D()}}.\cr
-The efficient algorithm considered for the Isotnic Regression (IR) is the ** Sequetial Block Merging (SBM)**. \cr
+The efficient algorithm considered for the Isotnic Regression (IR) is the \strong{Sequetial Block Merging (SBM)}. \cr
 If the \code{StratiConstraints} input is a null matrix then the model suppose a strict order
 }
 \seealso{

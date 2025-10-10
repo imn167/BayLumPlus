@@ -188,6 +188,7 @@ AgeC14_Computation <- function(Data_C14Cal,
  SampleNames,
  Nb_sample,
  PriorAge = rep(c(10, 50), Nb_sample),
+ jags_method = "rjparallel",
  SavePdf = FALSE,
  monitors = c('Age', "Z"),
  OutputFileName = c('MCMCplot', "HPD_CalC-14Curve", "summary"),
@@ -200,6 +201,7 @@ AgeC14_Computation <- function(Data_C14Cal,
  Model = c("full"),
  CalibrationCurve = c("IntCal20"),
  Iter = 50000,
+ burnin = 4000,
  t = 5,
  n.chains = 3,
  quiet = FALSE,
@@ -248,26 +250,52 @@ AgeC14_Computation <- function(Data_C14Cal,
                      "xbound"=PriorAge,"StratiConstraints"=StratiConstraints)
    }
 
-   ##set connection to model
-   con <- textConnection(Model_AgeC14[[Model]])
+    inits = list(C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints), #chain 1
+                 C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints), #chain 2
+                 C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints) #chain 3
+                 )
 
-   jags <-
-     rjags::jags.model(
-       con,
-       data = dataList,
-       n.chains = n.chains,
-       n.adapt = Iter,
-       quiet = quiet
-     )
+   #No autorun : writing model in temporary file
+   temp_file <- tempfile(fileext = "txt")
+   writeLines(Model_AgeC14[[Model]], con = temp_file)
+   jags <- runjags::run.JAGS(
+     model = temp_file,
+     data = dataList,
+     n.chains = n.chains,
+     monitor = monitors,
+     adapt = Iter,
+     burnin = burnin,
+     sample = Iter,
+     silent.jags = quiet,
+     method = jags_method,
+     thin = t,
+     inits = inits
+   )
+  ## --------------------------------- CODE UTILISANT RJAGS -----------------------
+   # ##set connection to model
+   # con <- textConnection()
+   #
+   # jags <-
+   #   rjags::jags.model(
+   #     con,
+   #     data = dataList,
+   #     n.chains = n.chains,
+   #     n.adapt = Iter,
+   #     quiet = quiet,
+   #     method = jags_method
+   #   )
+   #
+   # ##close connection
+   # close(con)
+   #
+   # ##set progress.bar
+   # if(quiet) progress.bar <- 'none' else progress.bar <- 'text'
+   #
+   # update(jags,Iter, progress.bar = progress.bar)
+   # echantillon <- rjags::coda.samples(jags,monitors ,min(Iter,10000),thin=t, progress.bar = progress.bar)
 
-   ##close connection
-   close(con)
-
-   ##set progress.bar
-   if(quiet) progress.bar <- 'none' else progress.bar <- 'text'
-
-   update(jags,Iter, progress.bar = progress.bar)
-   echantillon <- rjags::coda.samples(jags,monitors ,min(Iter,10000),thin=t, progress.bar = progress.bar)
+  # ----------------------------------------------------------------------------------------------@
+   echantillon <- jags$mcmc
    U <- summary(echantillon)
 
    Sample= runjags::combine.mcmc(echantillon)  ## echantillon[[1]]
@@ -340,15 +368,15 @@ AgeC14_Computation <- function(Data_C14Cal,
      cat("\t\t\t\t\t\t lower bound \t upper bound\n")
      HPD_95=CredibleInterval(Sample[,i],0.95,roundingOfValue=roundingOfValue)
      HPD_68=CredibleInterval(Sample[,i],0.68,roundingOfValue=roundingOfValue)
-     cat("\t\t\t\t at level 95% \t",(c(HPD_95[2])),"\t\t",(c(HPD_95[3])),"\n")
-     cat("\t\t\t\t at level 68% \t",(c(HPD_68[2])),"\t\t",(c(HPD_68[3])),"\n")
+     cat("\t\t\t\t at level 95% \t",(c(HPD_95[1])),"\t\t",(c(HPD_95[2])),"\n")
+     cat("\t\t\t\t at level 68% \t",(c(HPD_68[1])),"\t\t",(c(HPD_68[2])),"\n")
      AgePlot95[i,] <- HPD_95
      AgePlot68[i,] <- HPD_68
      AgePlotMoy[i]=(mean(Sample[,i]))
 
      R[i,3]=(mean(Sample[,i]))
-     R[i,c(1,5)]=(HPD_95[2:3])
-     R[i,c(2,4)]=(HPD_68[2:3])
+     R[i,c(1,5)]=(HPD_95[1:2])
+     R[i,c(2,4)]=(HPD_68[1:2])
      R[i,8]= sd(Sample[, i])
      R[i,6]=round(CV$psrf[i,1],roundingOfValue)
      R[i,7]=round(CV$psrf[i,2],roundingOfValue)
@@ -396,10 +424,10 @@ AgeC14_Computation <- function(Data_C14Cal,
       "Ages" = data.frame(
          SAMPLE = SampleNames,
          AGE = AgePlotMoy,
-         HPD68.MIN = AgePlot68[,2],
-         HPD68.MAX = AgePlot68[,3],
-         HPD95.MIN = AgePlot95[,2],
-         HPD95.MAX = AgePlot95[,3],
+         HPD68.MIN = AgePlot68[,1],
+         HPD68.MAX = AgePlot68[,2],
+         HPD95.MIN = AgePlot95[,1],
+         HPD95.MAX = AgePlot95[,2],
          stringsAsFactors = FALSE
       ),
       "Sampling" = echantillon,
@@ -408,7 +436,8 @@ AgeC14_Computation <- function(Data_C14Cal,
       "CalibrationCurve" = CalibrationCurve,
       "PriorAge" = PriorAge,
       "StratiConstraints" = StratiConstraints,
-      "Summary" = R
+      "Summary" = R,
+      "prior" = if(sum(StratiConstraints[-1, ]) == 0) "unconstrained" else NaN
    )
 
    # Plot ages ----------------------------------------------------------------------------------

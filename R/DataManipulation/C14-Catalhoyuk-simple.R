@@ -43,7 +43,24 @@ AC14_WithStratiWithout109995= AgeC14_Computation(Data_C14Cal=Catalhoyuk$C14ages,
                                                 CalibrationCurve = c("IntCal20"), Iter = 50000,
                                                 t = 10,
                                                 n.chains = 3, quiet = FALSE)
+NoSc = rbind(rep(1,Catalhoyuk$C14_Nb_sample), matrix(0, Catalhoyuk$C14_Nb_sample, Catalhoyuk$C14_Nb_sample))
+AgeC14 = AgeC14_Computation(Catalhoyuk$C14ages, Data_SigmaC14Cal = Catalhoyuk$C14agesEr,
+                                          SampleNames = Catalhoyuk$C14_SampleNames, Nb_sample = Catalhoyuk$C14_Nb_sample,
+                                          PriorAge =  rep(c(7, 13), Catalhoyuk$C14_Nb_sample), SavePdf = F,
+                                          SaveEstimates = F, StratiConstraints = NoSc, Model = c("full"),
+                                          CalibrationCurve = c("IntCal20"), Iter = 50,
+                                          t = 10,
+                                          n.chains = 3, quiet = FALSE, monitors = c("Age"))
+AgeC14_constrained = AgeC14_Computation(Catalhoyuk$C14ages, Data_SigmaC14Cal = Catalhoyuk$C14agesEr,
+                                        SampleNames = Catalhoyuk$C14_SampleNames, Nb_sample = Catalhoyuk$C14_Nb_sample,
+                                        PriorAge =  rep(c(7, 13), Catalhoyuk$C14_Nb_sample), SavePdf = F,
+                                        SaveEstimates = F, StratiConstraints = Catalhoyuk$StratiConstraints, Model = c("full"),
+                                        CalibrationCurve = c("IntCal20"), Iter = 5000,
+                                        t = 10,
+                                        n.chains = 3, quiet = FALSE, monitors = c("Age"))
+IsotonicDistorsion = IsotonicCurve(Catalhoyuk$StratiConstraints, AgeC14, F)
 AgeC14_Computation
+plotHpd(list(IsotonicDistorsion, Catalhoyuk$Output), c("iso","unconstrained"))
 
 reduced_network <- remove_transitive_edges(buildNetwork(Catalhoyuk$StratiConstraints))
 

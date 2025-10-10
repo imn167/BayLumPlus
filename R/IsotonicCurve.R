@@ -1,16 +1,16 @@
 #' Compute Isotonic Regression for different stratigraphic constraints
 #' @description This function compute the isotonic distorsion of a posterior distrubution obtained by [Compute_AgeS_D()].\cr
-#'The efficient algorithm considered for the Isotnic Regression (IR) is the ** Sequetial Block Merging (SBM)**. \cr
+#'The efficient algorithm considered for the Isotnic Regression (IR) is the **Sequetial Block Merging (SBM)**. \cr
 #'If the `StratiConstraints` input is a null matrix then the model suppose a strict order
 #'
 #' @param StratiConstraints [matrix] or [character] : The stratigraphic relation between samples.
 #' @param object [list]: output of the function [Compute_AgeS_D()] when using the prior **no_strat**. If the `StratiConstraints` input is a null matrix then the model suppose a strict order
+#' @param interactive [logical] (Default) Indicating wether we want an interactive html file or a plot image for the DAG structure
 #' @param levels [numeric] c(0.95, 0.68) by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
 #'  at the level indicated.
 #' @param path [character] (Default) path for saving the `StratiConstraints`'s DAG
-#' @param interactive [logical] (Default) Indicating wether we want an interactive html file or a plot image for the DAG structure
 #'
-#'@return ** NUMERICAL OUTPUT : A list of type `BayLum.list` containing the following objects**
+#'@return **NUMERICAL OUTPUT : A list of type `BayLum.list` containing the following objects**
 #'\enumerate{
 #'  \item \bold{Sampling} : Samples from the posterior distribution after distorsion by the isotonic regression;
 #'  \item \bold{network} : The DAG constructed from the `StratiConstraints` matrix
@@ -21,12 +21,12 @@
 #'@export
 
 
-IsotonicCurve <- function(StratiConstraints, object, levels = c(.68,.95), path = tempdir(), interactive) {
+IsotonicCurve <- function(StratiConstraints, object, interactive, levels = c(.68,.95), path = tempdir()) {
 
   ##### VARIABLES #######@
   ## Forbid user from using anything other than unconstrained_Jeffrey
   if(!is.nan(object$prior)) {
-    if(object$prior != "unconstrained_Jeffrey") stop(paste("The Posterior should be computed with the prior unconstrained_Jeffrey not", object$prior))
+    if(!startsWith(object$prior, "unconstrained")) stop(paste("The Posterior should be computed with the prior unconstrained_Jeffrey not", object$prior))
   }
 
   #get all mcmc samples

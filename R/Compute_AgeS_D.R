@@ -252,8 +252,7 @@ Compute_AgeS_D <- function(
     }
 
   else if ( prior == "constrained_Jeffrey" | prior == "uniform_order") {
-    temp_file <- tempfile(fileext = ".txt")
-    writeLines(model, con = temp_file)
+
     inits = list(
      list( e = rexp(Nb_sample + 1)), #chain 1
      list( e = rexp(Nb_sample+ 1)), #chain 2
@@ -262,8 +261,7 @@ Compute_AgeS_D <- function(
   }
 
     else if (prior == "StrictNicholls&Jones" | prior == "Nicholls&Jones") {    ######
-      temp_file <- tempfile(fileext = ".txt")
-      writeLines(model, con = temp_file)
+
       inits = list(
        nichollsInit(Nb_sample, 1, 0) , #chain 1
        nichollsInit(Nb_sample, 1, 0), #chain 2
@@ -272,8 +270,6 @@ Compute_AgeS_D <- function(
     }
 
     else if (prior == "nichollsBR") {    ######
-      temp_file <- tempfile(fileext = ".txt")
-      writeLines(model, con = temp_file)
       inits = list(
         nichollsBRInit(Nb_sample, 1, 0) , #chain 1
         nichollsBRInit(Nb_sample, 1, 0), #chain 2

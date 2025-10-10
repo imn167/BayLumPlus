@@ -93,7 +93,7 @@ network_vizualization <- function(network, vertices_labels, interactive = TRUE) 
     layout <- ggraph::create_layout(tg, layout = "sugiyama")
 
     ggraph::ggraph(layout) + ggraph::geom_edge_link(arrow = grid::arrow(length = grid::unit(.8, 'mm')),end_cap = ggraph::circle(3, 'mm'), alpha = 0.5, edge_colour = "red") +
-      ggraph::theme_graph() + ggraph::geom_node_circle(ggplot2::aes(r = .05), fill = "lightyellow", color = "blue", linewidth = 1)  +
+      ggraph::theme_graph() + ggraph::geom_node_circle(ggplot2::aes(r = .1), fill = "lightyellow", color = "blue")  +
       ggrepel::geom_text_repel(ggplot2::aes(x = .data$x, y = .data$y, label = .data$Samples), size = 3.5, max.overlaps = Inf)
     # plot(
     #   network,

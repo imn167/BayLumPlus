@@ -66,9 +66,9 @@ CredibleInterval <- function(a_chain, level = 0.95, roundingOfValue = 0) {
   # Returns the level and the endpoints rounded
   return(
     c(
-      "level" = level,
       "Credible.Interval.Inf" = round(I[i, 1], digits = roundingOfValue),
-      "Credible.Interval.Sup" = round(I[i, 2], digits = roundingOfValue)
+      "Credible.Interval.Sup" = round(I[i, 2], digits = roundingOfValue),
+      "level" = level
     )
   )
 }
@@ -161,16 +161,16 @@ Transform_HPD <- function(all_hpd) {
 
 hpd_method <- function(name, chain, level = .95) {
   hpd_output <- apply(chain, 2, arkhe::interval_hdr, level = level)
-  if (is.list(hpd_output)) {
+  if (is.list(hpd_output)) { # Multi-modal distribution (at leat two interval for the HPD regions)
     HPD <- data.frame()
     ## list manip
     for (var in names(hpd_output)) {
       d = dim(hpd_output[[var]])[1]
       hpd <- matrix(hpd_output[[var]][, 1:2], nrow = d)
-      tab <- data.frame(age = rep(var, d), inf = hpd[, 1], sup = hpd[, 2])
+      tab <- data.frame(Samples = rep(var, d), inf = hpd[, 1], sup = hpd[, 2])
       HPD <- HPD %>% dplyr::bind_rows(tab)
     }
-    HPD <- HPD  %>% dplyr::mutate(Models = name)
+    HPD <- HPD  %>% dplyr::mutate(Models = name) #If variable with several regions HPD --> repeated columns
   }
   else {
     tab = t(hpd_output[1:2, ])
@@ -220,6 +220,20 @@ nichollsBRInit <- function(I, upper, lower) {
   z = rbinom((I-2), 1, .5)
 
   return(list(s =s , e= e, first = first, b =b, z =z))
+}
+
+C14Init <- function(I, xbound, Sc){
+  lowers = xbound[(2*(1:I)-1)]
+  uppers = xbound[2*(1:I)]
+
+  A = rep(0, I)
+  A[1] = runif(1,lowers[1], uppers[1])
+  for (i in 2:I) {
+    l = Sc[1:i, i]*c(lowers[i], A[1:(i-1)])
+    A[i] = runif(1,l, uppers[i])
+  }
+
+  list(Age =A, invalpha = rgamma(I, shape = 3, rate = 4))
 }
 
 
