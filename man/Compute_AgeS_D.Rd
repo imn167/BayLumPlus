@@ -103,11 +103,13 @@ If it is not equal to "", it must be terminated by "/".}
 \item \bold{Ages} : dataframe containing the Credible interval at 95\% and 68\%, the bayes mean estimator, the bayes standard deviation estimator and sample names.
 \item \bold{Sampling}: that corresponds to a sample of the posterior distributions
 of the age (in ka);
+\item \bold{prior}: category of prior used. \code{prior == unconstrained} if no stratigraphic constraints;
 \item \bold{PriorAge}: stating the priors used for the age parameter (in ka);
 \item \bold{StratiConstraints}: stating the stratigraphic relations between samples considered in the model;
 \item \bold{CovarianceMatrix}: stating the covariance matrix of error used in the model, highlighting common errors between samples or not;
 \item \bold{model}: returns the model that was used for the Bayesian modelling as a \link{character};
 \item \bold{JAGS model output}: returns the JAGS model with class "runjags";
+\item \bold{Summary}: Summary Table of the posterior's MCMC;
 }
 \strong{PLOT OUTPUT}
 
@@ -127,10 +129,10 @@ with the primary difference being the first parameter.
 ** Which prior to use regarding the Stratigraphic constraints **
 If there is a strict order as a stratigraphic constraints, the user would be able to use the following priors :
 \enumerate{
-\item \bold{LogUniformOrder} : uniform order over the period of study;
-\item \bold{flawed_jeffrey} : old BayLum model : false configuration of the approximated Jeffrey;
-\item \bold{nicholls_jones_age} : The Nicholls & Jones uniform order applied on ages;
-\item \bold{no_strat} : The approached Jeffrey (see Combes & Philippe 2017) without stratigraphic constraints;
+\item \bold{constrained_Jeffrey} : uniform order over the period of study;
+\item \bold{old_BayLum} : old BayLum model : false configuration of the approximated Jeffrey;
+\item \bold{StrictNicholls&Jones} : The Nicholls & Jones uniform order applied on ages;
+\item \bold{unconstrained_jeffrey} : The approached Jeffrey (see Combes & Philippe 2017) without stratigraphic constraints;
 
 }
 }
@@ -142,7 +144,7 @@ DATA <- list(D = OSLJingbian$D, sD = OSLJingbian$sD, ddot = OSLJingbian$ddot)
  Nb_sample = OSLJingbian$Nb_Sample,
  SampleNames = OSLJingbian$SampleNames,
  ThetaMatrix = OSLJingbian$ThetaMatrix,
- ‡prior = "Independance",
+ ‡prior = "unconstrained_Jeffrey",
  PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
  Iter = 2000, burnin = 50000, t = 10)
 

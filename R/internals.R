@@ -192,6 +192,16 @@ AgeApprox <- function(DataMeasures) {
 
 }
 
+stratify_pvalue <- function(p_value) {
+  stars <- character(length(p_value))
+  stars[p_value <= .001] = "***" # not converged
+  stars[p_value <= .01 & p_value > .001] = "**" #not converged
+  stars[p_value <= .05 & p_value > .01] = "*" #not converged
+  stars[p_value < .1 & p_value > .05] = "." #closed to the limit of the test"
+  stars[p_value > .1] = "" #converged as the system is stationnary (values of the Z stat between -2, and 2)
+  return(stars)
+}
+
 #=================================================================================@
 
 strictify_monotonic <-  function(A, min_gap= .5, jitter_strength=1e-2) {
@@ -229,7 +239,7 @@ C14Init <- function(I, xbound, Sc){
   A = rep(0, I)
   A[1] = runif(1,lowers[1], uppers[1])
   for (i in 2:I) {
-    l = Sc[1:i, i]*c(lowers[i], A[1:(i-1)])
+    l = max(Sc[1:i, i]*c(lowers[i], A[1:(i-1)]))
     A[i] = runif(1,l, uppers[i])
   }
 

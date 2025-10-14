@@ -178,6 +178,7 @@
 #'  Nb_sample = nb_sample,
 #'  PriorAge = rep(c(20,60),nb_sample),
 #'  Iter = 500,
+#'  jags_method = "rjags",
 #'  quiet = TRUE,
 #'  roundingOfValue = 3)
 #'
@@ -188,7 +189,7 @@ AgeC14_Computation <- function(Data_C14Cal,
  SampleNames,
  Nb_sample,
  PriorAge = rep(c(10, 50), Nb_sample),
- jags_method = "rjparallel",
+ jags_method = "rjags",
  SavePdf = FALSE,
  monitors = c('Age', "Z"),
  OutputFileName = c('MCMCplot', "HPD_CalC-14Curve", "summary"),
@@ -348,11 +349,17 @@ AgeC14_Computation <- function(Data_C14Cal,
    for(i in 1:Nb_sample){
      rnames=c(rnames,paste("A_",SampleNames[i],sep=""))
    }
-   R=matrix(data=NA,ncol=8,nrow=Nb_sample,
+   R=matrix(data=NA,ncol=10,nrow=Nb_sample,
             dimnames=list(rnames,c("lower bound at 95%","lower bound at 68%","Bayes estimate",
                                    "upper bound at 68%","upper bound at 95%",
-                                   "Convergencies: Bayes estimate","Convergencies: uppers credible interval", "Bayes sd")))
+                                   "Convergencies: Bayes estimate","Convergencies: uppers credible interval", "Bayes sd",
+                                   "Geweke pvalue", "Geweke Stars"))
+            )
 
+   #geweke p_value
+   geweke = geweke.diag(Sample)$z[1:Nb_sample]
+   pvalue = 2*apply(rbind(pnorm(geweke), pnorm(geweke, lower.tail = F)),
+                  MARGIN = 2, FUN = min)
    ##- Bayes estimate and credible interval
    cat(paste("\n\n>> Bayes estimates of Age for each sample and credible interval <<\n"))
    AgePlot95=matrix(data=NA,nrow=Nb_sample,ncol=3)
@@ -383,6 +390,9 @@ AgeC14_Computation <- function(Data_C14Cal,
 
    }
 
+
+  R[, 9] = pvalue
+  R[, 10] = stratify_pvalue(pvalue)
    cat("\n------------------------------------------------------\n")
 
    # Representation graphique des resultats

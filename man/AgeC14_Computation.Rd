@@ -10,6 +10,7 @@ AgeC14_Computation(
   SampleNames,
   Nb_sample,
   PriorAge = rep(c(10, 50), Nb_sample),
+  jags_method = "rjags",
   SavePdf = FALSE,
   monitors = c("Age", "Z"),
   OutputFileName = c("MCMCplot", "HPD_CalC-14Curve", "summary"),
@@ -22,6 +23,7 @@ AgeC14_Computation(
   Model = c("full"),
   CalibrationCurve = c("IntCal20"),
   Iter = 50000,
+  burnin = 4000,
   t = 5,
   n.chains = 3,
   quiet = FALSE,
@@ -190,6 +192,7 @@ Age <- AgeC14_Computation(
  Nb_sample = nb_sample,
  PriorAge = rep(c(20,60),nb_sample),
  Iter = 500,
+ jags_method = "rjags",
  quiet = TRUE,
  roundingOfValue = 3)
 

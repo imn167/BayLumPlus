@@ -97,11 +97,13 @@ sepSC <- NULL
 #'  \item \bold{Ages} : dataframe containing the Credible interval at 95% and 68%, the bayes mean estimator, the bayes standard deviation estimator and sample names.
 #'   \item \bold{Sampling}: that corresponds to a sample of the posterior distributions
 #'  of the age (in ka);
+#'   \item \bold{prior}: category of prior used. `prior == unconstrained` if no stratigraphic constraints;
 #'   \item \bold{PriorAge}: stating the priors used for the age parameter (in ka);
 #'   \item \bold{StratiConstraints}: stating the stratigraphic relations between samples considered in the model;
 #'   \item \bold{CovarianceMatrix}: stating the covariance matrix of error used in the model, highlighting common errors between samples or not;
 #'   \item \bold{model}: returns the model that was used for the Bayesian modelling as a [character];
 #'   \item \bold{JAGS model output}: returns the JAGS model with class "runjags";
+#'   \item \bold{Summary}: Summary Table of the posterior's MCMC;
 #'  }
 #'  **PLOT OUTPUT**
 #'
@@ -114,10 +116,10 @@ sepSC <- NULL
 #' @details ** Which prior to use regarding the Stratigraphic constraints **
 #'If there is a strict order as a stratigraphic constraints, the user would be able to use the following priors :
 #'\enumerate{
-#'  \item \bold{LogUniformOrder} : uniform order over the period of study;
-#'  \item \bold{flawed_jeffrey} : old BayLum model : false configuration of the approximated Jeffrey;
-#'  \item \bold{nicholls_jones_age} : The Nicholls & Jones uniform order applied on ages;
-#'  \item \bold{no_strat} : The approached Jeffrey (see Combes & Philippe 2017) without stratigraphic constraints;
+#'  \item \bold{constrained_Jeffrey} : uniform order over the period of study;
+#'  \item \bold{old_BayLum} : old BayLum model : false configuration of the approximated Jeffrey;
+#'  \item \bold{StrictNicholls&Jones} : The Nicholls & Jones uniform order applied on ages;
+#'  \item \bold{unconstrained_jeffrey} : The approached Jeffrey (see Combes & Philippe 2017) without stratigraphic constraints;
 #'
 #'}
 #'@examples
@@ -128,7 +130,7 @@ sepSC <- NULL
 #'  Nb_sample = OSLJingbian$Nb_Sample,
 #'  SampleNames = OSLJingbian$SampleNames,
 #'  ThetaMatrix = OSLJingbian$ThetaMatrix,
-#'  ‡prior = "Independance",
+#'  ‡prior = "unconstrained_Jeffrey",
 #'  PriorAge = rep(c(1, 1400), OSLJingbian$Nb_Sample),
 #'  Iter = 2000, burnin = 50000, t = 10)
 #'
@@ -419,7 +421,7 @@ Compute_AgeS_D <- function(
 
   R <- matrix(
     data = NA,
-    ncol = 9,
+    ncol = 11,
     nrow = Nb_sample,
     dimnames = list(rnames,
                   c(
@@ -431,7 +433,9 @@ Compute_AgeS_D <- function(
                       "Bayes sd",
                       "Convergencies: Point estimate",
                       "Convergencies: uppers confidence interval",
-                      "Time Series SE"
+                      "Time Series SE",
+                      "Geweke Criteria pvalue",
+                      "Geweke Stars"
                     )
                   )
   )
@@ -442,10 +446,12 @@ Compute_AgeS_D <- function(
     "\n\n>> Bayes estimates of Age, Palaeodose and its dispersion for each sample and credible interval <<\n"
   )
 
-  credible95 <-  apply(sample, 2, CredibleInterval, level = .95)[ 2:3, ]
-  credible68 <- apply(sample, 2, CredibleInterval, level = .68)[2:3, ]
+  credible95 <-  apply(sample, 2, CredibleInterval, level = .95)[ 1:2, ]
+  credible68 <- apply(sample, 2, CredibleInterval, level = .68)[1:2, ]
   estimate <- apply(sample, 2, mean)
   standardError <- apply(sample, 2, sd)
+  geweke = geweke.diag(as.mcmc(sample))$z
+  pvalue = 2*apply(rbind(pnorm(geweke), pnorm(geweke, lower.tail = F)), 2, min)
 
   R[, c(1,5)] <- round(t(credible95), roundingOfValue)
   R[, c(2,4)] <- round(t(credible68), roundingOfValue)
@@ -454,6 +460,8 @@ Compute_AgeS_D <- function(
   R[, c(7, 8)] <- round(CV$psrf, roundingOfValue)
   R[, 6] <- round(standardError, roundingOfValue)
   R[, 9] <- round(SummaryMCMC$statistics[, 4], roundingOfValue)
+  R[, 10] <- pvalue
+  R[,11] <- stratify_pvalue(pvalue)
 
 
   print(data.frame(R) )
