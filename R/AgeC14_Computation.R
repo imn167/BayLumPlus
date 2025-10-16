@@ -16,7 +16,10 @@
 #'
 #' @param PriorAge [numeric] (with default): lower and upper bounds for age parameter of each sample in years (not in ka).
 #' Note that, `length(PriorAge) == 2 * Nb_sample`
-#' and `PriorAge[2i-1,2i]` corresponds to the lower and upper bounds of sample whose number ID is equal to `i`.
+#' and `PriorAge(2i-1,2i)` corresponds to the lower and upper bounds of sample whose number ID is equal to `i`.
+#'
+#' @param jags_method (with default): select which method to use in order to call JAGS. jags_methods `"rjags"`  (the default) and `"rjparallel"` have been tested.
+#' (for more information about these possibilities and others, see [runjags::run.jags])
 #'
 #' @param SavePdf [logical] (with default): if TRUE save graphs in pdf file named `OutputFileName` in folder `OutputFilePath`.
 #'

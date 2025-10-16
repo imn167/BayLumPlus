@@ -101,7 +101,7 @@ data("OSLJingbian")
 help(OSLJingbian)
 ```
 
-We can use the **Independance** prior for our first bayesian computation. The following code snippet produces this scenario:
+We can use the **unconstrained_Jeffrey** prior for our first bayesian computation. The following code snippet produces this scenario:
 
 ```{r Independance, eval=FALSE, include=TRUE}
 Output = Compute_AgeS_D(
@@ -117,7 +117,7 @@ Output = Compute_AgeS_D(
 
 Note that the data `OSLJingbian` already have the object *Output*, which is the return object of the code above.
 
-Then the following code snippet shows when we use the *constrained Jeffrey* prior for the second bayesian model
+Then the following code snippet shows when we use the *constrained_Jeffrey* prior for the second bayesian model
 
 ```{r  logUniformPrior, results='hide',  fig.show='hide'}
 JingbianUO = Compute_AgeS_D(
@@ -131,7 +131,7 @@ JingbianUO = Compute_AgeS_D(
 )
 ```
 
-Finally, the snippet code when using the *Nicholls & Jones* prior
+Finally, the snippet code when using the *StrictNicholls&Jones* prior
 
 ```{r Nicholls&JonesPrior, results='hide',  fig.show='hide'}
 JingbianNicholls = Compute_AgeS_D(
@@ -183,15 +183,15 @@ network_vizualization(reduced_network, interactive = T, vertices_labels = paste0
 
 In this section, we introduce the function `IsotonicCurve()`, which computes the isotonic distortion of a posterior distribution obtained from the `Compute_AgeS_D()` function.
 
-**The currently supported prior for this isotonic correction is the *Independence* prior.**
+**The currently supported priors for this isotonic correction are  *unconstrained* priors.**
 
 This function requires the following arguments:
 
 - `StratiConstraints`: The stratigraphic constraint matrix. This can either be provided directly or loaded from a file. If no matrix is supplied, the model assumes a strict chronological order.
 - `Object`: The output object returned by the age model function `Compute_AgeS_D()`.
+- `interactive`: An optional argument. If not provided, the program will decide whether to display an interactive Directed Acyclic Graph (DAG) visualization in a web browser.
 - `level`: Confidence levels for High Posterior Density (HPD) regions. The default values are `0.95` and `0.68`.
 - `path`: An optional path for saving the constraints DAG.
-- `interactive`: An optional argument. If not provided, the program will decide whether to display an interactive Directed Acyclic Graph (DAG) visualization in a web browser.
 
 
 

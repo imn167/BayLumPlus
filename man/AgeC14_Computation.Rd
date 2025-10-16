@@ -41,7 +41,10 @@ AgeC14_Computation(
 
 \item{PriorAge}{\link{numeric} (with default): lower and upper bounds for age parameter of each sample in years (not in ka).
 Note that, \code{length(PriorAge) == 2 * Nb_sample}
-and \code{PriorAge[2i-1,2i]} corresponds to the lower and upper bounds of sample whose number ID is equal to \code{i}.}
+and \code{PriorAge(2i-1,2i)} corresponds to the lower and upper bounds of sample whose number ID is equal to \code{i}.}
+
+\item{jags_method}{(with default): select which method to use in order to call JAGS. jags_methods \code{"rjags"}  (the default) and \code{"rjparallel"} have been tested.
+(for more information about these possibilities and others, see \link[runjags:run.jags]{runjags::run.jags})}
 
 \item{SavePdf}{\link{logical} (with default): if TRUE save graphs in pdf file named \code{OutputFileName} in folder \code{OutputFilePath}.}
 
