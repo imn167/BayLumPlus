@@ -199,11 +199,13 @@ If it is not equal to "", it must be terminated by "/".</p></dd>
 <p><strong>A list of type <code>BayLum.list</code> containing the following objects:</strong></p><ul><li><p><b>Ages</b> : dataframe containing the Credible interval at 95% and 68%, the bayes mean estimator, the bayes standard deviation estimator and sample names.</p></li>
 <li><p><b>Sampling</b>: that corresponds to a sample of the posterior distributions
 of the age (in ka);</p></li>
+<li><p><b>prior</b>: category of prior used. <code>prior == unconstrained</code> if no stratigraphic constraints;</p></li>
 <li><p><b>PriorAge</b>: stating the priors used for the age parameter (in ka);</p></li>
 <li><p><b>StratiConstraints</b>: stating the stratigraphic relations between samples considered in the model;</p></li>
 <li><p><b>CovarianceMatrix</b>: stating the covariance matrix of error used in the model, highlighting common errors between samples or not;</p></li>
 <li><p><b>model</b>: returns the model that was used for the Bayesian modelling as a <a href="https://rdrr.io/r/base/character.html" class="external-link">character</a>;</p></li>
 <li><p><b>JAGS model output</b>: returns the JAGS model with class "runjags";</p></li>
+<li><p><b>Summary</b>: Summary Table of the posterior's MCMC;</p></li>
 </ul><p><strong>PLOT OUTPUT</strong></p>
 <ol><li><p><b>MCMC trajectories</b>: A graph with the MCMC trajectories and posterior distributions of the age.
 On each line, the plot on the left represents the MCMC trajectories, and the one on the right the posterior distribution of the parameter.</p></li>
@@ -213,10 +215,10 @@ A default <code>plot_mode</code> parameter can gives either IC segment or densit
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>** Which prior to use regarding the Stratigraphic constraints **
-If there is a strict order as a stratigraphic constraints, the user would be able to use the following priors :</p><ol><li><p><b>LogUniformOrder</b> : uniform order over the period of study;</p></li>
-<li><p><b>flawed_jeffrey</b> : old BayLum model : false configuration of the approximated Jeffrey;</p></li>
-<li><p><b>nicholls_jones_age</b> : The Nicholls &amp; Jones uniform order applied on ages;</p></li>
-<li><p><b>no_strat</b> : The approached Jeffrey (see Combes &amp; Philippe 2017) without stratigraphic constraints;</p></li>
+If there is a strict order as a stratigraphic constraints, the user would be able to use the following priors :</p><ol><li><p><b>constrained_Jeffrey</b> : uniform order over the period of study;</p></li>
+<li><p><b>old_BayLum</b> : old BayLum model : false configuration of the approximated Jeffrey;</p></li>
+<li><p><b>StrictNicholls&amp;Jones</b> : The Nicholls &amp; Jones uniform order applied on ages;</p></li>
+<li><p><b>unconstrained_jeffrey</b> : The approached Jeffrey (see Combes &amp; Philippe 2017) without stratigraphic constraints;</p></li>
 </ol></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -232,7 +234,7 @@ If there is a strict order as a stratigraphic constraints, the user would be abl
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/LogoERC.png" width="100"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://quinaworld.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_Quina.png" width="100"></a>, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/logo-lmjl.png" width="100"></a>, <a href="https://www.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo-UnivRennes.png" width="100"></a>, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
+  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/LogoERC.png" width="130"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://quinaworld.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_Quina.png" width="130"></a>, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/logo-lmjl.png" width="130"></a>, <a href="https://www.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_UnivRennes.png" width="140"></a>, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

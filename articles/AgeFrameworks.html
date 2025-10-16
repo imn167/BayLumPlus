@@ -177,8 +177,8 @@ from Jingbian, China<br>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"OSLJingbian"</span><span class="op">)</span> </span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/help.html" class="external-link">help</a></span><span class="op">(</span><span class="va">OSLJingbian</span><span class="op">)</span></span></code></pre></div>
-<p>We can use the <strong>Independance</strong> prior for our first
-bayesian computation. The following code snippet produces this
+<p>We can use the <strong>unconstrained_Jeffrey</strong> prior for our
+first bayesian computation. The following code snippet produces this
 scenario:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Output</span> <span class="op">=</span> <span class="fu"><a href="../reference/Compute_AgeS_D.html">Compute_AgeS_D</a></span><span class="op">(</span></span>
@@ -192,8 +192,8 @@ scenario:</p>
 <span><span class="op">)</span> </span></code></pre></div>
 <p>Note that the data <code>OSLJingbian</code> already have the object
 <em>Output</em>, which is the return object of the code above.</p>
-<p>Then the following code snippet shows when we use the <em>constrained
-Jeffrey</em> prior for the second bayesian model</p>
+<p>Then the following code snippet shows when we use the
+<em>constrained_Jeffrey</em> prior for the second bayesian model</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">JingbianUO</span> <span class="op">=</span> <span class="fu"><a href="../reference/Compute_AgeS_D.html">Compute_AgeS_D</a></span><span class="op">(</span></span>
 <span>  </span>
@@ -205,8 +205,8 @@ Jeffrey</em> prior for the second bayesian model</p>
 <span>  Iter <span class="op">=</span> <span class="fl">2000</span>, burnin <span class="op">=</span> <span class="fl">50000</span>, t <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required namespace: rjags</span></span></code></pre></div>
-<p>Finally, the snippet code when using the <em>Nicholls &amp;
-Jones</em> prior</p>
+<p>Finally, the snippet code when using the
+<em>StrictNicholls&amp;Jones</em> prior</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">JingbianNicholls</span> <span class="op">=</span> <span class="fu"><a href="../reference/Compute_AgeS_D.html">Compute_AgeS_D</a></span><span class="op">(</span></span>
 <span>  </span>
@@ -261,8 +261,8 @@ the scheme on how to do that:</p>
 <code><a href="../reference/IsotonicCurve.html">IsotonicCurve()</a></code>, which computes the isotonic distortion of
 a posterior distribution obtained from the <code><a href="../reference/Compute_AgeS_D.html">Compute_AgeS_D()</a></code>
 function.</p>
-<p><strong>The currently supported prior for this isotonic correction is
-the <em>Independence</em> prior.</strong></p>
+<p><strong>The currently supported priors for this isotonic correction
+are <em>unconstrained</em> priors.</strong></p>
 <p>This function requires the following arguments:</p>
 <ul>
 <li>
@@ -273,16 +273,16 @@ is supplied, the model assumes a strict chronological order.</li>
 <code>Object</code>: The output object returned by the age model
 function <code><a href="../reference/Compute_AgeS_D.html">Compute_AgeS_D()</a></code>.</li>
 <li>
+<code>interactive</code>: An optional argument. If not provided, the
+program will decide whether to display an interactive Directed Acyclic
+Graph (DAG) visualization in a web browser.</li>
+<li>
 <code>level</code>: Confidence levels for High Posterior Density
 (HPD) regions. The default values are <code>0.95</code> and
 <code>0.68</code>.</li>
 <li>
 <code>path</code>: An optional path for saving the constraints
 DAG.</li>
-<li>
-<code>interactive</code>: An optional argument. If not provided, the
-program will decide whether to display an interactive Directed Acyclic
-Graph (DAG) visualization in a web browser.</li>
 </ul>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">IsotonicDistorsion</span> <span class="op">=</span> <span class="fu"><a href="../reference/IsotonicCurve.html">IsotonicCurve</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">OSLJingbian</span><span class="op">$</span><span class="va">Output</span>,interactive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
@@ -503,7 +503,7 @@ Artificial Intelligence</em>, 36:8575–83. 8.
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/LogoERC.png" width="100"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://quinaworld.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_Quina.png" width="100"></a>, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/logo-lmjl.png" width="100"></a>, <a href="https://www.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo-UnivRennes.png" width="100"></a>, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
+  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/LogoERC.png" width="130"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://quinaworld.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_Quina.png" width="130"></a>, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/logo-lmjl.png" width="130"></a>, <a href="https://www.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_UnivRennes.png" width="140"></a>, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

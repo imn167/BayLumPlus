@@ -56,6 +56,7 @@ Northern or Southern Hemisphere or marine atmospheric. It must be the same curve
 <span>  <span class="va">SampleNames</span>,</span>
 <span>  <span class="va">Nb_sample</span>,</span>
 <span>  PriorAge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span>, <span class="va">Nb_sample</span><span class="op">)</span>,</span>
+<span>  jags_method <span class="op">=</span> <span class="st">"rjags"</span>,</span>
 <span>  SavePdf <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  monitors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="st">"Z"</span><span class="op">)</span>,</span>
 <span>  OutputFileName <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCMCplot"</span>, <span class="st">"HPD_CalC-14Curve"</span>, <span class="st">"summary"</span><span class="op">)</span>,</span>
@@ -68,6 +69,7 @@ Northern or Southern Hemisphere or marine atmospheric. It must be the same curve
 <span>  Model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"full"</span><span class="op">)</span>,</span>
 <span>  CalibrationCurve <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"IntCal20"</span><span class="op">)</span>,</span>
 <span>  Iter <span class="op">=</span> <span class="fl">50000</span>,</span>
+<span>  burnin <span class="op">=</span> <span class="fl">4000</span>,</span>
 <span>  t <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  n.chains <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -98,7 +100,12 @@ Northern or Southern Hemisphere or marine atmospheric. It must be the same curve
 <dt id="arg-priorage">PriorAge<a class="anchor" aria-label="anchor" href="#arg-priorage"></a></dt>
 <dd><p><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a> (with default): lower and upper bounds for age parameter of each sample in years (not in ka).
 Note that, <code>length(PriorAge) == 2 * Nb_sample</code>
-and <code>PriorAge[2i-1,2i]</code> corresponds to the lower and upper bounds of sample whose number ID is equal to <code>i</code>.</p></dd>
+and <code>PriorAge(2i-1,2i)</code> corresponds to the lower and upper bounds of sample whose number ID is equal to <code>i</code>.</p></dd>
+
+
+<dt id="arg-jags-method">jags_method<a class="anchor" aria-label="anchor" href="#arg-jags-method"></a></dt>
+<dd><p>(with default): select which method to use in order to call JAGS. jags_methods <code>"rjags"</code>  (the default) and <code>"rjparallel"</code> have been tested.
+(for more information about these possibilities and others, see <a href="https://rdrr.io/pkg/runjags/man/run.jags.html" class="external-link">runjags::run.jags</a>)</p></dd>
 
 
 <dt id="arg-savepdf">SavePdf<a class="anchor" aria-label="anchor" href="#arg-savepdf"></a></dt>
@@ -277,8 +284,11 @@ IntCal13 ans Marine13 radiocarbon age calibration curves 0-50000 years cal BP. R
 <span class="r-in"><span> Nb_sample <span class="op">=</span> <span class="va">nb_sample</span>,</span></span>
 <span class="r-in"><span> PriorAge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>,<span class="fl">60</span><span class="op">)</span>,<span class="va">nb_sample</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span> Iter <span class="op">=</span> <span class="fl">500</span>,</span></span>
+<span class="r-in"><span> jags_method <span class="op">=</span> <span class="st">"rjags"</span>,</span></span>
 <span class="r-in"><span> quiet <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span> roundingOfValue <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: rjags</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Finished running the simulation</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>[plot_MCMC()] 'n.iter' out of range, reset to number of observations</span>
 <span class="r-plt img"><img src="AgeC14_Computation-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="AgeC14_Computation-2.png" alt="" width="700" height="433"></span>
@@ -289,10 +299,10 @@ IntCal13 ans Marine13 radiocarbon age calibration curves 0-50000 years cal BP. R
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; MCMC Convergence of Age parameters &lt;&lt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ----------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample name   Bayes estimate   Uppers credible interval</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26510 	 1.001 		 1.014 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26506 	 1 		 1.006 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26507 	 1.008 		 1.022 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26508 	 0.997 		 1.001 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26510 	 1 		 1.001 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26506 	 1 		 1.001 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26507 	 1 		 1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26508 	 1.248 		 1.623 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------------------------</span>
@@ -304,28 +314,28 @@ IntCal13 ans Marine13 radiocarbon age calibration curves 0-50000 years cal BP. R
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt;&gt; Bayes estimates of Age for each sample and credible interval &lt;&lt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample name 	 Bayes estimate  Credible interval: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26510 	 41.9339993405693 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26510 	 41.9544390866339 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 						 lower bound 	 upper bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 41.516 		 42.369 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 41.787 		 42.242 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 41.471 		 42.356 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 41.827 		 42.224 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample name 	 Bayes estimate  Credible interval: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26506 	 45.7086009330469 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26506 	 45.7122980445349 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 						 lower bound 	 upper bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 45.132 		 46.322 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 45.48 		 46.027 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 45.046 		 46.264 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 45.45 		 46.011 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample name 	 Bayes estimate  Credible interval: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26507 	 44.9242217790345 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26507 	 44.8606871634306 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 						 lower bound 	 upper bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 43.993 		 46.104 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 44.457 		 45.341 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 43.702 		 45.953 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 44.381 		 45.421 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Sample name 	 Bayes estimate  Credible interval: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26508 	 45.0302540751806 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> A_S-EVA-26508 	 45.1847910457901 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 						 lower bound 	 upper bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 44.214 		 46.034 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 44.459 		 45.49 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 95% 	 43.487 		 46.08 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 				 at level 68% 	 44.554 		 45.561 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ------------------------------------------------------</span>
 <span class="r-plt img"><img src="AgeC14_Computation-5.png" alt="" width="700" height="433"></span>
@@ -338,7 +348,7 @@ IntCal13 ans Marine13 radiocarbon age calibration curves 0-50000 years cal BP. R
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/LogoERC.png" width="100"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://quinaworld.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_Quina.png" width="100"></a>, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/logo-lmjl.png" width="100"></a>, <a href="https://www.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo-UnivRennes.png" width="100"></a>, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
+  <p>Developed by Imene Bouafia, Claire Christophe, Anne Philippe, Sebastian Kreutzer, Guillaume Guérin, Frederik Harly Baumgarten, Nicolas Frerebeau, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/LogoERC.png" width="130"></a>, <a href="https://www.cnrs.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_cnrs.jpg"></a>, <a href="https://quinaworld.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_Quina.png" width="130"></a>, <a href="https://erc.europa.eu/homepage" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/logo-lmjl.png" width="130"></a>, <a href="https://www.univ-rennes.fr" class="external-link"><img src="https://imn167.github.io/BayLumPlus/reference/figures/Logo_UnivRennes.png" width="140"></a>, <a href="https://www.u-bordeaux-montaigne.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_ubm.jpg"></a>, <a href="https://lascarbx.labex.u-bordeaux.fr" class="external-link"><img src="https://crp2a.github.io/BayLum/reference/figures/logo_idex.png"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
