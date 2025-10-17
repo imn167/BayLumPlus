@@ -20,8 +20,8 @@ create_mock_object <-  function(n_samples=5) {
     "Sampling" = coda::as.mcmc.list(coda::as.mcmc(mock_samples)),
     "Ages" = data.frame(SAMPLE = sample_names, stringsAsFactors = F, HPD95.MIN = rep(10, n_samples), HPD95.MAX = rep(20, n_samples),
                         HPD68.MIN = rep(12, n_samples), HPD68.MAX = rep(18, n_samples),
-                        AGE = rep(15, n_samples), Unit = 1:n_samples),
-    "Summary" = replicate(8, rep(1, n_samples)),
+                        AGE = rep(15, n_samples), Unit = 1:n_samples) %>% dplyr::mutate(`Bayes sd` =rep(1, n_samples) ),
+    "Summary" = as.data.frame(replicate(2, rep(1, n_samples))) %>% dplyr::mutate(`Bayes sd` =rep(1, n_samples) ) ,
     prior = "unconstrained_Jeffrey"
   )
 }

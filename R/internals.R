@@ -204,6 +204,7 @@ stratify_pvalue <- function(p_value) {
 
 #=================================================================================@
 
+
 strictify_monotonic <-  function(A, min_gap= .5, jitter_strength=1e-2) {
   n = length(A)
   jitter = cumsum(runif(n, min_gap, min_gap + jitter_strength))
@@ -232,18 +233,26 @@ nichollsBRInit <- function(I, upper, lower) {
   return(list(s =s , e= e, first = first, b =b, z =z))
 }
 
-C14Init <- function(I, xbound, Sc){
+C14Init <- function(I, xbound, Sc, unconstrained = FALSE){
   lowers = xbound[(2*(1:I)-1)]
   uppers = xbound[2*(1:I)]
+
+  if (unconstrained) {
+    return(list(Age = runif(I, lowers, uppers), invalpha = rgamma(I, shape = 3, rate = 4)))
+  }
 
   A = rep(0, I)
   A[1] = runif(1,lowers[1], uppers[1])
   for (i in 2:I) {
-    l = max(Sc[1:i, i]*c(lowers[i], A[1:(i-1)]))
-    A[i] = runif(1,l, uppers[i])
+    # l = max(Sc[1:i, i]*c(lowers[i], A[1:(i-1)]))
+    A[i] = runif(1,lowers[i], uppers[i])
   }
+  network = remove_transitive_edges(Sc)
+  edges = igraph::as_edgelist(network, names = F)
 
-  list(Age =A, invalpha = rgamma(I, shape = 3, rate = 4))
+  A_order = IsotoneOptimization::solve_isotone_DAG(y = A, w = rep(1, I), Emat = edges)
+
+  list(Age =A_order, invalpha = rgamma(I, shape = 3, rate = 4))
 }
 
 
@@ -314,7 +323,6 @@ IsotonicRegDAG = function(network, Ahat, weights) {
 
 
 ##==================================================================================@
-#'@export
 findbound <- function(index,  Sc) {
   Sc = Sc[-1, ] #del lower bound line
 
@@ -328,6 +336,47 @@ findbound <- function(index,  Sc) {
   else {b = -1}
   return(c(a,b))
 }
+
+
+##==================================================================================@
+
+### C14 Calibration graphs
+
+plotC14_Cal <- function(Nb_sample, PriorAge, TableauCalib, AgePlot95, AgePlotMoy, Data_C14Cal){
+
+couleur=rainbow(Nb_sample)
+sup = max(AgePlot95[, 2])
+inf = min(AgePlot95[, 1])
+par(mfrow=c(1,1),las = 0,mar=c(5,5,2,2))
+xl <- c(min(PriorAge[seq(1,(2*Nb_sample-1),2)]),max(PriorAge[seq(2,(2*Nb_sample),2)]))
+plot(
+  xl,
+  xl,
+  col = "white",
+  xlab = "C-14 Age BP (ka)",
+  ylab = "C-14 cal. BP (ka)",
+  xaxt = "n",
+  yaxt = "n",
+  cex.lab = 1.8,
+  xlim = c(inf - (sup-inf)* .75, sup + (sup-inf)* .75)
+)
+axis(2,cex.axis=2)
+axis(1,cex.axis=2)
+polygon(c(TableauCalib[, 1], rev(TableauCalib[, 1])),
+        c(TableauCalib[, 2] + 2 * TableauCalib[, 3],
+          rev(TableauCalib[, 2] - 2 * TableauCalib[, 3]))/1000,
+        col = "gray", border = "black")
+for (i in 1:Nb_sample) {
+  lines(c(AgePlot95[i, 1:2]), rep(Data_C14Cal[i], 2)/1000, col = couleur[i],
+        lwd = 4)
+  lines(AgePlotMoy[i], Data_C14Cal[i]/1000, col = "black", lwd = .5,
+        type = "p")
+}
+
+}
+
+
+
 
 
 

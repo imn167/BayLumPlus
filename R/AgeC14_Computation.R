@@ -254,10 +254,21 @@ AgeC14_Computation <- function(Data_C14Cal,
                      "xbound"=PriorAge,"StratiConstraints"=StratiConstraints)
    }
 
+   ## No need to run isotonicRegression init if no constraints
+   if(sum(StratiConstraints[-1, ]) == 0) {
+     inits = list(C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints,unconstrained =  T), #chain 1
+                  C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints,unconstrained =  T), #chain 2
+                  C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints, unconstrained = T) #chain 3
+     )
+   }
+
+   else {
+
     inits = list(C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints), #chain 1
                  C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints), #chain 2
                  C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints) #chain 3
                  )
+   }
 
    #No autorun : writing model in temporary file
    temp_file <- tempfile(fileext = "txt")
@@ -331,6 +342,10 @@ AgeC14_Computation <- function(Data_C14Cal,
 
     }
 
+   #geweke p_value
+   geweke = geweke.diag(Sample)$z[1:Nb_sample]
+   pvalue = 2*apply(rbind(pnorm(geweke), pnorm(geweke, lower.tail = F)),
+                  MARGIN = 2, FUN = min)
 
    ##- Gelman and Rubin test of convergency of the MCMC
    CV=gelman.diag(echantillon,multivariate=FALSE)
@@ -352,17 +367,13 @@ AgeC14_Computation <- function(Data_C14Cal,
    for(i in 1:Nb_sample){
      rnames=c(rnames,paste("A_",SampleNames[i],sep=""))
    }
-   R=matrix(data=NA,ncol=10,nrow=Nb_sample,
+   R=matrix(data=NA,ncol=9,nrow=Nb_sample,
             dimnames=list(rnames,c("lower bound at 95%","lower bound at 68%","Bayes estimate",
                                    "upper bound at 68%","upper bound at 95%",
                                    "Convergencies: Bayes estimate","Convergencies: uppers credible interval", "Bayes sd",
-                                   "Geweke pvalue", "Geweke Stars"))
+                                   "Geweke pvalue"))
             )
 
-   #geweke p_value
-   geweke = geweke.diag(Sample)$z[1:Nb_sample]
-   pvalue = 2*apply(rbind(pnorm(geweke), pnorm(geweke, lower.tail = F)),
-                  MARGIN = 2, FUN = min)
    ##- Bayes estimate and credible interval
    cat(paste("\n\n>> Bayes estimates of Age for each sample and credible interval <<\n"))
    AgePlot95=matrix(data=NA,nrow=Nb_sample,ncol=3)
@@ -395,37 +406,14 @@ AgeC14_Computation <- function(Data_C14Cal,
 
 
   R[, 9] = pvalue
-  R[, 10] = stratify_pvalue(pvalue)
+  R <- dplyr::as_data_frame(R)
+  R <- R %>% dplyr::mutate(GewekeStars = stratify_pvalue(pvalue))
    cat("\n------------------------------------------------------\n")
 
    # Representation graphique des resultats
    #        des HPD sur la courbe de calibration
-   couleur=rainbow(Nb_sample)
-   par(mfrow=c(1,1),las = 0,mar=c(5,5,2,2))
-   xl <- c(min(PriorAge[seq(1,(2*Nb_sample-1),2)]),max(PriorAge[seq(2,(2*Nb_sample),2)]))
-   plot(
-      xl,
-      xl,
-      col = "white",
-      xlab = "C-14 Age BP (ka)",
-      ylab = "C-14 cal. BP (ka)",
-      xaxt = "n",
-      yaxt = "n",
-      cex.lab = 1.8
-   )
-   axis(2,cex.axis=2)
-   axis(1,cex.axis=2)
-   polygon(c(TableauCalib[, 1], rev(TableauCalib[, 1])),
-           c(TableauCalib[, 2] + 2 * TableauCalib[, 3],
-             rev(TableauCalib[, 2] - 2 * TableauCalib[, 3]))/1000,
-           col = "gray", border = "black")
-  for (i in 1:Nb_sample) {
-    lines(c(AgePlot95[i, 2:3]), rep(Data_C14Cal[i], 2)/1000, col = couleur[i],
-          lwd = 4)
-    lines(AgePlotMoy[i], Data_C14Cal[i]/1000, col = "black", lwd = 2,
-          type = "p")
-  }
-   legend("topleft",SampleNames,lty=rep(1,Nb_sample),lwd=rep(2,Nb_sample),cex=1,col=couleur)
+   plotC14_Cal(Nb_sample, PriorAge, TableauCalib, AgePlot95, AgePlotMoy, Data_C14Cal)
+   # legend("topleft",SampleNames,lty=rep(1,Nb_sample),lwd=rep(2,Nb_sample),cex=1,col=couleur)
 
    if(SavePdf){
      dev.print(pdf,file=paste(OutputFilePath,OutputFileName[2],'.pdf',sep=""),width=8,height=10)

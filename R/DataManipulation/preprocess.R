@@ -21,7 +21,7 @@ plot_Ages(JingbianUnconstrained, plot_mode = "density")
 OSLJingbian <- list(D = Jingbian$D, sD = Jingbian$Sigma_D, ddot = Jingbian$d,
                       ThetaMatrix = Jingb_Theta, Nb_Sample = Jingb_Nb_sample,
                       SampleNames = Jingb_SampleNames, Output = JingbianUnconstrained)
-
+IsotonicCurve(c(), JingbianUnconstrained, F)
 JingbIso = PlotIsotonicCurve(StratiConstraints = c(), object = OSLJingbian$Output, level = .95)
 
 JingbianUO = Compute_AgeS_D(list(D = Jingbian$D, sD = Jingbian$Sigma_D, ddot = Jingbian$d,

@@ -421,7 +421,7 @@ Compute_AgeS_D <- function(
 
   R <- matrix(
     data = NA,
-    ncol = 11,
+    ncol = 10,
     nrow = Nb_sample,
     dimnames = list(rnames,
                   c(
@@ -434,8 +434,7 @@ Compute_AgeS_D <- function(
                       "Convergencies: Point estimate",
                       "Convergencies: uppers confidence interval",
                       "Time Series SE",
-                      "Geweke Criteria pvalue",
-                      "Geweke Stars"
+                      "Geweke Criteria pvalue"
                     )
                   )
   )
@@ -461,7 +460,9 @@ Compute_AgeS_D <- function(
   R[, 6] <- round(standardError, roundingOfValue)
   R[, 9] <- round(SummaryMCMC$statistics[, 4], roundingOfValue)
   R[, 10] <- pvalue
-  R[,11] <- stratify_pvalue(pvalue)
+
+  R <- dplyr::as_data_frame(R)
+  R <- R %>% dplyr::mutate(GewekeStars = stratify_pvalue(pvalue))
 
 
   print(data.frame(R) )

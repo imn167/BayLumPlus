@@ -20,6 +20,7 @@ models <<- c("unconstrained", "isotonic", "uo", "nicholls")
 
 paper_color <<-   c("unconstrained" = "blue",
                  "uo" = "red",
+                 "bayLum" = "#5E515A",
                  "nicholls" = "green",
                  "isotonic" = "orange",
                  "True Age" = "purple")

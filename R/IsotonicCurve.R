@@ -35,8 +35,7 @@ IsotonicCurve <- function(StratiConstraints, object, interactive, levels = c(.68
 
   n = length(SampleNames)
 
-  w = 1/ as.numeric(object$Summary[, 8])^2 #inv of the estimated variance
-
+  w = 1/ as.numeric(object$Summary$`Bayes sd`)^2 #inv of the estimated variance
   # html path
   graphPath = file.path(path, "graph.html")
 
