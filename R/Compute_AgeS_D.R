@@ -461,7 +461,7 @@ Compute_AgeS_D <- function(
   R[, 9] <- round(SummaryMCMC$statistics[, 4], roundingOfValue)
   R[, 10] <- pvalue
 
-  R <- dplyr::as_data_frame(R)
+  R <- dplyr::as_tibble(R)
   R <- R %>% dplyr::mutate(GewekeStars = stratify_pvalue(pvalue))
 
 

@@ -406,7 +406,7 @@ AgeC14_Computation <- function(Data_C14Cal,
 
 
   R[, 9] = pvalue
-  R <- dplyr::as_data_frame(R)
+  R <- dplyr::as_tibble(R)
   R <- R %>% dplyr::mutate(GewekeStars = stratify_pvalue(pvalue))
    cat("\n------------------------------------------------------\n")
 
