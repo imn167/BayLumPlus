@@ -318,7 +318,7 @@ Compute_AgeS_D <- function(
         model = temp_file,
         data = dataList,
         n.chains = n.chains,
-        monitor = c("A", "Sigma"),
+        monitor = c("A"),
         adapt = adapt,
         startburnin = process_settings$startburnin,
         startsample = process_settings$startsample,
