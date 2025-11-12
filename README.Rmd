@@ -54,20 +54,30 @@ These tools help simplify and explore complex stratigraphic relationships more i
 
 ### Bayesian Age Modeling with `Compute_AgeS_D()`
 
-We introduce a new modeling function: `Compute_AgeS_D()`, focused on Bayesian age estimation under various prior structures.
+We introduce a new modeling function: `Compute_AgeS_D()`, focused on Bayesian age estimation under various prior structures.  
 
 **Supported priors include:**
 
-- `StrictOrder`: Uniform order on the log-scale (chain-like constraints)  
-- `StrictNicholls`: Based on the Uniform Order prior, from the original `BayLum`  
-- `Independence`: For unstructured or weakly constrained stratigraphy  
+* Bayesian prior for OSL datasets: 
+
+  - `constrained_Jeffrey`: Uniform order on the log-scale (chain-like constraints)  
+  - `StrictNicholls&Jones`: Based on the Uniform Order prior, from the original `BayLum`  
+  - `unconstrained_Jeffrey`: For unstructured or weakly constrained stratigraphy  
+* Bayesian prior for the simple approach where the likelihood is $\ M_i \sim \mathcal{N}(A_i, \sigma_i^2) \quad \forall i$:
+
+  - `unconstrained`
+  - `uniform_order`
+  - `Nicholls&Jones` 
+
+
+*All priors for age processing are stored in the data `ModelAgePrior` to get an easy access please use `extract_Jags_Model()`interactive function.*   
 
 ### Isotonic Distortion Framework
 
 `BayLumPlus` introduces a new Bayesian modeling strategy called **Isotonic Distortion**, implemented via:
 
 - `IsotonicCurve()` – fits the isotonic model  
-- `PlotIsotonicCurve()` – visualizes the results  
+- `PlotIsotonicCurve()` – visualizes the results with ggplots 
 
 This framework supports partial order constraints in ages, offering a flexible and interpretable alternative to traditional priors.
 

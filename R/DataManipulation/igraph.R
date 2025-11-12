@@ -226,29 +226,29 @@ for (i in 1:nrow(edges_all)) {
 
 
 #### Example for the paper ####
-Sc = rbind(c(0,1,0,1,1), c(0,0,0,1,1), c(0,1,0,1,1), rep(0,5), rep(0,5))
-network <-graph_from_adjacency_matrix( Sc)
-E(network)
+Sc = rbind(rep(1, 5), c(0,1,0,1,1), c(0,0,0,1,1), c(0,1,0,1,1), rep(0,5), rep(0,5))
+network <-buildNetwork(Sc)
+igraph::E(network)
 plot(
   network,
-  layout = layout_with_sugiyama(network),
+  layout = igraph::layout_with_sugiyama(network),
   vertex.label = paste0("A", 1:5),
   vertex.size = 20,
   vertex.color = adjustcolor("lightblue", alpha.f = 0.6),
-  edge.arrow.size = 0.4,  # Smaller arrowheads
+  edge.arrow.size = 1.5,  # Smaller arrowheads
   edge.width = 2,
   asp = 0,
   edge.curved = 0.1
 )
 
-reduced_network = remove_transitive_edges(network)
+reduced_network = remove_transitive_edges(Sc)
 plot(
   reduced_network,
-  layout = layout_with_sugiyama(reduced_network),
+  layout = igraph::layout_with_sugiyama(reduced_network),
   vertex.label = paste0("A", 1:5),
   vertex.size = 20,
   vertex.color = adjustcolor("lightblue", alpha.f = 0.6),
-  edge.arrow.size = 0.4,  # Smaller arrowheads
+  edge.arrow.size = 1.5,  # Smaller arrowheads
   edge.width = 2,
   asp = 0,
   edge.curved = 0.1

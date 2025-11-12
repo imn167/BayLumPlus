@@ -1,5 +1,3 @@
-[![R-CMD-check.yaml](https://github.com/imn167/BayLumPlus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/imn167/BayLumPlus/actions/workflows/R-CMD-check.yaml)
-[![pkgdown.yaml](https://github.com/imn167/BayLumPlus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/imn167/BayLumPlus/actions/workflows/pkgdown.yaml) [![test-coverage](https://github.com/imn167/BayLumPlus/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/imn167/BayLumPlus/actions/workflows/test-coverage.yaml)
 
 
 
@@ -18,19 +16,14 @@ introduces several new capabilities, particularly for the Age
 processing, where we aim to test different prior assumptions without
 incurring the computational cost associated with the Palaeodose Model.
 
-    To cite the R package 'BayLumPlus' please cite the R package itself and
-    the following article:
+    To cite the R package 'BayLumPlus' please cite the R package itself and the following article:
 
-      Bouafia I, Christophe C, Philippe A, Kreutzer S, Guérin G, Baumgarten
-      F, Frerebeau N (2024). _BayLumPlus: Chronological Bayesian Models
-      Integrating Optically Stimulated Luminescence and Radiocarbon Age
-      Dating_. R package version 1.0.0,
+      Bouafia I, Christophe C, Philippe A, Kreutzer S, Guérin G, Baumgarten F, Frerebeau N (2024). _BayLumPlus: Chronological
+      Bayesian Models Integrating Optically Stimulated Luminescence and Radiocarbon Age Dating_. R package version 1.0.0,
       <https://imn167.github.io/BayLumPlus/>.
 
-      Philippe A, Guerin G, Kreutzer S (2019). "BayLum - An R package for
-      Bayesian analysis of OSL ages: An introduction." _Quaternary
-      Geochronology_, *49*, 16-24. doi:10.1016/j.quageo.2018.05.009
-      <https://doi.org/10.1016/j.quageo.2018.05.009>.
+      Philippe A, Guerin G, Kreutzer S (2019). "BayLum - An R package for Bayesian analysis of OSL ages: An introduction."
+      _Quaternary Geochronology_, *49*, 16-24. doi:10.1016/j.quageo.2018.05.009 <https://doi.org/10.1016/j.quageo.2018.05.009>.
 
 ## Installation
 
@@ -71,11 +64,25 @@ Bayesian age estimation under various prior structures.
 
 **Supported priors include:**
 
-- `StrictOrder`: Uniform order on the log-scale (chain-like
-  constraints)  
-- `StrictNicholls`: Based on the Uniform Order prior, from the original
-  `BayLum`  
-- `Independence`: For unstructured or weakly constrained stratigraphy
+- Bayesian prior for OSL datasets:
+
+  - `constrained_Jeffrey`: Uniform order on the log-scale (chain-like
+    constraints)  
+  - `StrictNicholls&Jones`: Based on the Uniform Order prior, from the
+    original `BayLum`  
+  - `unconstrained_Jeffrey`: For unstructured or weakly constrained
+    stratigraphy  
+
+- Bayesian prior for the simple approach where the likelihood is
+  $M_i \sim \mathcal{N}(A_i, \sigma_i^2) \quad \forall i$:
+
+  - `unconstrained`
+  - `uniform_order`
+  - `Nicholls&Jones`
+
+*All priors for age processing are stored in the data `ModelAgePrior` to
+get an easy access please use `extract_Jags_Model()`interactive
+function.*
 
 ### Isotonic Distortion Framework
 
@@ -83,7 +90,7 @@ Bayesian age estimation under various prior structures.
 **Isotonic Distortion**, implemented via:
 
 - `IsotonicCurve()` – fits the isotonic model  
-- `PlotIsotonicCurve()` – visualizes the results
+- `PlotIsotonicCurve()` – visualizes the results with ggplots
 
 This framework supports partial order constraints in ages, offering a
 flexible and interpretable alternative to traditional priors.
