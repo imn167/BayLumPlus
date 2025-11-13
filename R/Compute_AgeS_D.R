@@ -246,37 +246,22 @@ Compute_AgeS_D <- function(
     writeLines(model, con = temp_file)
     if ( prior == "oldBayLum"  | prior == "unconstrained_Jeffrey"| prior == "unconstrained") {
 
-  inits = list(
-    list(u = runif(Nb_sample)), #chain 1
-    list(u = runif(Nb_sample)), # chain 2
-    list(u = runif(Nb_sample)) #chain 3
-  )
+  inits = replicate(n.chains, list(u = runif(Nb_sample)), simplify = F)
     }
 
   else if ( prior == "constrained_Jeffrey" | prior == "uniform_order") {
 
-    inits = list(
-     list( e = rexp(Nb_sample + 1)), #chain 1
-     list( e = rexp(Nb_sample+ 1)), #chain 2
-      list(e = rexp(Nb_sample+ 1)) #chain 3
-    )
+    inits = replicate(n.chains, list( e = rexp(Nb_sample + 1)), simplify = F)
   }
 
     else if (prior == "StrictNicholls&Jones" | prior == "Nicholls&Jones") {    ######
 
-      inits = list(
-       nichollsInit(Nb_sample, 1, 0) , #chain 1
-       nichollsInit(Nb_sample, 1, 0), #chain 2
-       nichollsInit(Nb_sample, 1, 0) #chain 3
-      )
+      inits = replicate(n.chains, nichollsInit(Nb_sample, 1, 0), simplify = F)
+
     }
 
     else if (prior == "nichollsBR") {    ######
-      inits = list(
-        nichollsBRInit(Nb_sample, 1, 0) , #chain 1
-        nichollsBRInit(Nb_sample, 1, 0), #chain 2
-        nichollsBRInit(Nb_sample, 1, 0) #chain 3
-      )
+      inits = replicate(n.chains, nichollsBRInit(Nb_sample, 1, 0), simplify = F)
     }
     #run JAGS
     results_runjags <-

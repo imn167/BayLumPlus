@@ -441,6 +441,8 @@ Age_OSLC14 <- function(
         nrow = (Nb_sample + 1),
         byrow = T
       )
+
+
     } else{
       if (is(StratiConstraints)[1] == "character") {
         SCMatrix = read.csv(StratiConstraints, sep = sepSC)
@@ -513,14 +515,16 @@ Age_OSLC14 <- function(
 
     #---  Index preparation ####
     ind_OSL <- which(SampleNature[1,] == 1)
-    CS_OSL <- cumsum(SampleNature[1,])
+    CS_OSL <- cumsum(SampleNature[1,]) #where OSL in all samples (1:NbSample)
     ind_C14 <- which(SampleNature[2,] == 1)
-    CS_C14 <- cumsum(SampleNature[2,])
+    CS_C14 <- cumsum(SampleNature[2,]) # where C14 in all samples (1:NbSample)
+
+    n_C14 = length(ind_C14)
 
     ind_change <- c(1)
     for (i in 2:(Nb_sample - 1)) {
       if (SampleNature[1, i] != SampleNature[1, i + 1]) {
-        ind_change <- c(ind_change, i)
+        ind_change <- c(ind_change, i) #index that mark the switch between C14 and OSL
       }
     }
     ind_change <- c(ind_change, Nb_sample)
@@ -659,6 +663,10 @@ Age_OSLC14 <- function(
     # JAGS RUN --------------------- START
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 
+    ## initialization
+
+    inits = replicate(n = n.chains, expr = list(u = runif(Nb_sample), invalpha = rgamma(n_C14, shape = 3, rate = 1/4)), simplify = F)
+
     ##further settings provided eventually
     process_settings <- modifyList(x = list(
       max.time = Inf,
@@ -680,13 +688,14 @@ Age_OSLC14 <- function(
           model = temp_file,
           data = dataList,
           n.chains = n.chains,
-          monitor = c("A", "Z"),
+          monitor = c("A", "Z", "Atilde"),
           adapt = adapt,
           burnin = burnin,
           sample = Iter,
           silent.jags = quiet,
           method = jags_method,
-          thin = t
+          thin = t,
+          inits = inits
         )
     }
 
@@ -836,16 +845,16 @@ for (i in 1:results_runjags$args$Nb_sample) {
                                              roundingOfValue)
   cat(
     "\t\t\t\t at level 95% \t",
-    round(c(HPD_95[2]), roundingOfValue),
+    round(c(HPD_95[1]), roundingOfValue),
     "\t\t",
-    round(c(HPD_95[3]), roundingOfValue),
+    round(c(HPD_95[2]), roundingOfValue),
     "\n"
   )
   cat(
     "\t\t\t\t at level 68% \t",
-    round(c(HPD_68[2]), roundingOfValue),
+    round(c(HPD_68[1]), roundingOfValue),
     "\t\t",
-    round(c(HPD_68[3]), roundingOfValue),
+    round(c(HPD_68[2]), roundingOfValue),
     "\n"
   )
   AgePlot95[i, ] = HPD_95
@@ -853,8 +862,8 @@ for (i in 1:results_runjags$args$Nb_sample) {
   AgePlotMoy[i] = round(mean(Sample[, i]), roundingOfValue)
 
   R[i, 3] = round(mean(Sample[, i]), roundingOfValue)
-  R[i, c(1, 5)] = round(HPD_95[2:3], roundingOfValue)
-  R[i, c(2, 4)] = round(HPD_68[2:3], roundingOfValue)
+  R[i, c(1, 5)] = round(HPD_95[1:2], roundingOfValue)
+  R[i, c(2, 4)] = round(HPD_68[1:2], roundingOfValue)
   R[i, 6] = c('')
   R[i, 7] = round(CV$psrf[i, 1], roundingOfValue)
   R[i, 8] = round(CV$psrf[i, 2], roundingOfValue)
@@ -867,12 +876,13 @@ R[, c(7, 8)] <- round(CV$psrf[1:results_runjags$args$Nb_sample, ], roundingOfVal
 # Representation graphique des resultats
 #        des HPD sur la courbe de calibration
 if (sum(results_runjags$args$SampleNature[2, ]) > 1) {
+
   couleur = rainbow(results_runjags$args$Nb_sample)
   par(mfrow = c(1, 1),
       las = 0,
       mar = c(5, 5, 2, 2))
-  xl = c(min(results_runjags$args$PriorAge[seq(1, (2 * results_runjags$args$Nb_sample - 1), 2)]), max(results_runjags$args$PriorAge[seq(2, (2 *
-                                                                               results_runjags$args$Nb_sample), 2)]))
+  xl = c(min(results_runjags$args$PriorAge[seq(1, (2 * results_runjags$args$Nb_sample - 1), 2)]),
+         max(results_runjags$args$PriorAge[seq(2, (2 * results_runjags$args$Nb_sample), 2)]))
   plot(
     xl,
     xl,
@@ -890,7 +900,7 @@ if (sum(results_runjags$args$SampleNature[2, ]) > 1) {
           col = "gray",
           border = "black")
   for (i in ind_C14) {
-    lines(c(AgePlot95[i, 2:3]),
+    lines(c(AgePlot95[i, 1:2]),
           rep(results_runjags$args$Data_C14Cal[CS_C14[i]], 2),
           col = couleur[i],
           lwd = 4)
@@ -902,14 +912,14 @@ if (sum(results_runjags$args$SampleNature[2, ]) > 1) {
       type = 'p'
     )
   }
-  legend(
-    "topleft",
-    SampleNames[ind_C14],
-    lty = rep(1, results_runjags$args$Nb_sample),
-    lwd = rep(2, results_runjags$args$Nb_sample),
-    cex = 1,
-    col = couleur[ind_C14]
-  )
+  # legend(
+  #   "topleft",
+  #   SampleNames[ind_C14],
+  #   lty = rep(1, results_runjags$args$Nb_sample),
+  #   lwd = rep(2, results_runjags$args$Nb_sample),
+  #   cex = 1,
+  #   col = couleur[ind_C14]
+  # )
   if (SavePdf == TRUE) {
     dev.print(
       pdf,
@@ -944,10 +954,10 @@ output <- .list_BayLum(
   "Ages" = data.frame(
     SAMPLE = SampleNames,
     AGE = AgePlotMoy,
-    HPD68.MIN = AgePlot68[, 2],
-    HPD68.MAX = AgePlot68[, 3],
-    HPD95.MIN = AgePlot95[, 2],
-    HPD95.MAX = AgePlot95[, 3],
+    HPD68.MIN = AgePlot68[, 1],
+    HPD68.MAX = AgePlot68[, 2],
+    HPD95.MIN = AgePlot95[, 1],
+    HPD95.MAX = AgePlot95[, 2],
     stringsAsFactors = FALSE
   ),
   "Sampling" = echantillon,

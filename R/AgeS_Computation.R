@@ -500,6 +500,8 @@ AgeS_Computation <- function(
       temp_file <- tempfile(fileext = ".txt")
       writeLines(model, con = temp_file)
 
+      inits = replicate(n.chains, list(u = runif(Nb_sample)), simplify = F)
+
       ##run JAGS
       results_runjags <-
         runjags::run.JAGS(
@@ -512,7 +514,8 @@ AgeS_Computation <- function(
           sample = Iter,
           silent.jags = quiet,
           method = jags_method,
-          thin = t
+          thin = t,
+          inits = inits
         )
     }
 
@@ -698,16 +701,16 @@ AgeS_Computation <- function(
                                                roundingOfValue)
     cat(
       "\t\t\t\t at level 95% \t",
-      round(c(HPD_95[2]), roundingOfValue),
+      round(c(HPD_95[1]), roundingOfValue),
       "\t\t",
-      round(c(HPD_95[3]), roundingOfValue),
+      round(c(HPD_95[2]), roundingOfValue),
       "\n"
     )
     cat(
       "\t\t\t\t at level 68% \t",
-      round(c(HPD_68[2]), roundingOfValue),
+      round(c(HPD_68[1]), roundingOfValue),
       "\t\t",
-      round(c(HPD_68[3]), roundingOfValue),
+      round(c(HPD_68[2]), roundingOfValue),
       "\n"
     )
     AgePlot95[i, ] = HPD_95
@@ -715,8 +718,8 @@ AgeS_Computation <- function(
     AgePlotMoy[i] = round(mean(sample[, i]), roundingOfValue)
 
     R[i, 3] = round(mean(sample[, i]), roundingOfValue)
-    R[i, c(1, 5)] = round(HPD_95[2:3], roundingOfValue)
-    R[i, c(2, 4)] = round(HPD_68[2:3], roundingOfValue)
+    R[i, c(1, 5)] = round(HPD_95[1:2], roundingOfValue)
+    R[i, c(2, 4)] = round(HPD_68[1:2], roundingOfValue)
 
     cat(paste(
       "\nParameter",
@@ -738,22 +741,22 @@ AgeS_Computation <- function(
                                                roundingOfValue)
     cat(
       "\t\t\t\t at level 95% \t",
-      round(c(HPD_95[2]), roundingOfValue),
+      round(c(HPD_95[1]), roundingOfValue),
       "\t\t",
-      round(c(HPD_95[3]), roundingOfValue),
+      round(c(HPD_95[2]), roundingOfValue),
       "\n"
     )
     cat(
       "\t\t\t\t at level 68% \t",
-      round(c(HPD_68[2]), roundingOfValue),
+      round(c(HPD_68[1]), roundingOfValue),
       "\t\t",
-      round(c(HPD_68[3]), roundingOfValue),
+      round(c(HPD_68[2]), roundingOfValue),
       "\n"
     )
 
     R[(Nb_sample + i), 3] = round(mean(sample[, (Nb_sample + i)]), roundingOfValue)
-    R[(Nb_sample + i), c(1, 5)] = round(HPD_95[2:3], roundingOfValue)
-    R[(Nb_sample + i), c(2, 4)] = round(HPD_68[2:3], roundingOfValue)
+    R[(Nb_sample + i), c(1, 5)] = round(HPD_95[1:2], roundingOfValue)
+    R[(Nb_sample + i), c(2, 4)] = round(HPD_68[1:2], roundingOfValue)
 
     cat(paste(
       "\nParameter",
@@ -775,22 +778,22 @@ AgeS_Computation <- function(
                                                                    i)], 0.68, roundingOfValue = roundingOfValue)
     cat(
       "\t\t\t\t at level 95% \t",
-      round(c(HPD_95[2]), roundingOfValue),
+      round(c(HPD_95[1]), roundingOfValue),
       "\t\t",
-      round(c(HPD_95[3]), roundingOfValue),
+      round(c(HPD_95[2]), roundingOfValue),
       "\n"
     )
     cat(
       "\t\t\t\t at level 68% \t",
-      round(c(HPD_68[2]), roundingOfValue),
+      round(c(HPD_68[1]), roundingOfValue),
       "\t\t",
-      round(c(HPD_68[3]), roundingOfValue),
+      round(c(HPD_68[2]), roundingOfValue),
       "\n"
     )
 
     R[(2 * Nb_sample + i), 3] = round(mean(sample[, (2 * Nb_sample + i)]), roundingOfValue)
-    R[(2 * Nb_sample + i), c(1, 5)] = round(HPD_95[2:3], roundingOfValue)
-    R[(2 * Nb_sample + i), c(2, 4)] = round(HPD_68[2:3], roundingOfValue)
+    R[(2 * Nb_sample + i), c(1, 5)] = round(HPD_95[1:2], roundingOfValue)
+    R[(2 * Nb_sample + i), c(2, 4)] = round(HPD_68[1:2], roundingOfValue)
 
     # R[(3*(i-1)+1):(3*i),6]=c('','','')
     # R[(3*(i-1)+1):(3*i),7]=round(CV$psrf[c(i,i+Nb_sample,i+2*Nb_sample),1],2)
@@ -835,10 +838,10 @@ AgeS_Computation <- function(
     "Ages" = data.frame(
       SAMPLE = SampleNames,
       AGE = AgePlotMoy,
-      HPD68.MIN = AgePlot68[, 2],
-      HPD68.MAX = AgePlot68[, 3],
-      HPD95.MIN = AgePlot95[, 2],
-      HPD95.MAX = AgePlot95[, 3],
+      HPD68.MIN = AgePlot68[, 1],
+      HPD68.MAX = AgePlot68[, 2],
+      HPD95.MIN = AgePlot95[, 1],
+      HPD95.MAX = AgePlot95[, 2],
       stringsAsFactors = FALSE
     ),
     "Sampling" = echantillon,

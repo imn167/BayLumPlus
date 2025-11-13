@@ -256,18 +256,13 @@ AgeC14_Computation <- function(Data_C14Cal,
 
    ## No need to run isotonicRegression init if no constraints
    if(sum(StratiConstraints[-1, ]) == 0) {
-     inits = list(C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints,unconstrained =  T), #chain 1
-                  C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints,unconstrained =  T), #chain 2
-                  C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints, unconstrained = T) #chain 3
-     )
+
+     inits = replicate(n.chains, C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints,unconstrained =  T), simplify = F )
    }
 
    else {
 
-    inits = list(C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints), #chain 1
-                 C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints), #chain 2
-                 C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints) #chain 3
-                 )
+    inits = replicate(n.chains, C14Init(dataList$N, dataList$xbound, Sc = dataList$StratiConstraints), simplify = F)
    }
 
    #No autorun : writing model in temporary file

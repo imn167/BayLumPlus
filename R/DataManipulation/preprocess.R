@@ -987,15 +987,200 @@ visNetwork(nodes, edges) %>%
 
 
 ############## testing findbounds
+##testing the construction for OSLC14 function :
 
 
-all_bounds = findbounds(reduced_network)
-all_bounds[[2]]
+model_construction <- function(SampleNature, Nb_sample, Model_C14= "full") {
 
 
+  #---  Index preparation ####
+  ind_OSL <- which(SampleNature[1,] == 1)
+  CS_OSL <- cumsum(SampleNature[1,]) #where OSL in all samples (1:NbSample)
+  ind_C14 <- which(SampleNature[2,] == 1)
+  CS_C14 <- cumsum(SampleNature[2,]) # where C14 in all samples (1:NbSample)
 
+  ind_change <- c(1)
+  for (i in 2:(Nb_sample - 1)) {
+    if (SampleNature[1, i] != SampleNature[1, i + 1]) {
+      ind_change <- c(ind_change, i) #index that mark the switch between C14 and OSL
+    }
+  }
+  ind_change <- c(ind_change, Nb_sample)
 
+  q <- length(ind_change) %/% 2
+  r <- length(ind_change) %% 2
 
+  ##--- description du model BUG ####
+  BUGModel <- c()
 
+  #- Prior
+  ModelPrior <- 0
+  data(ModelPrior, envir = environment())
+  BUGPrior <- c()
 
+  if (r == 1) {
+    if (SampleNature[1, 1] == 1) {
+      BUGPrior <- paste(BUGPrior, ModelPrior$Sample1_OSL)
+    } else{
+      BUGPrior <- paste(BUGPrior, ModelPrior$Sample1_C14)
+    }
+    if (SampleNature[1, 2] == 1) {
+      BUGPrior <- paste(BUGPrior, ModelPrior$OSL_C14)
+    } else{
+      BUGPrior <- paste(BUGPrior, ModelPrior$C14_OSL)
+    }
+  } else{
+    q <- q - 1
+    if (q == 0) {
+      stop(
+        "[Age_OSLC14()] If you see this message, you are probably trying to run the model with a small number of samples.
+           You can still use the function, but the C-14 sample cannot be the first sample.",
+        call. = FALSE
+      )
 
+    }
+
+    if (SampleNature[1, 1] == 1) {
+      BUGPrior <- paste(BUGPrior, ModelPrior$Sample1_OSL)
+    } else{
+      BUGPrior <- paste(BUGPrior, ModelPrior$Sample1_C14)
+    }
+    if (SampleNature[1, 2] == 1) {
+      BUGPrior <- paste(BUGPrior, ModelPrior$OSL_C14)
+    } else{
+      BUGPrior <- paste(BUGPrior, ModelPrior$C14_OSL)
+    }
+    if (SampleNature[1, Nb_sample] == 1) {
+      BUGPrior = paste(BUGPrior, ModelPrior$OSL)
+    } else{
+      BUGPrior = paste(BUGPrior, ModelPrior$C14)
+    }
+  }
+
+  #- partie C14
+  ModelC14 <- 0
+  data(ModelC14, envir = environment())
+  if (Model_C14 == "full") {
+    BUGModel = paste(ModelC14$full, BUGPrior)
+  } else{
+    BUGModel = paste(ModelC14$naive, BUGPrior)
+  }
+
+  #- partie OSL
+  ModelOSL <- 0
+  LIN_fit =T
+  Origin_fit = T
+  distribution = "cauchy"
+
+  data(ModelOSL, envir = environment())
+  if (LIN_fit == TRUE) {
+    cLIN = c('LIN')
+  } else{
+    cLIN = c()
+  }
+  if (Origin_fit == TRUE) {
+    cO = c("ZO")
+  } else{
+    cO = c()
+  }
+  Model_GrowthCurve = c(paste("AgesMultiOSL_EXP", cLIN, cO, sep = ""))
+  BUGModel = c(paste("model{", ModelOSL[[Model_GrowthCurve]][[distribution]], BUGModel, "}"))
+
+  return(list(BUGModel= BUGModel, ind_change = ind_change, BUGPrior= BUGPrior))
+}
+
+sampleNature = matrix(c(c(1, 0, 1, 1, 1,0, 0, 0), (!c(1, 0, 1, 1, 1,0, 0, 0))*1), nrow = 2, byrow = T)
+sampleNature
+n = 8
+
+cat(model_construction(sampleNature, n))
+
+#test on data for Age_OSLC14
+## Load data
+# OSL data
+data(DATA1,envir = environment())
+data(DATA2,envir = environment())
+Data <- combine_DataFiles(DATA2,DATA1)
+
+# 14C data
+C14Cal <- DATA_C14$C14[1,1]
+SigmaC14Cal <- DATA_C14$C14[1,2]
+Names <- DATA_C14$Names[1]
+
+# Prior Age
+prior <- rep(c(1, 60),3)
+samplenature <- matrix(
+  data = c(1,0,1,0,1,0),
+  ncol = 3,
+  nrow = 2,
+  byrow = TRUE)
+
+SC <- matrix(
+  data = c(1,1,1,0,1,1,0,0,1,0,0,0),
+  ncol = 3,
+  nrow =4 ,
+  byrow = TRUE)
+
+Age <- Age_OSLC14(
+    DATA = Data,
+    Data_C14Cal = C14Cal,
+   Data_SigmaC14Cal = SigmaC14Cal,
+    SampleNames = c("GDB5",Names,"GDB3"),
+    Nb_sample = 3,
+    SampleNature = samplenature,
+    PriorAge = prior,
+    StratiConstraints = SC,
+    Iter = 2000,
+   t = 10,
+    burnin = 2000,
+    adapt = 200,
+  n.chains = 3,
+  jags_method = "rjparallel")
+
+Nb_sample <- 2
+SC <- matrix(
+  data = c(1,1,0,1,0,0),
+  ncol = 2,
+  nrow = (Nb_sample+1),
+  byrow = TRUE)
+
+## Not run:
+## run standard
+Age <- AgeS_Computation(
+  DATA = Data,
+  Nb_sample = Nb_sample,
+  SampleNames = c("GDB5","GDB3"),
+  PriorAge = rep(c(1,100), 2),
+  StratiConstraints = SC,
+  Iter = 2000,
+  burnin = 2000,
+  t = 10,
+  adapt = 1000,
+  quiet = FALSE,
+  jags_method = "rjparallel"
+)
+
+## Load data
+data(DATA_C14,envir = environment())
+C14Cal <- DATA_C14$C14[,1]
+SigmaC14Cal <- DATA_C14$C14[,2]
+Names <- DATA_C14$Names
+nb_sample <- length(Names)
+
+## Age computation of samples without stratigraphic relations
+Age <- AgeC14_Computation(
+  Data_C14Cal = C14Cal,
+  Data_SigmaC14Cal = SigmaC14Cal,
+  SampleNames = Names,
+  Nb_sample = nb_sample,
+  PriorAge = rep(c(20,60),nb_sample),
+  Iter = 2000,
+  t = 10,  burnin = 2000,
+  jags_method = "rjparallel",
+  quiet = TRUE,
+  roundingOfValue = 3)
+
+network_vizualization(remove_transitive_edges(SC), vertices_labels =c("GDB5",Names,"GDB3"), interactive = F)
+prior_age = model_construction(samplenature, 3)
+prior_age$ind_change
+cat(prior_age$BUGPrior)

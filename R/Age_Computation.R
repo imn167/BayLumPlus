@@ -223,13 +223,14 @@ Age_Computation <- function(
 
   ##open text connection
   con <- textConnection(Model_Age[[Model_GrowthCurve]][[distribution]])
-
+  inits = replicate(n.chains, list(u = runif(1)), simplify = F)
   jags <- rjags::jags.model(
     file = con,
     data = dataList,
     n.chains = n.chains,
     n.adapt = Iter,
-    quiet = quiet
+    quiet = quiet,
+    inits = inits
   )
 
   ##close connection
@@ -286,36 +287,36 @@ Age_Computation <- function(
   HPD_95=CredibleInterval(echantillon[[1]][,1],0.95,roundingOfValue = roundingOfValue)
   HPD_68=CredibleInterval(echantillon[[1]][,1],0.68,roundingOfValue = roundingOfValue)
   cat("\t\t\t\t\t\t lower bound \t upper bound\n")
-  cat("\t\t\t\t at level 95%\t",round(c(HPD_95[2]),2),"\t\t",round(c(HPD_95[3]),roundingOfValue),"\n")
-  cat("\t\t\t\t at level 68%\t",round(c(HPD_68[2]),2),"\t\t",round(c(HPD_68[3]),roundingOfValue),"\n")
+  cat("\t\t\t\t at level 95%\t",round(c(HPD_95[1]),2),"\t\t",round(c(HPD_95[2]),roundingOfValue),"\n")
+  cat("\t\t\t\t at level 68%\t",round(c(HPD_68[1]),2),"\t\t",round(c(HPD_68[2]),roundingOfValue),"\n")
   cat("----------------------------------------------\n")
 
   R[1,3]=round(mean(sample[,1]),roundingOfValue)
-  R[1,c(1,5)]=round(HPD_95[2:3],roundingOfValue)
-  R[1,c(2,4)]=round(HPD_68[2:3],roundingOfValue)
+  R[1,c(1,5)]=round(HPD_95[1:2],roundingOfValue)
+  R[1,c(2,4)]=round(HPD_68[1:2],roundingOfValue)
 
   cat(paste("D","\t\t", round(mean(sample[,2]),roundingOfValue),'\n'))
   HPD_95=CredibleInterval(echantillon[[1]][,2],0.95,roundingOfValue = roundingOfValue)
   HPD_68=CredibleInterval(echantillon[[1]][,2],0.68,roundingOfValue = roundingOfValue)
   cat("\t\t\t\t\t\t lower bound \t upper bound\n")
-  cat("\t\t\t\t at level 95%\t",round(c(HPD_95[2]),roundingOfValue),"\t\t",round(c(HPD_95[3]),roundingOfValue),"\n")
-  cat("\t\t\t\t at level 68%\t",round(c(HPD_68[2]),roundingOfValue),"\t\t",round(c(HPD_68[3]),roundingOfValue),"\n")
+  cat("\t\t\t\t at level 95%\t",round(c(HPD_95[1]),roundingOfValue),"\t\t",round(c(HPD_95[2]),roundingOfValue),"\n")
+  cat("\t\t\t\t at level 68%\t",round(c(HPD_68[1]),roundingOfValue),"\t\t",round(c(HPD_68[2]),roundingOfValue),"\n")
 
   R[2,3]=round(mean(sample[,2]),roundingOfValue)
-  R[2,c(1,5)]=round(HPD_95[2:3],roundingOfValue)
-  R[2,c(2,4)]=round(HPD_68[2:3],roundingOfValue)
+  R[2,c(1,5)]=round(HPD_95[1:2],roundingOfValue)
+  R[2,c(2,4)]=round(HPD_68[1:2],roundingOfValue)
 
   cat("----------------------------------------------\n")
   cat(paste("sD","\t\t", round(mean(sample[,3]),3),'\n'))
   HPD_95=CredibleInterval(echantillon[[1]][,3],0.95,roundingOfValue = roundingOfValue)
   HPD_68=CredibleInterval(echantillon[[1]][,3],0.68,roundingOfValue = roundingOfValue)
   cat("\t\t\t\t\t\t lower bound \t upper bound\n")
-  cat("\t\t\t\t at level 95%\t",round(c(HPD_95[2]),roundingOfValue),"\t\t",round(c(HPD_95[3]),roundingOfValue),"\n")
-  cat("\t\t\t\t at level 68%\t",round(c(HPD_68[2]),roundingOfValue),"\t\t",round(c(HPD_68[3]),roundingOfValue),"\n")
+  cat("\t\t\t\t at level 95%\t",round(c(HPD_95[1]),roundingOfValue),"\t\t",round(c(HPD_95[2]),roundingOfValue),"\n")
+  cat("\t\t\t\t at level 68%\t",round(c(HPD_68[1]),roundingOfValue),"\t\t",round(c(HPD_68[2]),roundingOfValue),"\n")
 
   R[3,3]=round(mean(sample[,3]),roundingOfValue)
-  R[3,c(1,5)]=round(HPD_95[2:3],roundingOfValue)
-  R[3,c(2,4)]=round(HPD_68[2:3],roundingOfValue)
+  R[3,c(1,5)]=round(HPD_95[1:2],roundingOfValue)
+  R[3,c(2,4)]=round(HPD_68[1:2],roundingOfValue)
 
   R[,6]=c('','','')
   R[,7]=round(CV$psrf[,1],roundingOfValue)
