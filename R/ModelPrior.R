@@ -13,7 +13,7 @@
 #                 u[1]~dunif(0,1)
 #                 CS[1]<-xbound[1]
 #                 A[1]<-exp(u[1]*log(xbound[2]/CS[1])+log(CS[1]))
-#                 Atilde[1] = A[1] -0.75
+#                 Atilde[1] = A[1] -0.075
 #                 "
 #
 # ModelPrior$OSL_C14 <- "
@@ -23,7 +23,7 @@
 #                   u[i]~dunif(0,1)
 #                   CS[i]<-max(StratiConstraints[(1:i),i]*c(xbound[(2*i-1)],A[1:(i-1)]))
 #                   A[i]<-exp(u[i]*log(xbound[2*(i-1)]/CS[i])+log(CS[i]))
-#                   Atilde[i] = A[i]-0.75
+#                   Atilde[i] = A[i]-0.075
 #                   }
 #                   # donnee C14
 #                   for(i in (ind_change[2*k]+1):ind_change[2*k+1]){
@@ -52,7 +52,7 @@
 #                     u[i]~dunif(0,1)
 #                     CS[i]<-max(StratiConstraints[(1:i),i]*c(xbound[(2*i-1)],A[1:(i-1)]))
 #                     A[i]<-exp(u[i]*log(xbound[2*(i-1)]/CS[i])+log(CS[i]))
-#                     Atilde[i] = A[i]-0.75
+#                     Atilde[i] = A[i]-0.075
 #                   }
 #             }"
 #
@@ -63,7 +63,7 @@
 #         u[i]~dunif(0,1)
 #         CS[i]<-max(StratiConstraints[(1:i),i]*c(xbound[(2*i-1)],A[1:(i-1)]))
 #         A[i]<-exp(u[i]*log(xbound[2*(i-1)]/CS[i])+log(CS[i]))
-#         Atilde[i] = A[i]-0.75
+#         Atilde[i] = A[i]-0.075
 #       }"
 #
 #
@@ -77,7 +77,7 @@
 #             alpha[CS_C14[i]]<-1/invalpha[CS_C14[i]]
 #             Atilde[i] = A[i]
 #         }"
-
-
-
-
+#
+#
+#
+#

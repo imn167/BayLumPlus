@@ -37,8 +37,8 @@
 #' `DR_GAMMA_U` \tab  standard error gamma-dose rate U \tab Gy/ka \cr
 #' `DR_GAMMA_Th` \tab  standard error gamma-dose rate Th \tab Gy/ka \cr
 #' `DR_GAMMA_TOTAL` \tab  standard error total gamma-dose rate \tab Gy/ka \cr
-#' `DR_TOTAL` \tab total dose rate  \tab Gy/ka \cr
-#' `DR_TOTAL_X` \tab standard error total dose rate  \tab Gy/ka \cr
+#' `DR_TOTAL` \tab total dose rate  \tab Gy/ka (\deqn{\dot{d}} )\cr
+#' `DR_TOTAL_X` \tab standard error total dose rate (\deqn{\sigma_\dot(d)})  \tab Gy/ka \cr
 #' }
 #'
 #' *Note: All columns can be set to 0 or `NA` but no column must be left empty! If a value > 0 is provided
@@ -59,8 +59,9 @@
 #' `s_gammaU` \tab relative uncertainty U concentration \tab - \cr
 #' `s_gammaTh` \tab relative uncertainty Th concentration \tab - \cr
 #' `s_gammaDR` \tab relative uncertainty gamma-dose rate  \tab - \cr
-#' `s_CAL` \tab relative uncertainty beta-source calibration \tab - \cr
+#' `s_CAL` \tab relative uncertainty beta-source calibration \dqen{\sigma_{\text{lab}}} \tab - \cr
 #' `s_intDR` \tab absolute uncertainty internal dose rate \tab Gy/ka \cr
+#' `s_water` \tab Relative uncertainty due to water conc (\deqn{\sigma_{\text{water}}}) \tab \cr
 #' }
 #'
 #'
@@ -119,7 +120,8 @@
 #'  s_gammaTh = 0.006,
 #'  s_gammaDR = 0.05,
 #'  s_CAL = 0.020,
-#'  s_intDR = 0.030))
+#'  s_intDR = 0.030,
+#'  s_water = .040))
 #'
 #' }
 #'
@@ -162,7 +164,8 @@ create_ThetaMatrix <- function(
     "s_gammaTh",
     "s_gammaDR",
     "s_CAL",
-    "s_intDR"
+    "s_intDR",
+    "s_water"
   )
 
   # Verify basic input --------------------------------------------------------------------------------
@@ -291,7 +294,7 @@ create_ThetaMatrix <- function(
       m[cmb[, j][1], cmb[, j][2]] <-
         sum(df[cmb[, j][1], -ncol(df)] * df[cmb[, j][2], -ncol(df)] *
               sigma_s[-which(names(sigma_s) == "s_intDR")] ^ 2) +
-        sigma_s["s_intDR"] ^ 2
+        sigma_s["s_intDR"] ^ 2 + sum(df[cmb[, j][1], -c(ncol(df), (ncol(df)-1))] * df[cmb[, j][2], -c(ncol(df), (ncol(df)-1))]) * sigma_s["s_water"]^2
 
     }
 

@@ -66,8 +66,8 @@ COLUMN \tab DESCRIPTION \tab UNIT \cr
 \code{DR_GAMMA_U} \tab  standard error gamma-dose rate U \tab Gy/ka \cr
 \code{DR_GAMMA_Th} \tab  standard error gamma-dose rate Th \tab Gy/ka \cr
 \code{DR_GAMMA_TOTAL} \tab  standard error total gamma-dose rate \tab Gy/ka \cr
-\code{DR_TOTAL} \tab total dose rate  \tab Gy/ka \cr
-\code{DR_TOTAL_X} \tab standard error total dose rate  \tab Gy/ka \cr
+\code{DR_TOTAL} \tab total dose rate  \tab Gy/ka (\deqn{\dot{d}} )\cr
+\code{DR_TOTAL_X} \tab standard error total dose rate (\deqn{\sigma_\dot(d)})  \tab Gy/ka \cr
 }
 
 \emph{Note: All columns can be set to 0 or \code{NA} but no column must be left empty! If a value > 0 is provided
@@ -88,8 +88,9 @@ ARGUMENT \tab DESCRIPTION \tab UNIT \cr
 \code{s_gammaU} \tab relative uncertainty U concentration \tab - \cr
 \code{s_gammaTh} \tab relative uncertainty Th concentration \tab - \cr
 \code{s_gammaDR} \tab relative uncertainty gamma-dose rate  \tab - \cr
-\code{s_CAL} \tab relative uncertainty beta-source calibration \tab - \cr
+\code{s_CAL} \tab relative uncertainty beta-source calibration \dqen{\sigma_{\text{lab}}} \tab - \cr
 \code{s_intDR} \tab absolute uncertainty internal dose rate \tab Gy/ka \cr
+\code{s_water} \tab Relative uncertainty due to water conc (\deqn{\sigma_{\text{water}}}) \tab \cr
 }
 }
 \section{Function version}{
@@ -116,7 +117,8 @@ sigma_s =  c(
  s_gammaTh = 0.006,
  s_gammaDR = 0.05,
  s_CAL = 0.020,
- s_intDR = 0.030))
+ s_intDR = 0.030,
+ s_water = .040))
 
 }
 

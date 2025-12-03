@@ -1089,11 +1089,11 @@ model_construction <- function(SampleNature, Nb_sample, Model_C14= "full") {
   return(list(BUGModel= BUGModel, ind_change = ind_change, BUGPrior= BUGPrior))
 }
 
-sampleNature = matrix(c(c(1, 0, 1, 1, 1,0, 0, 0), (!c(1, 0, 1, 1, 1,0, 0, 0))*1), nrow = 2, byrow = T)
+sampleNature = matrix(c(c(0, 0, 1, 1, 1,0, 0, 0), (!c(1, 0, 1, 1, 1,0, 0, 0))*1), nrow = 2, byrow = T)
 sampleNature
 n = 8
 
-cat(model_construction(sampleNature, n))
+cat(model_construction(sampleNature, n)$BUGModel)
 
 #test on data for Age_OSLC14
 ## Load data
