@@ -51,7 +51,7 @@
 #'   CredibleInterval(Event.12, 0.50)
 #' @author A. Philippe, M.-A. Vibet
 #' @noRd
-CredibleInterval <- function(a_chain, level = 0.95, roundingOfValue = 0) {
+CredibleInterval <- function(a_chain, level = 0.95, roundingOfValue = 3) {
   sorted_sample <- sort(a_chain) # Ordering the sample
   N <- length(a_chain)           # Calculation of the sample size
   OutSample <- N * (1 - level)   # Calculation of the number of data to be outside the interval

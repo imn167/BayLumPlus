@@ -9,6 +9,7 @@
 #' @param levels [numeric] c(0.95, 0.68) by default for the level of High Posterior Densities (HPD) regions. If the HPD region is composed of more than 1 interval then the model return the Credible Interval
 #'  at the level indicated.
 #' @param path [character] (Default) path for saving the `StratiConstraints`'s DAG
+#' @param rounding_digits [integer] (Default) digits for rounding estimated values.
 #'
 #'@return **NUMERICAL OUTPUT : A list of type `BayLum.list` containing the following objects**
 #'\enumerate{
@@ -21,7 +22,7 @@
 #'@export
 
 
-IsotonicCurve <- function(StratiConstraints, object, interactive, levels = c(.68,.95), path = tempdir()) {
+IsotonicCurve <- function(StratiConstraints, object, interactive, levels = c(.68,.95), path = tempdir(), rounding_digits = 3) {
 
   ##### VARIABLES #######@
   ## Forbid user from using anything other than unconstrained_Jeffrey
@@ -92,9 +93,10 @@ IsotonicCurve <- function(StratiConstraints, object, interactive, levels = c(.68
       HPD = apply(IsoSamples, 2, arkhe::interval_hdr, level = elt)
       if (is.list(HPD)) {
         message(paste("\t  \t Multiples HPD Regions -- Using", elt*100, " Credible Interval Instead \t \t "))
-        HPD = apply(IsoSamples, 2, CredibleInterval, level = elt, roundingOfValue = 3)
+        HPD = apply(IsoSamples, 2, CredibleInterval, level = elt, roundingOfValue = 12)
       }
       HPD = HPD[-3, ]
+      HPD = round(HPD, digits = rounding_digits)
 
       #create column names
       min_col <- paste0("HPD", elt*100, ".MIN")
@@ -107,7 +109,8 @@ IsotonicCurve <- function(StratiConstraints, object, interactive, levels = c(.68
     }
 
     colnames(IsoSamples) <-  SampleNames
-    IsoSummary = data.frame( AGE = apply(IsoSamples, 2, mean), SD = apply(IsoSamples, 2, sd), MAP = apply(IsoSamples, 2, get_map),
+    IsoSummary = data.frame( AGE = round(apply(IsoSamples, 2, mean), digits = rounding_digits),
+                             SD = round(apply(IsoSamples, 2, sd), digits = rounding_digits), MAP = round(apply(IsoSamples, 2, get_map), digits = rounding_digits),
                              SAMPLE = factor(SampleNames, levels = SampleNames), Unit = 1:n )
     IsoSummary = dplyr::left_join(IsoSummary, HPD_frame) #cbind(IsoSummary, HPD_frame)
 
@@ -158,6 +161,8 @@ PlotIsotonicCurve <- function( object, level = .95) {
     dplyr::rename_with(~c("lower", "upper"), dplyr::starts_with("HPD"))
   network <- object[[3]]
   n = dim(df)[1]
+  ## reversing the order for the ribbon and Graph plot
+  df <- df %>% dplyr::mutate(SAMPLE = factor(.data$SAMPLE, levels = rev(.data$SAMPLE)), Unit = rev(.data$Unit))
 
   curve = df  %>% ggplot2::ggplot(ggplot2::aes(x = .data$Unit, ymin = .data$lower, ymax = .data$upper)) +
     ggplot2::geom_ribbon(alpha = .4, fill = "orange") +
@@ -169,7 +174,8 @@ PlotIsotonicCurve <- function( object, level = .95) {
     ggplot2::geom_point(ggplot2::aes(x = .data$Unit, y = .data$AGE), color = "black") +
     BayLumTheme() + ggplot2::ylab("IsotonicRegression") + ggplot2::xlab("Samples") +
     ggplot2::scale_x_continuous(breaks = df$Unit, labels = df$SAMPLE)  +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) + ggplot2::coord_flip()
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) +
+    ggplot2::coord_flip() ## Flipped coordinates but needed to change the ordering ?
 
   # print(curve)
 

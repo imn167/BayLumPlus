@@ -57,7 +57,7 @@ IsotonicDistorsion = IsotonicCurve(Catalhoyuk$StratiConstraints, AgeC14_unconstr
 
 plot_Ages(IsotonicDistorsion, plot_mode = "density", model = "Isotonic")
 
-
+IsotonicDistorsion= IsotonicCurve(Catalhoyuk$StratiConstraints, Catalhoyuk$Output, interactive = F, rounding_digits = 4)
 IsotonicPlots = PlotIsotonicCurve(IsotonicDistorsion)
 IsotonicPlots$ribbon
 ggplot2::ggsave("../../Isotonic/images/Çatalhöyück/Catalhu_ribbon.png", width = 10, height = 6)

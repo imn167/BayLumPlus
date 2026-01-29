@@ -9,7 +9,8 @@ IsotonicCurve(
   object,
   interactive,
   levels = c(0.68, 0.95),
-  path = tempdir()
+  path = tempdir(),
+  rounding_digits = 3
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ IsotonicCurve(
 at the level indicated.}
 
 \item{path}{\link{character} (Default) path for saving the \code{StratiConstraints}'s DAG}
+
+\item{rounding_digits}{\link{integer} (Default) digits for rounding estimated values.}
 }
 \value{
 \strong{NUMERICAL OUTPUT : A list of type \code{BayLum.list} containing the following objects}
