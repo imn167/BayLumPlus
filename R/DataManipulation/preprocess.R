@@ -1095,13 +1095,14 @@ n = 8
 
 cat(model_construction(sampleNature, n)$BUGModel)
 
-#test on data for Age_OSLC14
+#### Age_OSLC14 test ####
 ## Load data
 # OSL data
-data(DATA1,envir = environment())
-data(DATA2,envir = environment())
-Data <- combine_DataFiles(DATA2,DATA1)
-
+data("DATA1", envir = environment())
+data("DATA2", envir = environment())
+DATA3 <- combine_DataFiles(L1 = DATA2, L2 = DATA1)
+str(DATA3)
+DATA1$Nb_measurement
 # 14C data
 C14Cal <- DATA_C14$C14[1,1]
 SigmaC14Cal <- DATA_C14$C14[1,2]
@@ -1120,6 +1121,59 @@ SC <- matrix(
   ncol = 3,
   nrow =4 ,
   byrow = TRUE)
+
+
+
+Doses_output = Palaeodose_Computation(DATA3, SampleNames = c("GDB5", "GDB3"), Nb_sample = 2, Iter = 2000, t = 10, n.chains = 3,
+                                      distribution = "cauchy", LIN_fit = TRUE, Origin_fit = FALSE)
+
+
+
+priorage = c(1, 10, 10, 100)
+Age <- AgeS_Computation(
+  DATA = DATA3,
+  Nb_sample = 2,
+  SampleNames = c("GDB5", "GDB3"),
+  PriorAge = priorage,
+  distribution = "cauchy",
+  LIN_fit = TRUE,
+  Origin_fit = FALSE,
+  Iter = 1000,
+  jags_method = "rjparallel"
+)
+
+samples = runjags::combine.mcmc(Age$Sampling)
+D = apply(samples[, 3:4], 2, mean)
+sD = as.numeric(apply(samples[, 3:4], 2, sd))
+M = c(as.numeric(D[1]), C14Cal, as.numeric(D[2]))
+Nb_sample = 3
+SampleNames = c("GDB5", Names, "GDB3")
+Theta = diag(c(DATA3$ddot_env[1,1]**2 * .1, DATA3$ddot_env[1,2]**2 * .1))
+encoding = c(1,0,1)
+
+dt = list(M = M, sD = sD, ddot = DATA3$ddot_env[1,], sigmaC14Cal =  SigmaC14Cal)
+
+output = Compute_AgeS_DC14(dt, Nb_sample, SampleNames, encoding, Theta, prior = "NichollsJones")
+
+
+index_osl = which(encoding == 1)
+index_c14 = which(encoding==0)
+Sigma = matrix(NA, 3,3)
+for (i in index_osl) {
+  for (j in index_c14) {
+    Sigma[i, j] = 0
+    Sigma[j,i] = 0
+  }
+}
+ThetaTilde = matrix(0, 3,3)
+ThetaTilde[index_osl, index_osl] = Theta
+for (i in index_osl) {
+  for (j in index_osl) {
+    Sigma[i, j] = ThetaTilde[i,j]
+  }
+}
+
+Sigma
 
 Age <- Age_OSLC14(
     DATA = Data,

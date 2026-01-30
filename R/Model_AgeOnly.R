@@ -12,7 +12,7 @@
 #' along with the structured data matrix computed by  \code{\link{create_MeasuresDataFrame}}.
 #' The models are designed to refine age estimation by integrating these measurements into a Bayesian framework.
 #' @references
-#' To cite this package, please use: citation("BayLum")
+#' To cite this package, please use: citation("BayLumPlus")
 
 #'@format oldBaylum : BayLum's Old Age Model (wrong vector law)
 

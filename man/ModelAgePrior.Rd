@@ -34,6 +34,6 @@ along with the structured data matrix computed by  \code{\link{create_MeasuresDa
 The models are designed to refine age estimation by integrating these measurements into a Bayesian framework.
 }
 \references{
-To cite this package, please use: citation("BayLum")
+To cite this package, please use: citation("BayLumPlus")
 }
 \keyword{datasets}
