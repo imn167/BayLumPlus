@@ -27,7 +27,7 @@ IsotonicCurve <- function(StratiConstraints, object, interactive, levels = c(.68
   ##### VARIABLES #######@
   ## Forbid user from using anything other than unconstrained_Jeffrey
   if(!is.nan(object$prior)) {
-    if(!startsWith(object$prior, "unconstrained")) stop(paste("The Posterior should be computed with the prior unconstrained_Jeffrey not", object$prior))
+    if(!startsWith(tolower(object$prior), "unconstrained")) stop(paste("The Posterior should be computed with the prior unconstrained_Jeffrey not", object$prior))
   }
 
   #get all mcmc samples

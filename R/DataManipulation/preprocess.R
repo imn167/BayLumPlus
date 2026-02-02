@@ -1124,9 +1124,11 @@ SC <- matrix(
 
 
 
-Doses_output = Palaeodose_Computation(DATA3, SampleNames = c("GDB5", "GDB3"), Nb_sample = 2, Iter = 2000, t = 10, n.chains = 3,
-                                      distribution = "cauchy", LIN_fit = TRUE, Origin_fit = FALSE)
+Doses_output = Palaeodose_Computation(DATA3, SampleNames = c("GDB5", "GDB3"), Nb_sample = 2, Iter = 20000, t = 10, n.chains = 3,
+                                      distribution = "cauchy", LIN_fit = F, Origin_fit = FALSE)
 
+switch(attributes(OSLJingbian$Output)$originator,
+      AgeS_Computation = object <- OSLJingbian$Output$Sampling, Compute_AgeS_D = object <- OSLJingbian$Output$Sampling)
 
 
 priorage = c(1, 10, 10, 100)
@@ -1154,6 +1156,68 @@ encoding = c(1,0,1)
 dt = list(M = M, sD = sD, ddot = DATA3$ddot_env[1,], sigmaC14Cal =  SigmaC14Cal)
 
 output = Compute_AgeS_DC14(dt, Nb_sample, SampleNames, encoding, Theta, prior = "NichollsJones")
+
+
+SaintBelec = read.csv2("R/DataManipulation/DC14_data/Data-SaintBelec.csv", skipNul = T, na.strings = "")
+
+SampleNames = colnames(SaintBelec)[2:17]
+SampleNames
+Nb_sample = length(SampleNames)
+M = as.numeric(SaintBelec[5, 2:17])
+M[is.na(M)] = as.numeric(SaintBelec[3, 2:17][!is.na(SaintBelec[3, 2:17])])
+M
+sD = as.numeric(SaintBelec[6,2:17][!is.na(SaintBelec[6,2:17])])
+sD
+ddot = as.numeric(SaintBelec[7,2:17][!is.na(SaintBelec[7,2:17])])
+ddot
+encoding = as.numeric(SaintBelec[1, 2:17])
+encoding
+SigmaC14Cal = as.numeric(SaintBelec[4,2:17][!is.na(SaintBelec[4,2:17])])
+SigmaC14Cal
+
+
+dt = list(M = M, sD = sD, ddot = ddot, sigmaC14Cal = SigmaC14Cal)
+dt$M
+Theta = as.matrix((read.csv("R/DataManipulation/DC14_data/ThetaMatrix1212.csv", sep = ";", dec = ".")))
+dim(Theta)
+output = Compute_AgeS_DC14(dt, Nb_sample, SampleNames, encoding, Theta, prior = "NichollsJones" , PriorAge = rep(c(1, 200), Nb_sample), burnin = 80000,
+                           Iter = 2000, t = 10)
+output$Ages
+output$diagnostics_plots$trace()
+output$diagnostics_plots$acf()
+output$prior = "unconstrained"
+
+load("R/DataManipulation/DC14_data/Models_SaintBelec.RData")
+
+strati = as.matrix(readxl::read_xlsx("R/DataManipulation/DC14_data/StratCons.xlsx", sheet = 1, col_names = F))
+
+colnames(strati) = SampleNames
+dim(strati)
+for (i in 1:16) {
+  strati[i,i] =0
+}
+
+strati = rbind(rep(1,Nb_sample))
+plot(remove_transitive_edges(rbind(rep(1,Nb_sample), strati)))
+network_vizualization(remove_transitive_edges(rbind(rep(1,Nb_sample), strati)), vertices_labels = SampleNames, interactive = F)
+
+isotonic_output = IsotonicCurve(rbind(rep(1,Nb_sample), strati), output, interactive = F)
+Isotonic_Plots = PlotIsotonicCurve(isotonic_output)
+Isotonic_Plots$DAG
+Isotonic_Plots$ribbon
+
+plot_Ages(output, plot_mode = "density")
+plot_Ages(isotonic_output, plot_mode = "density")
+
+
+save(output, isotonic_output, Isotonic_Plots, strati,   file = "R/DataManipulation/DC14_data/Models_SaintBelec.RData")
+M = as.numeric(SaintBelec[5, 2:17][!is.na(SaintBelec[5, 2:17])])
+M
+dt = list(D = M, sD = sD, ddot = ddot)
+osl_output = Compute_AgeS_D(dt, 12, SampleNames[1:12], Theta, prior = "unconstrained_Jeffrey")
+
+sapply(dt, length)
+
 
 
 index_osl = which(encoding == 1)

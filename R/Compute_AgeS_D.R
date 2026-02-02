@@ -103,7 +103,6 @@ sepSC <- NULL
 #'   \item \bold{StratiConstraints}: stating the stratigraphic relations between samples considered in the model;
 #'   \item \bold{CovarianceMatrix}: stating the covariance matrix of error used in the model, highlighting common errors between samples or not;
 #'   \item \bold{model}: returns the model that was used for the Bayesian modelling as a [character];
-#   \item \bold{JAGS model output}: returns the JAGS model with class "runjags";
 #'   \item \bold{diagnostics_plots}: List of MCMC and ACF plots for the diagnostics of convergence -- check attributes for Gelman CV;
 #'   \item \bold{Summary}: Summary Table of the posterior's MCMC;
 #'  }
@@ -268,7 +267,7 @@ Compute_AgeS_D <- function(
     }
     #run JAGS
     results_runjags <-
-      runjags::run.JAGS(
+      suppressWarnings(runjags::run.JAGS(
         model = temp_file,
         data = dataList,
         n.chains = n.chains,
@@ -281,6 +280,7 @@ Compute_AgeS_D <- function(
         thin = t,
         inits = inits
       )
+  )# Silence known harmless rjags warnings caused by non-UTF8 Windows locales (e.g. French Windows)
 
   }
 
@@ -352,7 +352,7 @@ Compute_AgeS_D <- function(
   diagnostic_plots = create_diagnostic_plots(echantillon, SampleNames)
 
   #optional display for plots
-  if (interactive()) {
+  if (display_plots) {
     display_diagnostic_plots(diagnostic_plots)
   }
 

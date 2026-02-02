@@ -86,7 +86,9 @@ plot_MCMC <- function(
         ##select what to do for different functions
         switch(attributes(object)$originator,
                AgeS_Computation = object <- object$Sampling,
-               Age_OSLC14 = object <- object$Sampling
+               Age_OSLC14 = object <- object$Sampling,
+               Compute_AgeS_D = object <-object$Sampling, #new function BayLumPlus
+               Compute_AgeS_DC14 = object <- object$Sampling # new function BayLumPlus
         )
 
       }
@@ -106,7 +108,7 @@ plot_MCMC <- function(
                   paste(sel, collapse = ", "), "."), call. = FALSE)
     }
 
-    ##create new object
+    ##create new object with only the sel variables
     object <- as.mcmc.list(lapply(object, function(x){
       x[,sel, drop = FALSE]
 
@@ -122,10 +124,10 @@ plot_MCMC <- function(
 
   ##treat the argument n.iter, which is rather fragile and easly misused
   if(length(n.iter) > 1)
-    warning("[plot_MCMC()] length 'n.iter' > 1, using only the first value", call. = FALSE, immediate. = TRUE)
+    warning("[plot_MCMC()] length 'n.iter' > 1, using only the first value of the argument", call. = FALSE, immediate. = TRUE)
 
   if(n.iter[1] > coda::niter(object) || n.iter[1] < 2){
-    warning("[plot_MCMC()] 'n.iter' out of range, reset to number of observations", call. = FALSE, immediate. = TRUE)
+    warning("[plot_MCMC()] Argument 'n.iter' out of range, reset to number of observations in mcmc.list / mcmc", call. = FALSE, immediate. = TRUE)
     n.iter <- coda::niter(object)
   }
 

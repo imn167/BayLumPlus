@@ -168,6 +168,10 @@ create_ThetaMatrix <- function(
     "s_water"
   )
 
+  ##Required vs Optional
+  sigma_required <- setdiff(sigma_s_ref, "s_water")
+  sigma_optional <- "s_water"
+
   # Verify basic input --------------------------------------------------------------------------------
   # basic input
   if(missing(input)){
@@ -222,16 +226,52 @@ create_ThetaMatrix <- function(
 
   }
 
-  ##check sigma_s
-  if(!is.null(sigma_s) && !all(sigma_s_ref %in% names(sigma_s)))
-      stop("[create_ThetaMatrix()] Value names do not match in 'sigma_s', please check the manual!", call. = FALSE)
+  # if(!is.null(sigma_s) && !all(sigma_required %in% names(sigma_s)))
+  #     stop("[create_ThetaMatrix()] Value names do not match in 'sigma_s', please check the manual!", call. = FALSE)
+  #
+  # ##set NULL case
+  # if(is.null(sigma_s)){
+  #   sigma_s <- numeric(length(sigma_required))
+  #   names(sigma_s) <- sigma_s_ref
+  #
+  # }
 
-  ##set NULL case
-  if(is.null(sigma_s)){
+  ##check sigma_s
+  if (!is.null(sigma_s)) {
+
+    # Check required names
+    missing_required <- setdiff(sigma_required, names(sigma_s))
+    if (length(missing_required) > 0) {
+      stop(
+        "[create_ThetaMatrix()] Value names do not match in 'sigma_s', please check the manual!",
+        paste(missing_required, collapse = ", "),
+        call. = FALSE
+      )
+    }
+
+    # Check for unknown names
+    unknown_names <- setdiff(names(sigma_s), sigma_s_ref)
+    if (length(unknown_names) > 0) {
+      stop(
+        "[create_ThetaMatrix()] Unknown values in 'sigma_s': ",
+        paste(unknown_names, collapse = ", "),
+        call. = FALSE
+      )
+    }
+  }
+
+  ## set NULL case
+  if (is.null(sigma_s)) {
     sigma_s <- numeric(length(sigma_s_ref))
     names(sigma_s) <- sigma_s_ref
-
   }
+
+  if (!sigma_optional %in% names(sigma_s)) {
+    sigma_s[sigma_optional] <- 0
+  }
+
+
+
 
 # Verify data.frame ---------------------------------------------------------------------------
   #verify data.frame, we hard stop here

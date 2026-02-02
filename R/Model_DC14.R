@@ -19,6 +19,13 @@
 #                       Sigma[j,i] <- 0
 #                   }
 #               }
+#               ## init off-diag for C14
+#               for (i in 1:(length(order_c14) - 1)) {
+#                 for (j in (i + 1):length(order_c14)) {
+#                   Sigma[index_c14[i], index_c14[j]] <- 0
+#                   Sigma[index_c14[j], index_c14[i]] <- 0
+#                 }
+#               }
 #               ## OSL filling
 #               for (i in order_osl) {
 #                   for (j in order_osl){
@@ -71,6 +78,15 @@
 #                       Sigma[j,i] <- 0
 #                   }
 #               }
+#
+#               ## init off-diag for C14
+#               for (i in 1:(length(order_c14) - 1)) {
+#                 for (j in (i + 1):length(order_c14)) {
+#                   Sigma[index_c14[i], index_c14[j]] <- 0
+#                   Sigma[index_c14[j], index_c14[i]] <- 0
+#                 }
+#               }
+#
 #               ## OSL filling
 #               for (i in order_osl) {
 #                   for (j in order_osl){
@@ -127,6 +143,15 @@
 #                       Sigma[j,i] <- 0
 #                   }
 #               }
+#
+#               ## init off-diag for C14
+#               for (i in 1:(length(order_c14) - 1)) {
+#                 for (j in (i + 1):length(order_c14)) {
+#                   Sigma[index_c14[i], index_c14[j]] <- 0
+#                   Sigma[index_c14[j], index_c14[i]] <- 0
+#                 }
+#               }
+#
 #               ## OSL filling
 #               for (i in order_osl) {
 #                   for (j in order_osl){
@@ -183,7 +208,7 @@
 # Model_DC14$Unconstrained <- Unconstrained
 # Model_DC14$Constrained <- Constrained
 # Model_DC14$NichollsJones <- StrictNichollsJones
-#
+# #
 
 
 "Model_DC14"
