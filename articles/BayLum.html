@@ -406,7 +406,7 @@ following example code reproduces this case:</p>
 <span><span class="va">samp1_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/samp1/bin.bin"</span>, package <span class="op">=</span> <span class="st">"BayLum"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## read YAML manually and select only the first record </span></span>
-<span><span class="va">config_file</span> <span class="op">&lt;-</span> <span class="fu">yaml</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/yaml/man/read_yaml.html" class="external-link">read_yaml</a></span><span class="op">(</span><span class="va">yaml_file</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="va">config_file</span> <span class="op">&lt;-</span> <span class="fu">yaml</span><span class="fu">::</span><span class="fu"><a href="https://yaml.r-lib.org/reference/read_yaml.html" class="external-link">read_yaml</a></span><span class="op">(</span><span class="va">yaml_file</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
 <span><span class="co">## import BIN/BINX files and select position 2 and grain 32 only</span></span>
 <span><span class="va">samp1</span> <span class="op">&lt;-</span> <span class="fu">Luminescence</span><span class="fu">::</span><span class="fu"><a href="https://r-lum.github.io/Luminescence/reference/read_BIN2R.html" class="external-link">read_BIN2R</a></span><span class="op">(</span><span class="va">samp1_file</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -1257,7 +1257,7 @@ PloS one, 12(1), e0169418. doi: <a href="https://doi.org/10.1371/journal.pone.01
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

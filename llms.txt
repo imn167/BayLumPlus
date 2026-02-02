@@ -1,0 +1,359 @@
+# BayLumPlus ![](reference/figures/logo_BayLum.png)
+
+An R package for chronological **Bay**esian models integrated for
+Optically Stimulated (OSL) **Lum**inescence Dating
+
+**BayLumPlus** is a a refined fork of the original
+[`BayLum`](https://crp2a.github.io/BayLum/) R package. This update
+introduces several new capabilities, particularly for the Age
+processing, where we aim to test different prior assumptions without
+incurring the computational cost associated with the Palaeodose Model.
+
+``` R
+To cite the R package 'BayLumPlus' please cite the R package itself and the following article:
+
+  Bouafia I, Christophe C, Philippe A, Kreutzer S, Guérin G, Baumgarten F, Frerebeau N (2024). _BayLumPlus: Chronological
+  Bayesian Models Integrating Optically Stimulated Luminescence and Radiocarbon Age Dating_. R package version 1.0.0,
+  <https://imn167.github.io/BayLumPlus/>.
+
+  Philippe A, Guerin G, Kreutzer S (2019). "BayLum - An R package for Bayesian analysis of OSL ages: An introduction."
+  _Quaternary Geochronology_, *49*, 16-24. doi:10.1016/j.quageo.2018.05.009 <https://doi.org/10.1016/j.quageo.2018.05.009>.
+```
+
+## Installation
+
+**You need to have [JAGS](https://mcmc-jags.sourceforge.io) installed on
+your computer.**
+
+The package **BayLumPlus** has only a development version from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("imn167/BayLumPLus")
+```
+
+Please note that development versions may change day by day.
+
+## About this Extension
+
+### Graph Theory for Stratigraphic Constraints
+
+To support the modeling of stratigraphic relationships, we introduce
+graph-based functions:
+
+- [`network_vizualization()`](https://imn167.github.io/BayLumPlus/reference/network_vizualization.md)
+  – visualizes stratigraphic constraints as a graph  
+- [`remove_transitive_edges()`](https://imn167.github.io/BayLumPlus/reference/remove_transitive_edges.md)
+  – called Edge Pruner Algorithm (EPA), it removes redundant edges
+  implied by transitivity
+
+These tools help simplify and explore complex stratigraphic
+relationships more intuitively.
+
+------------------------------------------------------------------------
+
+### Bayesian Age Modeling with `Compute_AgeS_D()`
+
+We introduce a new modeling function:
+[`Compute_AgeS_D()`](https://imn167.github.io/BayLumPlus/reference/Compute_AgeS_D.md),
+focused on Bayesian age estimation under various prior structures.
+
+**Supported priors include:**
+
+- Bayesian prior for OSL datasets:
+
+  - `constrained_Jeffrey`: Uniform order on the log-scale (chain-like
+    constraints)  
+  - `StrictNicholls&Jones`: Based on the Uniform Order prior, from the
+    original `BayLum`  
+  - `unconstrained_Jeffrey`: For unstructured or weakly constrained
+    stratigraphy
+
+- Bayesian prior for the simple approach where the likelihood is
+  $M_{i} \sim \mathcal{N}\left( A_{i},\sigma_{i}^{2} \right)\quad\forall i$:
+
+  - `unconstrained`
+  - `uniform_order`
+  - `Nicholls&Jones`
+
+*All priors for age processing are stored in the data `ModelAgePrior` to
+get an easy access please use `extract_Jags_Model()`interactive
+function.*
+
+### Isotonic Distortion Framework
+
+`BayLumPlus` introduces a new Bayesian modeling strategy called
+**Isotonic Distortion**, implemented via:
+
+- [`IsotonicCurve()`](https://imn167.github.io/BayLumPlus/reference/IsotonicCurve.md)
+  – fits the isotonic model  
+- [`PlotIsotonicCurve()`](https://imn167.github.io/BayLumPlus/reference/PlotIsotonicCurve.md)
+  – visualizes the results with ggplots
+
+This framework supports partial order constraints in ages, offering a
+flexible and interpretable alternative to traditional priors.
+
+------------------------------------------------------------------------
+
+### Comparing Priors with `plotHpd()`
+
+To facilitate the comparison of different modeling choices and prior
+structures, the
+[`plotHpd()`](https://imn167.github.io/BayLumPlus/reference/plotHpd.md)
+function allows visual comparison of **Highest Posterior Density (HPD)**
+intervals under different model settings.
+
+This is particularly useful for:
+
+- Sensitivity analysis  
+- Model comparison  
+- Reporting credible intervals with varying assumptions
+
+## License
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or any later
+version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+Public License for more details.
+
+## Acknowledgements
+
+The development of **BayLumPlus** received a european financial support
+by the European Research Center ERC through the grant QuinaWorld.
+
+The development of **BayLum** received a state financial support managed
+by the Agence Nationale de la Recherche (France) through the program
+*Investissements d’avenir* (ref. ANR-10-LABX-52) between 2015 and 2018.
+
+# Package index
+
+## All functions
+
+- [`AgeC14_Computation()`](https://imn167.github.io/BayLumPlus/reference/AgeC14_Computation.md)
+  : Bayesian analysis for C-14 age estimations of various samples
+
+- [`AgeS`](https://imn167.github.io/BayLumPlus/reference/AgeS.md) :
+
+  Output of `AgeS_Computation` function for the samples: "GDB5" and
+  "GDB3"
+
+- [`AgeS_Computation()`](https://imn167.github.io/BayLumPlus/reference/AgeS_Computation.md)
+  : Bayesian analysis for OSL age estimation of various samples
+
+- [`Age_Computation()`](https://imn167.github.io/BayLumPlus/reference/Age_Computation.md)
+  : Bayesian analysis for the OSL age estimation of one sample
+
+- [`Age_OSLC14()`](https://imn167.github.io/BayLumPlus/reference/Age_OSLC14.md)
+  : Bayesian analysis for age estimation of OSL measurements and C-14
+  ages of various samples
+
+- [`Catalhoyuk`](https://imn167.github.io/BayLumPlus/reference/Catalhoyuk.md)
+  : Example Data for Bayesian Age Model
+
+- [`Compute_AgeS_D()`](https://imn167.github.io/BayLumPlus/reference/Compute_AgeS_D.md)
+  : Bayesian Models for Age Estimation with Priors from ModelAgePrior
+  Dataset
+
+- [`Compute_AgeS_DC14()`](https://imn167.github.io/BayLumPlus/reference/Compute_AgeS_DC14.md)
+  : Bayesian Models for Age Estimation with Priors from Model_DC14
+  Dataset
+
+- [`DATA1`](https://imn167.github.io/BayLumPlus/reference/DATA1.md) :
+  DATA of sample named GDB3
+
+- [`DATA2`](https://imn167.github.io/BayLumPlus/reference/DATA2.md) :
+  DATA on sample named GDB5
+
+- [`DATA3`](https://imn167.github.io/BayLumPlus/reference/DATA3.md) :
+  DATA of sample named FER1
+
+- [`DATA_C14`](https://imn167.github.io/BayLumPlus/reference/DATA_C14.md)
+  : C14 cal age estiamte and its error
+
+- [`Generate_DataFile()`](https://imn167.github.io/BayLumPlus/reference/Generate_DataFile-deprecated.md)
+  : Generates, from one (or several) BIN-file(s) of Single-grain OSL
+  measurements, a list of luminescence data and information before
+  statistical analysis (DEPRECATED)
+
+- [`Generate_DataFile_MG()`](https://imn167.github.io/BayLumPlus/reference/Generate_DataFile_MG-deprecated.md)
+  : Generates, from one (or several) BIN file(s) of Multi-grain OSL
+  measurements a list of luminescence data and information before
+  statistical analysis (DEPRECATED)
+
+- [`IntCal13`](https://imn167.github.io/BayLumPlus/reference/IntCal13.md)
+  : Atmospheric North data for calibration of 14C age
+
+- [`IntCal20`](https://imn167.github.io/BayLumPlus/reference/IntCal20.md)
+  : Atmospheric North data for calibration of 14C age
+
+- [`IsotonicCurve()`](https://imn167.github.io/BayLumPlus/reference/IsotonicCurve.md)
+  : Compute Isotonic Regression for different stratigraphic constraints
+
+- [`LT_RegenDose()`](https://imn167.github.io/BayLumPlus/reference/LT_RegenDose-deprecated.md)
+  : Plots Lx/Tx as a function of the regenerative dose (DEPRECATED)
+
+- [`MCMCsample`](https://imn167.github.io/BayLumPlus/reference/MCMCsample.md)
+  : MCMC sample from the posterior distribution of the dataset GDB5
+
+- [`Marine13`](https://imn167.github.io/BayLumPlus/reference/Marine13.md)
+  : Marine data for calibration of 14C age
+
+- [`Marine20`](https://imn167.github.io/BayLumPlus/reference/Marine20.md)
+  : Marine data for calibration of 14C age
+
+- [`ModelAgePrior`](https://imn167.github.io/BayLumPlus/reference/ModelAgePrior.md)
+  :
+
+  JAGS Models for OSL Age Estimation in `Compute_AgeS_D`
+
+- [`ModelC14`](https://imn167.github.io/BayLumPlus/reference/ModelC14.md)
+  :
+
+  Likelihood of C14 samples for JAGS models use in `Age_OSLC14`
+
+- [`ModelOSL`](https://imn167.github.io/BayLumPlus/reference/ModelOSL.md)
+  :
+
+  Likelihood of OSL samples for JAGS models use in `Age_OSLC14`
+
+- [`ModelPrior`](https://imn167.github.io/BayLumPlus/reference/ModelPrior.md)
+  :
+
+  Prior for JAGS models use in `Age_OSLC14`
+
+- [`Model_Age`](https://imn167.github.io/BayLumPlus/reference/Model_Age.md)
+  :
+
+  JAGS models use in `Age_Computation`
+
+- [`Model_AgeC14`](https://imn167.github.io/BayLumPlus/reference/Model_AgeC14.md)
+  :
+
+  JAGS models use in `AgeC14_Computation`
+
+- [`Model_AgeS`](https://imn167.github.io/BayLumPlus/reference/Model_AgeS.md)
+  :
+
+  JAGS models use in `AgeS_Computation`
+
+- [`Model_DC14`](https://imn167.github.io/BayLumPlus/reference/Model_DC14.md)
+  :
+
+  JAGS Models for OSL Age Estimation in `Compute_AgeS_DC14`
+
+- [`Model_Palaeodose`](https://imn167.github.io/BayLumPlus/reference/Model_Palaeodose.md)
+  :
+
+  JAGS models use in `Palaeodose_Computation`
+
+- [`OSLJingbian`](https://imn167.github.io/BayLumPlus/reference/OSLJingbian.md)
+  : Example Data for OSL Bayesian Age Model
+
+- [`Palaeodose_Computation()`](https://imn167.github.io/BayLumPlus/reference/Palaeodose_Computation.md)
+  : Bayesian analysis for the palaeodose estimation of various samples
+
+- [`PlotIsotonicCurve()`](https://imn167.github.io/BayLumPlus/reference/PlotIsotonicCurve.md)
+  :
+
+  Plot graphs build to vizualise isotonic distorsion of the function
+  [`IsotonicCurve()`](https://imn167.github.io/BayLumPlus/reference/IsotonicCurve.md).
+  The user needs to note that only one HPD regions / Credible Interval
+  level can be allowed and vizualized.
+
+- [`SCMatrix()`](https://imn167.github.io/BayLumPlus/reference/SCMatrix.md)
+  : Construct the Stratigraphic Constrain Matrix Interactively
+
+- [`SC_Ordered()`](https://imn167.github.io/BayLumPlus/reference/SC_Ordered.md)
+  : Create Stratigraphically Ordered Sample Matrix
+
+- [`SHCal13`](https://imn167.github.io/BayLumPlus/reference/SHCal13.md)
+  : Atmospheric South data for calibration of 14C age
+
+- [`SHCal20`](https://imn167.github.io/BayLumPlus/reference/SHCal20.md)
+  : Atmospheric South data for calibration of 14C age
+
+- [`combine_DataFiles()`](https://imn167.github.io/BayLumPlus/reference/combine_DataFiles.md)
+  [`Concat_DataFile()`](https://imn167.github.io/BayLumPlus/reference/combine_DataFiles.md)
+  : Combine objects
+
+- [`create_DataFile()`](https://imn167.github.io/BayLumPlus/reference/create_DataFile.md)
+  : Prepare input data for subsequent BayLum Analysis
+
+- [`create_FolderTemplates()`](https://imn167.github.io/BayLumPlus/reference/create_FolderTemplates.md)
+  : Create Folder Templates
+
+- [`create_MeasuresDataFrame()`](https://imn167.github.io/BayLumPlus/reference/create_MeasuresDataFrame.md)
+  : Create Input for Age Computation
+
+- [`create_ThetaMatrix()`](https://imn167.github.io/BayLumPlus/reference/create_ThetaMatrix.md)
+  : Create Theta Matrix
+
+- [`create_diagnostic_plots()`](https://imn167.github.io/BayLumPlus/reference/create_diagnostic_plots.md)
+  : Create MCMC diagnostic plots for AgeS_Computation / Compute_Ages
+  functions
+
+- [`display_diagnostic_plots()`](https://imn167.github.io/BayLumPlus/reference/display_diagnostic_plots.md)
+  : Display diagnostic plots
+
+- [`extract_Jags_model()`](https://imn167.github.io/BayLumPlus/reference/extract_Jags_model.md)
+  : Extract and View Bayesian Models in BayLum
+
+- [`findbounds()`](https://imn167.github.io/BayLumPlus/reference/findbounds.md)
+  : Bounds for each age according to the stratigraphic constraints
+
+- [`initialize_SC()`](https://imn167.github.io/BayLumPlus/reference/initialize_SC.md)
+  : Initialization of the Gibbs Algorithm according to the fixed
+  stratigraphy
+
+- [`network_vizualization()`](https://imn167.github.io/BayLumPlus/reference/network_vizualization.md)
+  : Plot a Graph Network according to sugiyama layout
+
+- [`plotHpd()`](https://imn167.github.io/BayLumPlus/reference/plotHpd.md)
+  : Compute High Posterior Density (HPD) Interval
+
+- [`plot_Ages()`](https://imn167.github.io/BayLumPlus/reference/plot_Ages.md)
+  : Create Age Plot
+
+- [`plot_MCMC()`](https://imn167.github.io/BayLumPlus/reference/plot_MCMC.md)
+  : Plot MCMC trajectories and posterior distributions
+
+- [`plot_RegDosePoints()`](https://imn167.github.io/BayLumPlus/reference/plot_RegDosePoints.md)
+  : Plot Regeneration Dose Points
+
+- [`plot_Scatterplots()`](https://imn167.github.io/BayLumPlus/reference/plot_Scatterplots.md)
+  [`ScatterSamples()`](https://imn167.github.io/BayLumPlus/reference/plot_Scatterplots.md)
+  : Display Scatter Plot Matrix of the Bayesian Age Results
+
+- [`remove_transitive_edges()`](https://imn167.github.io/BayLumPlus/reference/remove_transitive_edges.md)
+  :
+
+  The Edge Pruner Algorithm (EPA). This algorithm handles the redundancy
+  of the constraints matrix (see
+  [`create_ThetaMatrix()`](https://imn167.github.io/BayLumPlus/reference/create_ThetaMatrix.md))
+  by deleting all unecessary edges. The result is
+
+- [`save_diagnostic_plots()`](https://imn167.github.io/BayLumPlus/reference/save_diagnostic_plots.md)
+  : Save diagnostic plots to PDF
+
+- [`write_BayLumFiles()`](https://imn167.github.io/BayLumPlus/reference/write_BayLumFiles.md)
+  : Write BayLum .csv-files
+
+- [`write_YAMLConfigFile()`](https://imn167.github.io/BayLumPlus/reference/write_YAMLConfigFile.md)
+  : Write Auto Generated YAML BayLum Configuration File to the Disc
+
+# Articles
+
+### All vignettes
+
+- [Age
+  Frameworks](https://imn167.github.io/BayLumPlus/articles/AgeFrameworks.md):
+- [BayLum: An
+  Introduction](https://imn167.github.io/BayLumPlus/articles/BayLum.md):
+- [BayLum: Specification of the YAML config
+  file](https://imn167.github.io/BayLumPlus/articles/ConfigFile_Specification.md):

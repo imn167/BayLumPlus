@@ -17,6 +17,7 @@
 <url><loc>https://imn167.github.io/BayLumPlus/reference/BayLumPlus-package.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/Catalhoyuk.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/Compute_AgeS_D.html</loc></url>
+<url><loc>https://imn167.github.io/BayLumPlus/reference/Compute_AgeS_DC14.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/DATA1.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/DATA2.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/DATA3.html</loc></url>
@@ -37,6 +38,7 @@
 <url><loc>https://imn167.github.io/BayLumPlus/reference/Model_Age.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/Model_AgeC14.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/Model_AgeS.html</loc></url>
+<url><loc>https://imn167.github.io/BayLumPlus/reference/Model_DC14.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/Model_Palaeodose.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/OSLJingbian.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/Palaeodose_Computation.html</loc></url>
@@ -50,6 +52,8 @@
 <url><loc>https://imn167.github.io/BayLumPlus/reference/create_FolderTemplates.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/create_MeasuresDataFrame.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/create_ThetaMatrix.html</loc></url>
+<url><loc>https://imn167.github.io/BayLumPlus/reference/create_diagnostic_plots.html</loc></url>
+<url><loc>https://imn167.github.io/BayLumPlus/reference/display_diagnostic_plots.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/extract_Jags_model.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/findbounds.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/index.html</loc></url>
@@ -62,6 +66,7 @@
 <url><loc>https://imn167.github.io/BayLumPlus/reference/plot_RegDosePoints.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/plot_Scatterplots.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/remove_transitive_edges.html</loc></url>
+<url><loc>https://imn167.github.io/BayLumPlus/reference/save_diagnostic_plots.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/write_BayLumFiles.html</loc></url>
 <url><loc>https://imn167.github.io/BayLumPlus/reference/write_YAMLConfigFile.html</loc></url>
 </urlset>

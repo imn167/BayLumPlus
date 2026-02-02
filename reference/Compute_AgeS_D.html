@@ -69,6 +69,7 @@ with the primary difference being the first parameter.</p>
 <span>  autorun <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  roundingOfValue <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  display_plots <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  SavePdf <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  OutputFileName <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCMCplot"</span>, <span class="st">"summary"</span><span class="op">)</span>,</span>
 <span>  OutputFilePath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span>,</span>
@@ -161,6 +162,10 @@ available in the <code>ModelAgePrior</code> dataset. Use <code><a href="extract_
 <dd><p><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a> (with default):  Integer indicating the number of decimal places to be used, default = 3.</p></dd>
 
 
+<dt id="arg-display-plots">display_plots<a class="anchor" aria-label="anchor" href="#arg-display-plots"></a></dt>
+<dd><p><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a> (with default): enable/disable MCMC and ACF plots.</p></dd>
+
+
 <dt id="arg-savepdf">SavePdf<a class="anchor" aria-label="anchor" href="#arg-savepdf"></a></dt>
 <dd><p><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a> (with default): if TRUE save graphs in pdf file named <code>OutputFileName</code> in folder <code>OutputFilePath</code>.</p></dd>
 
@@ -204,7 +209,7 @@ of the age (in ka);</p></li>
 <li><p><b>StratiConstraints</b>: stating the stratigraphic relations between samples considered in the model;</p></li>
 <li><p><b>CovarianceMatrix</b>: stating the covariance matrix of error used in the model, highlighting common errors between samples or not;</p></li>
 <li><p><b>model</b>: returns the model that was used for the Bayesian modelling as a <a href="https://rdrr.io/r/base/character.html" class="external-link">character</a>;</p></li>
-<li><p><b>JAGS model output</b>: returns the JAGS model with class "runjags";</p></li>
+<li><p><b>diagnostics_plots</b>: List of MCMC and ACF plots for the diagnostics of convergence – check attributes for Gelman CV;</p></li>
 <li><p><b>Summary</b>: Summary Table of the posterior's MCMC;</p></li>
 </ul><p><strong>PLOT OUTPUT</strong></p>
 <ol><li><p><b>MCMC trajectories</b>: A graph with the MCMC trajectories and posterior distributions of the age.
@@ -238,7 +243,7 @@ If there is a strict order as a stratigraphic constraints, the user would be abl
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
