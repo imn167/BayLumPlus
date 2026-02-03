@@ -1,5 +1,6 @@
 test_that("Interactive tests", {
   testthat::skip_on_cran()
+  testthat::skip_on_ci()
   local_edition(3)
 
   ## set y
