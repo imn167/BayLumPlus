@@ -1,4 +1,4 @@
-
+[![R-CMD-check.yaml](https://github.com/imn167/BayLumPlus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/imn167/BayLumPlus/actions/workflows/R-CMD-check.yaml) [![pkgdown.yaml](https://github.com/imn167/BayLumPlus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/imn167/BayLumPlus/actions/workflows/pkgdown.yaml) [![test-coverage](https://github.com/imn167/BayLumPlus/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/imn167/BayLumPlus/actions/workflows/test-coverage.yaml)
 
 
 
