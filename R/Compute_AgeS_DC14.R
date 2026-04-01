@@ -8,7 +8,7 @@
 #' - Error of the C14 Calibrated age : `SigmaC14Cal`
 #' @param Nb_sample [integer] number of samples
 #' @param SampleNames [character] character vector with sample names
-#' @param encoding [vector] encoder, 1 if OSL and 0 if C14
+#' @param encoding [vector] encoder, 2 for UTh,  1 if OSL and 0 if C14
 #' @param ThetaMatrix [matrix] or [character] input of systematic and individual errors.
 #' @param prior [character] : Character string specifying the name of one of the models
 #'   available in the `Model_DC14` dataset. Use [extract_Jags_model()] to see all available options
@@ -108,28 +108,37 @@ Compute_AgeS_DC14 <- function(
     ...
 ) {
 
+  #
+  index_osl = which(encoding == 1)
+  index_c14 = which(encoding == 0)
+  index_uth = which(encoding == 2)
+
+  n_uth = length(index_uth)
+  n_osl = length(index_osl)
+  n_c14 = length(index_c14)
+
+  has_osl = n_osl >0
+  has_uth = n_uth >0
+  has_c14 = n_c14>0
+
+  n_types = sum(has_uth, has_c14, has_osl)
+
+  #OSL settings
+  if (has_osl) {
   ## sigma_D For Equivalent doses D when mixing
   encode_sD = rep(0, Nb_sample)
   encode_sD[encoding ==1] = DATA$sD**2
-  # ## Measure vector for both Equivalent doses and calibrated C14 data
-  # M = rep(0, Nb_sample)
-  # M[encoding ==1] = DATA$D
-  # M[encoding == 0] = DATA$Data_C14_Cal
-
-  ## index in C14 references only
-  order_osl = 1:sum(encoding)
-  order_c14 = 1:sum(1-encoding)
-
-  CS_osl = cumsum(encoding)
-  CS_c14 = cumsum(1-encoding)
-
-  index_osl = which(encoding == 1)
-  index_c14 = which(encoding == 0)
-
+  order_osl = 1:n_osl
+  CS_osl = cumsum(encoding == 1)
   # grid = expand.grid(index_osl, index_osl)
   Theta_Tilde = matrix(0, Nb_sample, Nb_sample)
   Theta_Tilde[index_osl, index_osl] = ThetaMatrix
+  }
 
+  ## C14 settings
+  if (has_c14) {
+  order_c14 = 1:n_c14
+  CS_c14 = cumsum(encoding == 0)
 
   #--- Calibration curve ####
   TableauCalib = c()
@@ -142,9 +151,32 @@ Compute_AgeS_DC14 <- function(
                             dec = ".")
   }
 
-  AgeBP = rev(TableauCalib[, 1])
-  CalC14 = rev(TableauCalib[, 2])
-  SigmaCalC14 = rev(TableauCalib[, 3])
+  if (startsWith(CalibrationCurve, "SH")) {
+    AgeBP = TableauCalib[, 1]
+    CalC14 = TableauCalib[, 2]
+    SigmaCalC14 = TableauCalib[, 3]
+  }
+  else {
+
+    AgeBP = rev(TableauCalib[, 1])
+    CalC14 = rev(TableauCalib[, 2])
+    SigmaCalC14 = rev(TableauCalib[, 3])
+  }
+
+  }
+
+
+  if (has_uth) {
+  order_uth = 1:n_uth
+  CS_uth = cumsum(encoding == 2)
+  }
+
+
+
+
+
+
+
 
   if (prior == "Constrained" || prior == "NichollsJones") {
 
@@ -160,9 +192,6 @@ Compute_AgeS_DC14 <- function(
       "order_c14" = order_c14,
       "index_osl" = index_osl,
       "index_c14" = index_c14,
-      # "StratiConstraints" = StratiConstraints,
-      # "CS_osl" = CS_osl,
-      # "CS_c14" = CS_c14,
       "xTableauCalib" = AgeBP,
       "yTableauCalib" = CalC14,
       "zTableauCalib" = SigmaCalC14
@@ -170,30 +199,90 @@ Compute_AgeS_DC14 <- function(
   }
 
 
-  else if ( prior == "Unconstrained") {
+  else if ( startsWith(prior, "Unconstrained") ) {
 
+  if (n_types == 3) {
 
-  dataList = list(
-    "Theta" = Theta_Tilde,
-    "encoded_covD" = diag(encode_sD),
-    "ddot" = DATA$ddot,
-    "xbound" = PriorAge,
-    "M" = DATA$M,
-    "sigma" = DATA$sigmaC14Cal,
-    "order_osl" = order_osl,
-    "order_c14" = order_c14,
-    "index_osl" = index_osl,
-    "index_c14" = index_c14,
-    # "StratiConstraints" = StratiConstraints,
-    # "CS_osl" = CS_osl,
-    # "CS_c14" = CS_c14,
-    "xTableauCalib" = AgeBP,
-    "yTableauCalib" = CalC14,
-    "zTableauCalib" = SigmaCalC14
-  )
+    prior <- "Unconstrained_OSL_C14_UTh"
+          dataList = list(
+          "Theta" = Theta_Tilde,
+          "encoded_covD" = diag(encode_sD),
+          "ddot" = DATA$ddot,
+          "xbound" = PriorAge,
+          "M" = DATA$M,
+          "sigma" = DATA$sigmaC14Cal,
+          "sigma_uth" = DATA$sigma_UTh,
+          "order_osl" = order_osl,
+          "order_c14" = order_c14,
+          "order_uth" = order_uth,
+          "index_osl" = index_osl,
+          "index_c14" = index_c14,
+          "index_uth" = index_uth,
+          "xTableauCalib" = AgeBP,
+          "yTableauCalib" = CalC14,
+          "zTableauCalib" = SigmaCalC14
+        )
+  }
+    else if (has_osl & has_c14) {
+
+      prior <- "Unconstrained_OSL_C14"
+
+      dataList = list(
+        "Theta" = Theta_Tilde,
+        "encoded_covD" = diag(encode_sD),
+        "ddot" = DATA$ddot,
+        "xbound" = PriorAge,
+        "M" = DATA$M,
+        "sigma" = DATA$sigmaC14Cal,
+        "order_osl" = order_osl,
+        "order_c14" = order_c14,
+        "index_osl" = index_osl,
+        "index_c14" = index_c14,
+        "xTableauCalib" = AgeBP,
+        "yTableauCalib" = CalC14,
+        "zTableauCalib" = SigmaCalC14
+      )
+    }
+
+    else if (has_osl & has_uth) {
+
+      prior <- "Unconstrained_OSL_UTh"
+
+      dataList = list(
+        "Theta" = Theta_Tilde,
+        "encoded_covD" = diag(encode_sD),
+        "ddot" = DATA$ddot,
+        "xbound" = PriorAge,
+        "M" = DATA$M,
+        "sigma_uth" = DATA$sigma_UTh,
+        "order_osl" = order_osl,
+        "order_uth" = order_uth,
+        "index_osl" = index_osl,
+        "index_uth" = index_uth
+      )
+    }
+
+    else if (has_uth & has_c14) {
+
+      prior <- "Unconstrained_C14_UTh"
+
+      dataList = list(
+        "xbound" = PriorAge,
+        "M" = DATA$M,
+        "sigma" = DATA$sigmaC14Cal,
+        "sigma_uth" = DATA$sigma_UTh,
+        "order_c14" = order_c14,
+        "order_uth" = order_uth,
+        "index_c14" = index_c14,
+        "index_uth" = index_uth,
+        "xTableauCalib" = AgeBP,
+        "yTableauCalib" = CalC14,
+        "zTableauCalib" = SigmaCalC14
+      )
+    }
   }
 
-
+  print(prior)
     Model_DC14 <- 0
     data(Model_DC14, envir = environment())
     if (is.null(model)) {
@@ -201,13 +290,12 @@ Compute_AgeS_DC14 <- function(
       model <- Model_DC14[[prior]]
     }
 
-
     #
     if (!(autorun)) {
       #write model in tempfile
       temp_file <- tempfile(fileext = ".txt")
       writeLines(model, con = temp_file)
-      if ( prior == "Unconstrained") {
+      if ( startsWith(prior, "Unconstrained") ) {
 
         inits = replicate(n.chains, list(u = runif(Nb_sample)), simplify = F)
       }
@@ -377,7 +465,7 @@ Compute_AgeS_DC14 <- function(
         "PriorAge" = PriorAge,
         "prior" = if(is.null(entry_model)) prior else NaN,
         "StratiConstraints" = StratiConstraints,
-        "CovarianceMatrix" = Theta_Tilde,
+        "CovarianceMatrix" = if (has_osl) Theta_Tilde else NULL,
         "model" = model,
         "diagnostics_plots" = diagnostics_plots,
         # "runjags_object" = results_runjags,

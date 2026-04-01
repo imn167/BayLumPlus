@@ -40,7 +40,7 @@ Compute_AgeS_DC14(
 
 \item{SampleNames}{\link{character} character vector with sample names}
 
-\item{encoding}{\link{vector} encoder, 1 if OSL and 0 if C14}
+\item{encoding}{\link{vector} encoder, 2 for UTh,  1 if OSL and 0 if C14}
 
 \item{ThetaMatrix}{\link{matrix} or \link{character} input of systematic and individual errors.}
 
