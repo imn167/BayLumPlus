@@ -50,8 +50,8 @@ Compute_AgeS_DC14(
 
 - encoding:
 
-  [vector](https://rdrr.io/r/base/vector.html) encoder, 1 if OSL and 0
-  if C14
+  [vector](https://rdrr.io/r/base/vector.html) encoder, 2 for UTh, 1 if
+  OSL and 0 if C14
 
 - ThetaMatrix:
 

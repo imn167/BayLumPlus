@@ -12,8 +12,8 @@ Model_DC14
 
 ## Format
 
-Unconstrained : Model with log-uniform settings for OSL and plain
-uniform for C14.
+Unconstrained : Model with log-uniform settings for OSL, plain uniform
+for C14 and UTh.
 
 Constrained : Model with log-uniform order settings for OSL and plain
 uniform order for C14.
