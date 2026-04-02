@@ -121,7 +121,7 @@ create_DataFile(yaml_file)
 #> ✔ Load YAML configuration file ...  [7ms]
 #> 
 #> ⠙ Sanitize sample names ... 
-#> ✔ Sanitize sample names ...  [19ms]
+#> ✔ Sanitize sample names ...  [18ms]
 #> 
 #> ⠙ Generate object list ... 
 #> Error: [create_DataFile()] <samp1> is not a valid object in the working environment!
