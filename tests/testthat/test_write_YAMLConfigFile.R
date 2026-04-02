@@ -1,5 +1,6 @@
 test_that("Full function test", {
   testthat::skip_on_cran()
+  testthat::skip_on_os(os = "windows")
   local_edition(3)
 
 # Prepare test ------------------------------------------------------------

@@ -52,7 +52,7 @@ Imports:
     dplyr,
     hexbin (>= 1.28.3),
     KernSmooth (>= 2.23),
-    Luminescence (>= 0.9.24),
+    Luminescence (>= 1.2.1),
     magrittr,
     methods,
     rjags (>= 4-15),
