@@ -52,7 +52,7 @@ Imports:
     dplyr,
     hexbin (>= 1.28.3),
     KernSmooth (>= 2.23),
-    Luminescence (== 1.0.1),
+    Luminescence (>= 0.9.24),
     magrittr,
     methods,
     rjags (>= 4-15),
@@ -91,5 +91,4 @@ Config/testthat/edition: 3
 Config/testthat/parallel: true
 Remotes: 
     IsotoneOptimization=github::Xiwen1997/IsotoneRpkg
-    url::https://cran.r-project.org/src/contrib/Archive/Luminescence/Luminescence_1.0.1.tar.gz
     

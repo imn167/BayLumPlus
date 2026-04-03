@@ -102,6 +102,7 @@ curve is taken account, for C-14 samples}
 \item dose rates : \code{ddot}
 \item standard error for D : \code{sD}
 \item Error of the C14 Calibrated age : \code{SigmaC14Cal}
+\item Error of the Gaussian distribution UTh : \code{sigma_UTh}
 }}
 }
 \value{

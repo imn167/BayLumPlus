@@ -6,6 +6,7 @@
 #' - dose rates : `ddot`
 #' - standard error for D : `sD`
 #' - Error of the C14 Calibrated age : `SigmaC14Cal`
+#' - Error of the Gaussian distribution UTh : `sigma_UTh`
 #' @param Nb_sample [integer] number of samples
 #' @param SampleNames [character] character vector with sample names
 #' @param encoding [vector] encoder, 2 for UTh,  1 if OSL and 0 if C14

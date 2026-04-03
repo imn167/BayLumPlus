@@ -229,8 +229,9 @@ Generate_DataFile_MG <- function(
         verbose =  read_BIN2R.settings$verbose
       )
 
-      object <- if (inherits(object, "Risoe.BINfileData")) list(object) else object
-      object <- object[[1]]
+      # object <- if (inherits(object, "Risoe.BINfileData")) list(object) else object
+      # object <- object[[1]]
+      # print(object)
       ##sort dataset in correct order by aliquots
       if(force_run1_at_a_time) {
         o <- object@METADATA[["ID"]][order(object@METADATA[["POSITION"]])]
