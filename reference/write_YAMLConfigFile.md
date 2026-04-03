@@ -89,5 +89,5 @@ write_YAMLConfigFile(
  output_file = tempfile("configuration.yml"),
  sample = c("samp1", "samp2"),
  settings.rules.endTest = 10)
-#> [1] "/tmp/RtmpVpj4nl/configuration.yml1f2f52f066c5.yml"
+#> [1] "/tmp/RtmprzYF8L/configuration.yml1d2cc1af491.yml"
 ```

@@ -124,10 +124,10 @@ Age <- AgeC14_Computation(
 #> >> MCMC Convergence of Age parameters <<
 #> ----------------------------------------------
 #> Sample name   Bayes estimate   Uppers credible interval
-#> A_S-EVA-26510     1       1 
-#> A_S-EVA-26506     1.009       1.023 
-#> A_S-EVA-26507     1.002       1.007 
-#> A_S-EVA-26508     1.003       1.01 
+#> A_S-EVA-26510     1.001       1.004 
+#> A_S-EVA-26506     1.004       1.005 
+#> A_S-EVA-26507     1.01        1.022 
+#> A_S-EVA-26508     1.004       1.011 
 #> 
 #> 
 #> ---------------------------------------------------------------------------------------------------
@@ -139,28 +139,28 @@ Age <- AgeC14_Computation(
 #> >> Bayes estimates of Age for each sample and credible interval <<
 #> ------------------------------------------------------
 #> Sample name   Bayes estimate  Credible interval: 
-#> A_S-EVA-26510     41.9614143424911 
+#> A_S-EVA-26510     41.960961204292 
 #>                       lower bound     upper bound
-#>               at level 95%    41.473          42.356 
-#>               at level 68%    41.827          42.24 
+#>               at level 95%    41.457          42.331 
+#>               at level 68%    41.813          42.227 
 #> ------------------------------------------------------
 #> Sample name   Bayes estimate  Credible interval: 
-#> A_S-EVA-26506     45.712113182689 
+#> A_S-EVA-26506     45.7045043812265 
 #>                       lower bound     upper bound
-#>               at level 95%    45.035          46.207 
-#>               at level 68%    45.492          46.024 
+#>               at level 95%    45.039          46.291 
+#>               at level 68%    45.416          45.976 
 #> ------------------------------------------------------
 #> Sample name   Bayes estimate  Credible interval: 
-#> A_S-EVA-26507     44.8905482327229 
+#> A_S-EVA-26507     44.8464847725795 
 #>                       lower bound     upper bound
-#>               at level 95%    43.719          45.866 
-#>               at level 68%    44.455          45.394 
+#>               at level 95%    43.686          45.902 
+#>               at level 68%    44.391          45.303 
 #> ------------------------------------------------------
 #> Sample name   Bayes estimate  Credible interval: 
-#> A_S-EVA-26508     45.0256760593151 
+#> A_S-EVA-26508     45.0530562099889 
 #>                       lower bound     upper bound
-#>               at level 95%    44.037          46.22 
-#>               at level 68%    44.577          45.576 
+#>               at level 95%    43.964          46.121 
+#>               at level 68%    44.502          45.466 
 #> 
 #> ------------------------------------------------------
 
@@ -170,10 +170,10 @@ Age <- AgeC14_Computation(
 plot_Ages(Age)
 
 #>        SAMPLE      AGE HPD68.MIN HPD68.MAX HPD95.MIN HPD95.MAX ALT_SAMPLE_NAME
-#> 1 S-EVA-26510 41.96141    41.827    42.240    41.473    42.356              NA
-#> 2 S-EVA-26506 45.71211    45.492    46.024    45.035    46.207              NA
-#> 3 S-EVA-26507 44.89055    44.455    45.394    43.719    45.866              NA
-#> 4 S-EVA-26508 45.02568    44.577    45.576    44.037    46.220              NA
+#> 1 S-EVA-26510 41.96096    41.813    42.227    41.457    42.331              NA
+#> 2 S-EVA-26506 45.70450    45.416    45.976    45.039    46.291              NA
+#> 3 S-EVA-26507 44.84648    44.391    45.303    43.686    45.902              NA
+#> 4 S-EVA-26508 45.05306    44.502    45.466    43.964    46.121              NA
 #>   AT
 #> 1  4
 #> 2  3
@@ -184,10 +184,10 @@ plot_Ages(Age)
 plot_Ages(Age, plot_mode = "density", legend.pos = "topright")
 
 #>        SAMPLE      AGE HPD68.MIN HPD68.MAX HPD95.MIN HPD95.MAX ALT_SAMPLE_NAME
-#> 1 S-EVA-26510 41.96141    41.827    42.240    41.473    42.356              NA
-#> 2 S-EVA-26506 45.71211    45.492    46.024    45.035    46.207              NA
-#> 3 S-EVA-26507 44.89055    44.455    45.394    43.719    45.866              NA
-#> 4 S-EVA-26508 45.02568    44.577    45.576    44.037    46.220              NA
+#> 1 S-EVA-26510 41.96096    41.813    42.227    41.457    42.331              NA
+#> 2 S-EVA-26506 45.70450    45.416    45.976    45.039    46.291              NA
+#> 3 S-EVA-26507 44.84648    44.391    45.303    43.686    45.902              NA
+#> 4 S-EVA-26508 45.05306    44.502    45.466    43.964    46.121              NA
 #>   AT
 #> 1  4
 #> 2  3

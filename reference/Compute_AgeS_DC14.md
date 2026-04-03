@@ -210,6 +210,8 @@ Compute_AgeS_DC14(
 
   - Error of the C14 Calibrated age : `SigmaC14Cal`
 
+  - Error of the Gaussian distribution UTh : `sigma_UTh`
+
 ## Value
 
 **NUMERICAL OUTPUT**

@@ -40,7 +40,7 @@ Imène Bouafia
 #Example for strict order
 network <- remove_transitive_edges(c(), n_samples = 5)
 print(network)
-#> IGRAPH 6a156a0 D--- 5 4 -- 
-#> + edges from 6a156a0:
+#> IGRAPH 2ce5ea3 D--- 5 4 -- 
+#> + edges from 2ce5ea3:
 #> [1] 1->2 2->3 3->4 4->5
 ```
