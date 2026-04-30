@@ -1302,3 +1302,74 @@ network_vizualization(remove_transitive_edges(SC), vertices_labels =c("GDB5",Nam
 prior_age = model_construction(samplenature, 3)
 prior_age$ind_change
 cat(prior_age$BUGPrior)
+
+
+####@
+SampleNames=c("OSL1-10","E1","OSL2-10","OSL3-10","OSL4-10","OSL5-10","OSL6-10","OSL7-10","OSL8-10","E2","E3")
+
+Nb_sample=length(SampleNames)
+
+Trono_Meas = c(0.09,123.98,0.60,1.03,2.22,2.11,1.74,4.31,10.29,4190,6790)
+Trono_QdosesErr = c(0.01,0.07,0.07,0.22,0.11,0.25,0.35,0.53)
+Trono_QdoseRates = c(1.05,1.03,1.05,1.02,1.00,1.03,1.10,2.48)
+
+C14Ages=c(123.98,4190,6790)
+C14_Er=c(0.43,50,50)
+
+
+dt=list(M = Trono_Meas, sD = Trono_QdosesErr, ddot = Trono_QdoseRates,sigmaC14Cal=C14_Er)
+
+OSLorC14=c(1,0,1,1,1,1,1,1,1,0,0)
+
+Trono_Meas[OSLorC14==1] / Trono_QdoseRates
+
+Theta = read.csv("../BayLumPlusTest/SaintBelec/Book2.csv", sep =";")
+
+
+sigma_s =  c(     #on ne touche pas à ces valeurs
+  s_betaK = 0.010,
+  s_betaU = 0.007,
+  s_betaTh = 0.006,
+  s_gammaK = 0.010,
+  s_gammaU = 0.007,
+  s_gammaTh = 0.006,
+  s_gammaDR = 0.0,
+  s_CAL = 0.020,
+  s_intDR = 0.030)
+
+
+
+Theta=create_ThetaMatrix(input=Theta,output_file = NULL, sigma_s=sigma_s)
+Theta
+
+PriorAge =rep(c(.001,10),Nb_sample)
+
+Ages_Trono=Compute_AgeS_DC14(
+  DATA=dt, Nb_sample = Nb_sample, SampleNames = SampleNames, encoding = OSLorC14,
+  ThetaMatrix = Theta, prior = "Unconstrained", PriorAge = PriorAge, monitors = "A",
+  Iter = 5000, burnin = 2000, adapt = 1000, t= 10)
+Ages_Trono$diagnostics_plots$trace()
+
+plot_Ages(Ages_Trono, plot_mode = "density")
+
+
+SC=SC = matrix(data=0,ncol=11,nrow=12)
+SC[1,]=rep(1,11)                #USH1b (1 échantillon, qui contraint tous les autres)
+SC[2,]=rep(0,11)                #USH1b (1 échantillon, qui ne cotraint pas lui même)
+SC[3,]=c(0,0,rep(1,9))           #USH2 commence (1 sample qui contraint tous les autres)
+SC[4,]=c(rep(0,3),rep(1,8))            #1 sample
+SC[5,]=c(rep(0,4),rep(1,7))            #1 sample
+SC[6,]=c(rep(0,5),rep(1,6))            #1 sample
+SC[7,]=c(rep(0,2),rep(1,4))     #2 samples qu contraignent les autres
+SC[8,]=c(rep(0,2),rep(1,4))
+SC[9,]=c(rep(0,11))                #Outlier (OSL 6)
+SC[10,]=c(rep(0,1),rep(1,2))
+SC[11,]=c(rep(0,1),rep(1,1))    #1 SAMPLE
+SC[12,]=rep(0,11)
+
+
+IsotonicDistorsion = IsotonicCurve(StratiConstraints = SC, object = Ages_Trono,interactive = FALSE)
+
+
+
+

@@ -332,7 +332,7 @@ create_ThetaMatrix <- function(
     }else{
       ##fill the rest of the matrix
       m[cmb[, j][1], cmb[, j][2]] <-
-        sum(df[cmb[, j][1], -ncol(df)] * df[cmb[, j][2], -ncol(df)] *
+        sum(df[cmb[, j][1], ] * df[cmb[, j][2], ] *
               sigma_s[-which(names(sigma_s) == "s_intDR")] ^ 2) +
         sigma_s["s_intDR"] ^ 2 + sum(df[cmb[, j][1], -c(ncol(df), (ncol(df)-1))] * df[cmb[, j][2], -c(ncol(df), (ncol(df)-1))]) * sigma_s["s_water"]^2
 

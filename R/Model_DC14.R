@@ -60,9 +60,8 @@
 #               ###C14 filling
 #               for (i in order_c14) {
 #                   mu[index_c14[i]] <-  interp.lin(Atilde[index_c14[i]], xTableauCalib, yTableauCalib)
-#                   Z[i] ~ dcat(c(0.1, 0.9))
 #                   err[i] <- interp.lin(Atilde[index_c14[i]], xTableauCalib, zTableauCalib)
-#                   sigma_C14[i] <-  (alpha[i]^(-Z[i]+2)*(pow(sigma[i],2)+pow(err[i],2)))
+#                   sigma_C14[i] <-  (pow(sigma[i],2)+pow(err[i],2))
 #                   Sigma[index_c14[i], index_c14[i]] <-  sigma_C14[i]
 #               }
 #
@@ -82,7 +81,7 @@
 #               ### prior
 #               for (i in order_osl) {
 #                   u[index_osl[i]] ~ dunif(0,1)
-#                   Atilde[index_osl[i]] <- exp(u[index_osl[i]] * log(xbound[2*index_osl[i]] / xbound[2*index_osl[i]-1])) + xbound[2*index_osl[i]-1]
+#                   Atilde[index_osl[i]] <- exp(u[index_osl[i]] * log(xbound[2*index_osl[i]] / xbound[2*index_osl[i]-1])) * xbound[2*index_osl[i]-1]
 #                   A[index_osl[i]] = Atilde[index_osl[i]] -0.075
 #               }
 #
@@ -90,8 +89,6 @@
 #                 u[index_c14[i]] ~dunif(0,1)
 #                 Atilde[index_c14[i]] = u[index_c14[i]] * (xbound[2*index_c14[i]] - xbound[2*index_c14[i]-1]) + xbound[2*index_c14[i]-1]
 #                 A[index_c14[i]] = Atilde[index_c14[i]]
-#                 invalpha[i] ~ dgamma(3,4)
-#                 alpha[i] = 1/invalpha[i]
 #               }
 #
 #               for (i in order_uth) {
@@ -135,9 +132,8 @@
 #               ###C14 filling
 #               for (i in order_c14) {
 #                   mu[index_c14[i]] <-  interp.lin(Atilde[index_c14[i]], xTableauCalib, yTableauCalib)
-#                   Z[i] ~ dcat(c(0.1, 0.9))
 #                   err[i] <- interp.lin(Atilde[index_c14[i]], xTableauCalib, zTableauCalib)
-#                   sigma_C14[i] <-  (alpha[i]^(-Z[i]+2)*(pow(sigma[i],2)+pow(err[i],2)))
+#                   sigma_C14[i] <-  (pow(sigma[i],2)+pow(err[i],2))
 #                   Sigma[index_c14[i], index_c14[i]] <-  sigma_C14[i]
 #               }
 #
@@ -152,7 +148,7 @@
 #               ### prior
 #               for (i in order_osl) {
 #                   u[index_osl[i]] ~ dunif(0,1)
-#                   Atilde[index_osl[i]] <- exp(u[index_osl[i]] * log(xbound[2*index_osl[i]] / xbound[2*index_osl[i]-1])) + xbound[2*index_osl[i]-1]
+#                   Atilde[index_osl[i]] <- exp(u[index_osl[i]] * log(xbound[2*index_osl[i]] / xbound[2*index_osl[i]-1])) * xbound[2*index_osl[i]-1]
 #                   A[index_osl[i]] = Atilde[index_osl[i]] -0.075
 #               }
 #
@@ -160,8 +156,6 @@
 #                 u[index_c14[i]] ~dunif(0,1)
 #                 Atilde[index_c14[i]] = u[index_c14[i]] * (xbound[2*index_c14[i]] - xbound[2*index_c14[i]-1]) + xbound[2*index_c14[i]-1]
 #                 A[index_c14[i]] = Atilde[index_c14[i]]
-#                 invalpha[i] ~ dgamma(3,4)
-#                 alpha[i] = 1/invalpha[i]
 #               }
 #
 #
@@ -209,7 +203,7 @@
 #               ### prior
 #               for (i in order_osl) {
 #                   u[index_osl[i]] ~ dunif(0,1)
-#                   A[index_osl[i]] <- exp(u[index_osl[i]] * log(xbound[2*index_osl[i]] / xbound[2*index_osl[i]-1])) + xbound[2*index_osl[i]-1]
+#                   A[index_osl[i]] <- exp(u[index_osl[i]] * log(xbound[2*index_osl[i]] / xbound[2*index_osl[i]-1])) * xbound[2*index_osl[i]-1]
 #               }
 #
 #               for (i in order_uth) {
@@ -249,8 +243,6 @@
 #                 u[index_c14[i]] ~ dunif(0,1)
 #                 Atilde[index_c14[i]] = u[index_c14[i]] * (xbound[2*index_c14[i]] - xbound[2*index_c14[i]-1]) + xbound[2*index_c14[i]-1]
 #                 A[index_c14[i]] = Atilde[index_c14[i]]
-#                 invalpha[i] ~ dgamma(3,4)
-#                 alpha[i] = 1/invalpha[i]
 #               }
 #
 #               for (i in order_uth) {
