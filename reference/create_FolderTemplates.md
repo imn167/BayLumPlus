@@ -76,7 +76,7 @@ create_FolderTemplates(tempdir())
 #> 
 #> [create_FolderTemplates()]
 #> -|
-#>  |__(dir created:) /tmp/RtmprzYF8L 
+#>  |__(dir created:) /tmp/RtmpGS3JQf 
 #> All templates created. Please modify the parameters according to your data!
 
 ```
